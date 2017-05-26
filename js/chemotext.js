@@ -70,109 +70,120 @@ function queryNeo4j(payload,successFunc){
 		success:function(data,xhr,status){ successFunc(data); },
 		error:function(xhr,err,msg){
 			console.log(xhr);
-			console.log(err);
-			console.log(msg);
+			console.log(err+": "+msg);
 			$("#loader").remove();
-			tableform.innerHTML = "Connection to Neo4j Database rejected";
+			$(displayText).text("Connection to Neo4j Database rejected");
 		}
 	});
 }
 	
+	
+function makeFilters(stack,name){
+	var select = document.getElementById("typeSelect");
+	var filterType = document.getElementById("filter-type-button");
+	filterType.onclick = function(){ filterStack(select,stack,name); }
+}
+
+function traverseTerms(stack, condition, operation){
+	var term = stack.first;
+	while(term != null){
+		if(condition(term)){
+			operation(term);
+		}
+		term = term.right;
+	}	
+}
+
+/* returns filtered stack */
+function filterType(stack, type){
+	var newStack = new ThornStack();
+
+	if(type == "Disease" || type == "Chemical" || type == "Other"){
+		traverseTerms(stack, 
+			function(term){return term.type==type;},
+			function(term){newStack.add(term.name, term.copy());}
+		);
+	
+		// var term = stack.first;
+		// while(term != null){
+			// if(term.type == type){
+				// newStack.add(term.name,term.copy());
+			// }
+			// term = term.right;
+		// }
+	}else if(type=="Drug"){
+		var term = stack.first;
+		while(term != null){
+			if(term.isDrug){
+				newStack.add(term.name,term.copy());
+			}
+			term = term.right;
+		}
+		
+	}else{
+		console.log("Check -3");
+		var term = stack.first;
+		while(true){
+			if(term.stype == type){
+				newStack.add(term.name,term.copy());
+			}
+			if(term.right!=null){
+				term = term.right;
+			}else{
+				break;
+			}
+		}		
+	}	
+}
+
 function filterStack(dropbox,stack,name){
-		console.log("All Terms");
-		console.log(stack.length);
-		var dateAfter = document.getElementById("dateAfterInput");
-		var dateBefore = document.getElementById("dateBeforeInput");
-		var newStack = new ThornStack();
-		console.log("Stack Length:"+ stack.length);
-		if(!isArticle){
-			var type = dropbox.value;
-			if(type=="None"){
-				console.log("Check -1");
-				newStack = stack;
-			}else if(type == "Disease" || type == "Chemical" || type == "Other"){
-				console.log("Check -2");
-				name = name+"_"+type;
-				var term = stack.first;
-				while(true){
-					if(term.type == type){
-						newStack.add(term.name,term.copy());
-					}
-					if(term.right!=null){
-						term = term.right;
-					}else{
-						break;
-					}
-				}
-			}else if(type=="Drug"){
-				name = name+"_"+type;
-				var term = stack.first;
-				while(true){
-					if(term.isDrug){
-						newStack.add(term.name,term.copy());
-					}
-					if(term.right!=null){
-						term = term.right;
-					}else{
-						break;
-					}
+	console.log("Stack Length:"+ stack.length);
+
+	var dateAfter = document.getElementById("dateAfterInput");
+	var dateBefore = document.getElementById("dateBeforeInput");
+	var newStack = new ThornStack();
+	
+	var type = dropbox.value;
+	
+	if(isArticle || type=="None"){
+		newStack = stack;
+	} else {
+		name = name+"_"+type;
+		newStack = filterType(stack, type);
+	}
+
+	//OK
+	console.log("Check 1");
+	var newnewStack = new ThornStack();
+	if(dateAfter.value==""){
+		console.log("Check 2");
+		newnewStack = newStack;
+	}else{
+		console.log("Check 3");
+		name = name + "_After" + dateAfter.value;
+		console.log(dateAfter.value);
+		var split = dateAfter.value.split("-");
+		var month = parseInt(split[1]);
+		var day = parseInt(split[2]);
+		var year = parseInt(split[0]);
+		//console.log("Check 4");
+		var term = newStack.first;
+		while(true){
+			//break;
+			//console.log("Check 5");
+			var termCopy = term.copy();
+			for(var i =0;i<term.stack.length;i++){	
+				if(term.stack[i]==null){
+					console.log(term.stack);
 				}
 				
-			}else{
-				console.log("Check -3");
-				name = name+"_"+type;
-				var term = stack.first;
-				while(true){
-					if(term.stype == type){
-						newStack.add(term.name,term.copy());
-					}
-					if(term.right!=null){
-						term = term.right;
-					}else{
-						break;
-					}
-				}		
-			}
-		}else{
-			newStack = stack;
-		}
-
-		//OK
-		console.log("Check 1");
-		var newnewStack = new ThornStack();
-		if(dateAfter.value==""){
-			console.log("Check 2");
-			newnewStack = newStack;
-		}else{
-			console.log("Check 3");
-			name = name + "_After" + dateAfter.value;
-			console.log(dateAfter.value);
-			var split = dateAfter.value.split("-");
-			var month = parseInt(split[1]);
-			var day = parseInt(split[2]);
-			var year = parseInt(split[0]);
-			//console.log("Check 4");
-			var term = newStack.first;
-			while(true){
-				//break;
-				//console.log("Check 5");
-				var termCopy = term.copy();
-				for(var i =0;i<term.stack.length;i++){	
-					if(term.stack[i]==null){
-						console.log(term.stack);
-					}
+				if(term.stack[i].year > year){
+				
+				}else if(term.stack[i].year == year){
+					if(term.stack[i].month > month){
 					
-					if(term.stack[i].year > year){
-					
-					}else if(term.stack[i].year == year){
-						if(term.stack[i].month > month){
-						
-						}else if(term.stack[i].month == month){
-							if(term.stack[i].day < day){
-								termCopy.count--;
-								termCopy.stack[i] = null;
-							}
-						}else{
+					}else if(term.stack[i].month == month){
+						if(term.stack[i].day < day){
 							termCopy.count--;
 							termCopy.stack[i] = null;
 						}
@@ -180,66 +191,66 @@ function filterStack(dropbox,stack,name){
 						termCopy.count--;
 						termCopy.stack[i] = null;
 					}
-				
+				}else{
+					termCopy.count--;
+					termCopy.stack[i] = null;
 				}
 			
-				if(termCopy.count > 0){
-					//console.log("Do we even Exist");
-					newnewStack.add(term.name,termCopy);
-				}
-				var newArray = [];
-				for(var j=0;j<termCopy.stack.length;j++){
-					if(termCopy.stack[j]!=null){
-						newArray.push(termCopy.stack[j]);
-					}
-				}
-				termCopy.stack = newArray;
-				
-				if(term.right!=null){
-					term = term.right;
-				}else{
-					break;
+			}
+		
+			if(termCopy.count > 0){
+				//console.log("Do we even Exist");
+				newnewStack.add(term.name,termCopy);
+			}
+			var newArray = [];
+			for(var j=0;j<termCopy.stack.length;j++){
+				if(termCopy.stack[j]!=null){
+					newArray.push(termCopy.stack[j]);
 				}
 			}
+			termCopy.stack = newArray;
 			
-			if(isShared){
-				filterDateAfterShared(newnewStack,year,month,day);
+			if(term.right!=null){
+				term = term.right;
+			}else{
+				break;
 			}
 		}
 		
-		console.log("Check 6");
-		var new3Stack = new ThornStack();
-		if(dateBefore.value==""){
-			new3Stack = newnewStack;
-			console.log("Check 7");
-		}else{
-			console.log("Check 8");
-			name = name + "_Before" + dateBefore.value;
-			var term = newnewStack.first;
-			var split = dateBefore.value.split("-");
-			var month = parseInt(split[1]);
-			var day = parseInt(split[2]);
-			var year = parseInt(split[0]);
-			console.log(year);
-			while(true){
-				var termCopy = term.copy();
-				for(var i =0;i<term.stack.length;i++){
+		if(isShared){
+			filterDateShared(newnewStack,year,month,day,true);
+		}
+	}
+	
+	console.log("Check 6");
+	var new3Stack = new ThornStack();
+	if(dateBefore.value==""){
+		new3Stack = newnewStack;
+		console.log("Check 7");
+	}else{
+		console.log("Check 8");
+		name = name + "_Before" + dateBefore.value;
+		var term = newnewStack.first;
+		var split = dateBefore.value.split("-");
+		var month = parseInt(split[1]);
+		var day = parseInt(split[2]);
+		var year = parseInt(split[0]);
+		console.log(year);
+		while(true){
+			var termCopy = term.copy();
+			for(var i =0;i<term.stack.length;i++){
+				
+				if(term.stack[i] == null){
+				
+				}else if(term.stack[i].year < year){
 					
-					if(term.stack[i] == null){
+				}else if(term.stack[i].year == year){
+					if(term.stack[i].month < month){
 					
-					}else if(term.stack[i].year < year){
-						
-					}else if(term.stack[i].year == year){
-						if(term.stack[i].month < month){
-						
-						}else if(term.stack[i].month == month){
-							if(term.stack[i].day <= day){
-								if(term.stack[i].pmid=="26147141"){
-									console.log(term.stack[i].year);
-								}
-							}else{
-								termCopy.count--;
-								termCopy.stack[i] = null;
+					}else if(term.stack[i].month == month){
+						if(term.stack[i].day <= day){
+							if(term.stack[i].pmid=="26147141"){
+								console.log(term.stack[i].year);
 							}
 						}else{
 							termCopy.count--;
@@ -249,125 +260,62 @@ function filterStack(dropbox,stack,name){
 						termCopy.count--;
 						termCopy.stack[i] = null;
 					}
-				
-				}
-			
-				if(termCopy.count > 0){
-					new3Stack.add(term.name,termCopy);
-				
-				}
-				var newArray = [];
-				for(var j=0;j<termCopy.stack.length;j++){
-					if(termCopy.stack[j]!=null){
-						newArray.push(termCopy.stack[j]);
-					}
-				}
-				termCopy.stack = newArray;
-					
-				if(term.right!=null){
-					term = term.right;
 				}else{
-					break;
+					termCopy.count--;
+					termCopy.stack[i] = null;
 				}
-			}
-			if(isShared){
-				filterDateBeforeShared(new3Stack,year,month,day);
-			}
-		}
-		console.log("Check Final");
-		makeTables(new3Stack,10);
-		console.log("Check Final 2");
-		if(!isArticle){
-			makeDownloadableCSV(name,new3Stack);
-		}
-}
-	
-function filterDateAfterShared(stack,year,month,day){
-	var benchmark = new Date(year,month,day).getTime();
-	
-	var term = stack.first;
-	while(term != null){
-		for(var i =0;i<term.stack1.length;i++){
-			var node = term.stack1[i]
-			var date = new Date(node.year, node.month, node.day).getTime();			
-			if (date < benchmark){
-				term.sharedCount1--;				
-			}
-		}
-		term = term.right;
-	}
-	
-	var term = stack.first;
-	while(term != null){
-		for(var i =0;i<term.stack2.length;i++){
-			var node = term.stack2[i]
-			var date = new Date(node.year, node.month, node.day).getTime();
-			if (date < benchmark){
-				term.sharedCount2--;				
-			}
-		}
-		term = term.right;
-	}
-}
-	
-	
-function filterDateBeforeShared(stack,year,month,day){
-	var term = stack.first;
-	while(true){
-		for(var i =0;i<term.stack1.length;i++){
-			if(term.stack1[i].year < year){
 			
-			}else if(term.stack1[i].year == year){
-				if(term.stack1[i].month == month){
-					if(term.stack1[i].day > day){
-						term.sharedCount1--;
-					}
-				}else if(term.stack1[i].month > month){
-					term.sharedCount1--;
+			}
+		
+			if(termCopy.count > 0){
+				new3Stack.add(term.name,termCopy);
+			
+			}
+			var newArray = [];
+			for(var j=0;j<termCopy.stack.length;j++){
+				if(termCopy.stack[j]!=null){
+					newArray.push(termCopy.stack[j]);
 				}
+			}
+			termCopy.stack = newArray;
+				
+			if(term.right!=null){
+				term = term.right;
 			}else{
-				term.sharedCount1--;
+				break;
 			}
 		}
-		if(term.right!=null){
-			term = term.right;
-		}else{
-			break;
+		if(isShared){
+			filterDateShared(newnewStack,year,month,day,false);
 		}
 	}
-	var term = stack.first;
-	while(true){
-		for(var i =0;i<term.stack2.length;i++){
-			if(term.stack2[i].year < year){
+	console.log("Check Final");
+	makeTables(new3Stack,10);
+	console.log("Check Final 2");
+	if(!isArticle){
+		makeDownloadableCSV(name,new3Stack);
+	}
+}
+	
+	
+function compareNodeDate(benchmark, node){
+	var date = new Date(node.year, node.month, node.day).getTime();		
+	return date - benchmark;
+}
+// return if node date is before the benchmark
+function noteDateBefore(benchmark, node){	
+	return compareNodeDate(benchmark, node) < 0;
+}
+// return if node date is after the benchmark
+function noteDateAfter(benchmark, node){
+	return compareNodeDate(benchmark, node) > 0;
+}
 
-			}else if(term.stack2[i].year == year){
-				if(term.stack2[i].month < month){
-				
-				}else if(term.stack2[i].month == month){
-					if(term.stack2[i].day <= day){
-						
-					}else{
-						term.sharedCount2--;
-					}
-				}else{
-					term.sharedCount2--;
-				}
-			}else{
-				term.sharedCount2--;
-			}
-		}
-		if(term.right!=null){
-			term = term.right;
-		}else{
-			break;
-		}
-	}
-}
+
 	
 function errorHandler(e) {
 	console.log(e);
 }
-
 
 function onInitFs(fs, withPmids){
 	console.log('Opened File System:' + fs.name);
@@ -429,13 +377,6 @@ function makeDownloadableCSV(name,stack){
 		// window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
 		// window.requestFileSystem(window.TEMPORARY, 5*1024*1024, onInitFs2, errorHandler)	
 	// }
-}
-
-	
-function makeFilters(stack,name){
-	var select = document.getElementById("typeSelect");
-	var filterType = document.getElementById("filter-type-button");
-	filterType.onclick = function(){ filterStack(select,stack,name); }
 }
 
 function openArticleList(node){		
@@ -599,7 +540,7 @@ function updateTableFooter(stack,limit,index, type){
 	$("#prev-arrow")[0].onclick = function(){makeTables(stack,limit,index-limit, type);}
 
 	$("#table-limit-button")[0].onclick = function(){
-		tableLimit = parseInt(limitInput.value);
+		tableLimit = parseInt(this.value);
 		makeTables(stack,tableLimit,0, type);
 	};
 	
@@ -609,9 +550,14 @@ function updateTableFooter(stack,limit,index, type){
 	
 	if(index-limit < 0){
 		$("#prev-arrow").hide();
+	} else {
+		$("#prev-arrow").show();
 	}
+	
 	if(index+limit >= stack.length){
 		$("#next-arrow").hide();
+	} else {
+		$("#next-arrow").show();
 	}
 }
 

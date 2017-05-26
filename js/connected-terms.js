@@ -102,7 +102,7 @@ function addTermOrSubterm(data){
 		if(!check){
 			var newTerm = new Term(name,type,stype);
 			var isDrug = data2[i]["row"][0]["isDrug"];
-			console.log(typeof isDrug);
+			//console.log(typeof isDrug);
 			if(isDrug=="true"){newTerm.isDrug=true;}
 			_stack.add(name,newTerm);
 			newTerm.addArt(pmid,date,_stack,title);

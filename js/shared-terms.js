@@ -255,7 +255,6 @@ function findSharedSubTermsTwo(data){
 }
 
 function addSharedSubTermsTwo(data){
-	
 	var results = data["results"][0];
 	var data2 = results["data"];
 	var stack = sharedStack;
@@ -294,5 +293,33 @@ function addSharedSubTermsTwo(data){
 		makeFilters(stack,input.value);
 		makeTables(stack,tableLimit);
 		makeDownloadableCSV(input.value,stack);
+	}
+}
+
+	
+/* before: true = remove those before the date, false = remove those after the date */
+function filterDateShared(stack, year, month, day, removeBefore){
+	var toFilter = removeBefore ? nodeDateBefore : nodeDateAfter;
+	
+	var benchmark = new Date(year,month,day).getTime();
+	var term = stack.first;
+	while(term != null){
+		for(var i =0;i<term.stack1.length;i++){
+			if (toFilter(benchmark, term.stack1[i]){
+				term.sharedCount1--;				
+			}
+		}
+		term = term.right;
+	}
+	
+	var term = stack.first;
+	while(term != null){
+		for(var i =0;i<term.stack2.length;i++){
+			var node = term.stack2[i]
+			if (toFilter(benchmark, term.stack2[i]){
+				term.sharedCount2--;				
+			}
+		}
+		term = term.right;
 	}
 }
