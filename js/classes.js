@@ -416,35 +416,26 @@ class ThornStack {
 	}
 	
 	chartonum(cha){
-		baseCharToNum(cha, true);
+		var upper = cha.toUpperCase();
+		var code = upper.charCodeAt(0);
+		
+		// is a letter
+		if (code >= 65 && code <= 90){
+			return code-64;	//1 - 26
+		}
+		
+		//is a number
+		if (code >= 48 && code <= 57){
+			return code-21;	//27 - 36
+		}
+		
+		if (cha == ','){ return 37; }
+		if (cha == ';'){ return 38; }
+		if (cha == '-'){ return 39; }
+		if (cha == ' '){ return 40; }
+
+		return 41; 
 	}
 }
 
 
-
-function baseCharToNum(cha, includeSpace){
-	var upper = cha.toUpperCase();
-	var code = upper.charCodeAt(0);
-	
-	// is a letter
-	if (code >= 65 && code <= 90){
-		return code-64;	//1 - 26
-	}
-	
-	//is a number
-	if (code >= 48 && code <= 57){
-		return code-21;	//27 - 36
-	}
-	
-	if (cha == ','){ return 37; }
-	if (cha == ';'){ return 38; }
-	if (cha == '-'){ return 39; }
-
-	if (includeSpace){
-		if (cha == ' '){ return 40;}
-		else{ return 41; }
-	}
-	
-	else { return 40; }
-}
-	
