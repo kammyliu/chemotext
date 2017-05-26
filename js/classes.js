@@ -193,38 +193,16 @@ class ThornStack {
 	}
 	add(tag,object){
 		if(tag==null){
-			console.log("SUPER PROBLEM");
-			console.log(object);
+			console.log("null tag, object: "+object);
 			return;
 		}
 		var chars = tag.toString().split('');
 		var length = chars.length;
 		var array = this.thornstack;
-		var arrayMissing = true;
-		for(var i=0;i<=length;i++){
+		
+		for(var i=0;i<length;i++){
+			var arrayMissing = true;
 			var pos = this.chartonum(chars[i]);
-			if(i==length){
-				array.splice(0,0,[0,object]);
-				this.length++;
-				//EXTRA STUFF
-				if(this.withCountCode){
-					if(this.extra){
-						if(this.first==null){						
-							this.first = object;
-							this.end = object;	
-						}else{
-							this.end.right = object;
-							object.left = this.end;
-							this.end = object;
-						}
-						object.checkPosition(this); 
-					}
-				}else{
-					this.list.push(tag);
-				}
-				break;
-			}
-			arrayMissing = true;
 			for(var j=0;j<array.length;j++){
 				if(array[j][0]==pos){
 					array = array[j][1];
@@ -242,20 +220,35 @@ class ThornStack {
 				var newArray = [];
 				array.push([pos,newArray]);
 				array = newArray;
+			}	
+		}	
+		array.splice(0,0,[0,object]);
+		this.length++;
+		//EXTRA STUFF
+		if(this.withCountCode){
+			if(this.extra){
+				if(this.first==null){						
+					this.first = object;
+					this.end = object;	
+				}else{
+					this.end.right = object;
+					object.left = this.end;
+					this.end = object;
+				}
+				object.checkPosition(this); 
 			}
-			
-		}		
+		}else{
+			this.list.push(tag);
+		}
 	}
 
 	getSyn(tag){
 		var chars = tag.split('');
 		var length = chars.length;
-		
+
 		var array = this.thornstack;
 		
-		for(var i=0;i<=length;i++){
-			var pos = this.chartonum(chars[i]);
-		
+		for(var i=0;i<=length;i++){		
 			if(array.length==0){
 				return false;
 			}
@@ -276,6 +269,7 @@ class ThornStack {
 				}
 			}
 			var isMissing = true;
+			var pos = this.chartonum(chars[i]);
 			for(var j=0;j<array.length;j++){
 				if(array[j][0]==pos){
 					array = array[j][1];
@@ -296,9 +290,7 @@ class ThornStack {
 		
 		var array = this.thornstack;
 		
-		for(var i=0;i<length+1;i++){
-			var pos = this.chartonum(chars[i]);
-		
+		for(var i=0;i<=length;i++){		
 			if(array.length==0){
 				return false;
 			}
@@ -310,6 +302,7 @@ class ThornStack {
 				}
 			}
 			var isMissing = true;
+			var pos = this.chartonum(chars[i]);
 			for(var j=0;j<array.length;j++){
 				if(array[j][0]==pos){
 					array = array[j][1];
@@ -330,9 +323,8 @@ class ThornStack {
 		console.log(chars);
 		var length = chars.length;
 		var array = this.thornstack;
-		for(var i=0;i<length+1;i++){
+		for(var i=0;i<=length;i++){
 			console.log(chars[i]);
-			var pos = this.chartonum(chars[i]);
 			if(array.length==0){
 				return false;
 			}
@@ -348,6 +340,8 @@ class ThornStack {
 				}
 			}
 			var isMissing = true;
+			var pos = this.chartonum(chars[i]);
+
 			for(var j=0;j<array.length;j++){
 				if(array[j][0]==pos){
 					array = array[j][1];
