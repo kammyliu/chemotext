@@ -448,10 +448,6 @@ function makeConnectedTermsTable(stack, index, indexLimit){
 
 	for(var j=index;j<indexLimit;j++){
 		if (node == null) break;
-		// $(tableform).append('<tr><td>'+node.name+'</td>'+
-		// '<td class="countCol">'+
-		// '<button type="button" class="articleButton" onclick="openArticleList('+j+')">'+node.count+
-		// '</button></td></tr>');
 		
 		$tr = $("<tr/>");
 		$tr.append('<td>'+node.name+'</td>');
@@ -461,17 +457,16 @@ function makeConnectedTermsTable(stack, index, indexLimit){
 			type: "button", 
 			"class": "articleButton", 
 			text: node.count, 
-			click: function(node){ return function(){openArticleList(node);} }(node)	//CHECK THIS
+			click: function(node){ return function(){openArticleList(node);} }(node)
 		}));
 		$tr.append($button);
-		$(tableform).append($tr);
+		$(tableform).find("tbody").append($tr);
 
 		node = node.right;
 	}
 	
 
 }
-
 
 function openArticleList(node){		
 	var html = "<html><head><title>" + node.name + "</title></head><body>";
@@ -492,7 +487,7 @@ function openArticleList(node){
 function makeTables(stack,limit,index=0,type){
 		
 	var tableform = document.getElementById("tableform");
-	$(tableform).slice(1).remove();	//remove all tr except the first one
+	$(tableform).find("tr").slice(1).remove();	//remove all tr except the first one
 
 	if(stack.length==0){
 		$(displayText).text("No Results");
@@ -506,7 +501,7 @@ function makeTables(stack,limit,index=0,type){
 		indexLimit = stack.length;
 	}
 	
-	updateTableFooter(stack,limit,index,tableform,maintable);
+	updateTableFooter(stack,limit,index, type);
 	
 	switch (type) {
 		case 'connected':
@@ -631,14 +626,14 @@ function makeTables(stack,limit,index=0,type){
 
 }
 function updateTableFooter(stack,limit,index){
-	$("#prev-arrow")[0].onclick = function(){makeTables(stack,limit,index-limit);}
+	$("#prev-arrow")[0].onclick = function(){makeTables(stack,limit,index-limit, type);}
 
 	$("#table-limit-button")[0].onclick = function(){
 		tableLimit = parseInt(limitInput.value);
-		makeTables(stack,tableLimit,0);
+		makeTables(stack,tableLimit,0, type);
 	};
 	
-	$("#next-arrow")[0].onclick = function(){makeTables(stack,limit,index+limit);}
+	$("#next-arrow")[0].onclick = function(){makeTables(stack,limit,index+limit, type);}
 
 	$("#results-count").text(stack.length);
 	
