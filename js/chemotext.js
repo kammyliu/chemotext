@@ -438,36 +438,6 @@ function makeFilters(stack,name){
 	filterType.onclick = function(){ filterStack(select,stack,name); }
 }
 
-function makeConnectedTermsTable(stack, index, indexLimit){
-	var tableform = document.getElementById("tableform");
-	
-	var node = stack.first;
-	for(var i=0;i<index;i++){
-		node = node.right;	//skip up to 'index'
-	}
-
-	for(var j=index;j<indexLimit;j++){
-		if (node == null) break;
-		
-		$tr = $("<tr/>");
-		$tr.append('<td>'+node.name+'</td>');
-		$tr.append('<td class="countCol">');
-		
-		$button = $("<td/>").append( $("<button/>", {
-			type: "button", 
-			"class": "articleButton", 
-			text: node.count, 
-			click: function(node){ return function(){openArticleList(node);} }(node)
-		}));
-		$tr.append($button);
-		$(tableform).find("tbody").append($tr);
-
-		node = node.right;
-	}
-	
-
-}
-
 function openArticleList(node){		
 	var html = "<html><head><title>" + node.name + "</title></head><body>";
 	for(var i= 0;i<node.stack.length;i++){
@@ -625,7 +595,7 @@ function makeTables(stack,limit,index=0,type){
 	
 
 }
-function updateTableFooter(stack,limit,index){
+function updateTableFooter(stack,limit,index, type){
 	$("#prev-arrow")[0].onclick = function(){makeTables(stack,limit,index-limit, type);}
 
 	$("#table-limit-button")[0].onclick = function(){
@@ -676,16 +646,13 @@ function inputSuggestion($inputSection, inputId){
 	});
 }
 	
-function makeSTypes(parent,id,withNone=false){
+//Table filter always includes "None". path-search intermediary step doesn't
+function makeSTypes(parent, id, withNone){
 	var select = document.createElement("select");
 	select.id = id;
-	select.style.margin = 0;
-	select.style.padding = 2;
+	
 	if(withNone){
-		var option4 = document.createElement("option");
-		option4.innerHTML = "No Filter";
-		option4.value = "None";
-		select.appendChild(option4);
+		$(select).append('<option value="None">No Filter</option>');
 	}
 	
 	var stypes = [
@@ -750,14 +717,13 @@ function makeSTypes(parent,id,withNone=false){
 	}
 	
 	parent.appendChild(select);
-	
 }
 	
 function makePageSections(){
 	var thepage = document.getElementById("thepage");
 
 	thepage.addEventListener('submit', function(e) {
-		console.log("Page Event Listerner");
+		//console.log("Page Event Listener");
 		e.preventDefault();
 	}, false);
 	
@@ -775,10 +741,12 @@ function makePageSections(){
 
 	// filter fields
 	var filterSection = document.getElementById("filterSection");
-	makeSTypes(filterSection,"typeSelect",true);
+	makeSTypes(filterSection, "typeSelect", true);	
 	$(filterSection).append('<button type="submit" id="filter-type-button">Filter</button>');
 	$(filterSection).append('<p>Date After:<input id="dateAfterInput" type="date">'+ 
 		'Date Before:<input id="dateBeforeInput" type="date"></p>');
+		
+	$("#mappedResults").append('<button onclick="showSubterms()">Click Here to see Subterms</button>');
 }
 
 function showLoader(){

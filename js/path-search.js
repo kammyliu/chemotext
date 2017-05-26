@@ -7,7 +7,7 @@ $(document).ready(function(){
 
 	inputSuggestion($("#inputSection"), "inputbar");
 	
-	makeSTypes($("#selectBar-section")[0],"selectBar");
+	makeSTypes($("#selectBar-section")[0],"selectBar",false);
 
 	thepage = document.getElementById("thepage");
 	input = document.getElementById("inputbar");
@@ -118,7 +118,7 @@ function triangleSearchOnSuccess(data){
 	makeTables(stack,tableLimit,0);
 	
 	downloadform.innerHTML = "Choose the type of C Terms you want to search for"
-	makeSTypes(downloadform,"triType");
+	makeSTypes(downloadform,"triType", false);
 	var selectBar2 = document.getElementById("triType");
 	
 	var newStack = new ThornStack();
@@ -199,7 +199,7 @@ function addTriangleSubTerms(data){
 		makeTables(stack,tableLimit,0);
 	
 		downloadform.innerHTML = "Choose the type of C Terms you want to search for"
-		makeSTypes(downloadform,"triType");
+		makeSTypes(downloadform,"triType",false);
 		var selectBar2 = document.getElementById("triType");
 		
 		var newStack = new ThornStack();
