@@ -702,7 +702,7 @@ function inputSuggestion($inputSection, inputId){
 		if(check && check!=[] && keyC!=37 && keyC!=38 && keyC!=39 && keyC!=40){
 			//console.log(check);
 			//console.log(check.length);
-			var newDataList = document.getElementById("#datalist-"+inputId);
+			var newDataList = document.getElementById("datalist-"+inputId);
 			newDataList.innerHTML = "";
 			for(var i=0;i<check.length;i++){
 				var option = document.createElement("option");
