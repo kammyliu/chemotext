@@ -102,6 +102,7 @@ function addTermOrSubterm(data){
 		if(!check){
 			var newTerm = new Term(name,type,stype);
 			var isDrug = data2[i]["row"][0]["isDrug"];
+			console.log(typeof isDrug);
 			if(isDrug=="true"){newTerm.isDrug=true;}
 			_stack.add(name,newTerm);
 			newTerm.addArt(pmid,date,_stack,title);
@@ -117,23 +118,6 @@ function showResult(){
 	makeTables(_stack, tableLimit, 0, "connected");
 	makeDownloadableCSV(input.value, _stack);
 }
-
-function getMentionsPayload(name){
-	return JSON.stringify({
-		"statements" : [{
-			"statement" : "match (n:Term{name:{name}})-[:MENTIONS]-(a)-[:MENTIONS]-(m) return m, a " , "parameters" : {"name": name}
-		}]
-	});
-}
-
-function getSubtermsPayload(name){
-	return JSON.stringify({
-		"statements" : [{
-			"statement" : "match (n:Term{name:{name}})-[:MAPPED]->(a) return a " , "parameters" : {"name": name}
-		}]
-	});
-}
-
 
 function makeConnectedTermsTable(stack, index, indexLimit){
 	//skip up to 'index'
@@ -162,8 +146,25 @@ function makeConnectedTermsTable(stack, index, indexLimit){
 			text: node.count, 
 			click: function(node){ return function(){openArticleList(node);} }(node)
 		}));
-		$tbody.append($tr.append($buttonTd););
+		$tbody.append($tr.append($buttonTd));
 
 		node = node.right;
 	}
+}
+
+
+function getMentionsPayload(name){
+	return JSON.stringify({
+		"statements" : [{
+			"statement" : "match (n:Term{name:{name}})-[:MENTIONS]-(a)-[:MENTIONS]-(m) return m, a " , "parameters" : {"name": name}
+		}]
+	});
+}
+
+function getSubtermsPayload(name){
+	return JSON.stringify({
+		"statements" : [{
+			"statement" : "match (n:Term{name:{name}})-[:MAPPED]->(a) return a " , "parameters" : {"name": name}
+		}]
+	});
 }
