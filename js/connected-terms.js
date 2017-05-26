@@ -1,10 +1,11 @@
-var thepage, input, tableform, downloadform;
+var thepage, input, tableform, downloadform, displayText;
 
 $(document).ready(function(){	
 		
 	thepage = document.getElementById("thepage");
 	tableform = document.getElementById("tableform");
 	downloadform = document.getElementById("downloadform");
+	downloadform = document.getElementById("displayText");
 	
 	makePageSections();
 	
@@ -27,16 +28,14 @@ function simpleSearch(){
 	
 	showLoader();
 
-	console.log(input);
 	//get term or its synonym
 	_term = synStack.getSyn(input.value);
 	if(_term && _term.includes('|')){	
 		console.log("IS SYNONYM");
 		_term = _term.split('|')[1]; //_term.mainTerm.name;
 	}
-	tableform.innerHTML = "Looking for term: " + _term ;
+	$(displayText).text("Looking for term: " + _term);
 	console.log(_term);
-	
 	
 	var subterms = document.getElementById("mappedCheckbox").checked;
 	if(subterms){

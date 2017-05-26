@@ -433,47 +433,9 @@ function makeDownloadableCSV(name,stack){
 
 	
 function makeFilters(stack,name){
-	var filterSection = document.getElementById("filterSection");
-	while(filterSection.firstChild){
-		filterSection.removeChild(filterSection.firstChild);
-	}
-	var select = "";
-	
-	makeSTypes(filterSection,"typeSelect",true);
-	
-	select = document.getElementById("typeSelect");
-	
-	var filterType = document.createElement("button");
-	filterType.type = "submit";
-	filterType.id = "download";
-	filterType.innerHTML = "Filter";
-	filterType.style.height = select.style.height;
+	var select = document.getElementById("typeSelect");
+	var filterType = document.getElementById("filter-type-button");
 	filterType.onclick = function(){ filterStack(select,stack,name); }
-	filterSection.appendChild(filterType);
-
-	//END OF TYPE FILTER
-	var dateAfter = document.createElement("p");
-	dateAfter.innerHTML = "Date After:";
-	var dateAfterInput = document.createElement("input");
-	dateAfterInput.id = "dateAfterInput";
-	dateAfterInput.type = "date";
-	dateAfterInput.style.marginLeft = 11;
-	dateAfterInput.style.marginRight = 10;
-	
-	dateAfter.appendChild(dateAfterInput);
-	filterSection.appendChild(dateAfter);
-	
-	dateAfter.innerHTML = dateAfter.innerHTML + " Date Before:";
-	//dateAfter.appendChild(" Date Before:")
-	var dateBefore = document.createElement("p");
-	dateBefore.innerHTML = "Date Before:";
-	var dateBeforeInput = document.createElement("input");
-	dateBeforeInput.id = "dateBeforeInput";
-	dateBeforeInput.type = "date";
-	dateBeforeInput.style.marginLeft = 11;
-	
-	dateAfter.appendChild(dateBeforeInput);
-	//filterSection.appendChild(dateBefore);
 }
 
 function makeConnectedTermsTable(stack, index, indexLimit){
@@ -533,7 +495,7 @@ function makeTables(stack,limit,index=0,type){
 	$(tableform).slice(1).remove();	//remove all tr except the first one
 
 	if(stack.length==0){
-		tableform.innerHTML = "No Results";
+		$(displayText).text("No Results");
 		return;
 	}
 	
@@ -680,10 +642,10 @@ function updateTableFooter(stack,limit,index){
 
 	$("#results-count").text(stack.length);
 	
-	if(index<=0){
+	if(index-limit < 0){
 		$("#prev-arrow").hide();
 	}
-	if(index>=stack.length){
+	if(index+limit >= stack.length){
 		$("#next-arrow").hide();
 	}
 }
@@ -804,15 +766,24 @@ function makePageSections(){
 		e.preventDefault();
 	}, false);
 	
+	// table pagination and labels
 	$(tableform).append('<img src="img/previous.png" class="table-arrow" id="prev-arrow">');
 	$(tableform).append('<input value="'+tableLimit+'">');
 	$(tableform).append('<button id="table-limit-button" type="submit">Set Table Limit</button>');	
 	$(tableform).append('<img src="img/next.png" class="table-arrow" id="next-arrow">');
 	$(tableform).append('<p>Total Count: <span id="results-count"></span></p>');
 
+	// download buttons
 	var downloadform = document.getElementById("downloadform");
 	$(downloadform).append('<button type="button" id="csv" class="download-button">View CSV</button>');
 	$(downloadform).append('<button type="button" id="csv-with-mpids" class="download-button">CSV with pmids</button>');
+
+	// filter fields
+	var filterSection = document.getElementById("filterSection");
+	makeSTypes(filterSection,"typeSelect",true);
+	$(filterSection).append('<button type="submit" id="filter-type-button">Filter</button>');
+	$(filterSection).append('<p>Date After:<input id="dateAfterInput" type="date">'+ 
+		'Date Before:<input id="dateBeforeInput" type="date"></p>');
 }
 
 function showLoader(){
