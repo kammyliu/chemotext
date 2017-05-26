@@ -117,7 +117,7 @@ function filterType(stack, type){
 
 /* returns a new, filtered stack. Pass true for DateAfter, false for DateBefore */
 function filterDate(stack, removeBefore, dateValue){
-	var split = dateAfter.value.split("-");
+	var split = dateValue.split("-");
 	var year = parseInt(split[0]);
 	var month = parseInt(split[1]);
 	var day = parseInt(split[2]);
@@ -245,7 +245,9 @@ function onInitFs(fs, stack, withPmids){
 			}
 			
 			fileWriter.addEventListener("writeend", function() {
-				window.open("filesystem:http://chemotext.mml.unc.edu/temporary/"+fileName);
+				//window.open("filesystem:http://chemotext.mml.unc.edu/temporary/"+fileName);
+				window.open("filesystem:https://kammyliu.github.io/temporary/"+fileName);
+				
 			}, false);
 			var blob = new Blob([data],{type: 'text/plain'});
 			fileWriter.write(blob);
