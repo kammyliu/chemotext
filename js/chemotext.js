@@ -694,7 +694,6 @@ function inputSuggestion($inputSection, inputId){
 	
 	$("#"+inputId).keyup(function(keyEvent){
 		var inputTerm = $(this).val();
-		console.log(inputTerm);
 		var check = synStack.search(inputTerm);
 		var keyC = keyEvent.keyCode;
 		
@@ -816,9 +815,5 @@ function makePageSections(){
 
 function showLoader(){
 	var thepage = document.getElementById("thepage");
-	var loader = document.createElement("img");
-	loader.src = "img/ajax-loader.gif";
-	loader.alt = "Loading circle";
-	loader.id = "loader";
-	thepage.appendChild(loader);
+	$(thepage).append('<img src="img/ajax-loader.gif" alt="Loading circle" id="loader">');
 }

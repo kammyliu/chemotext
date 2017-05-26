@@ -3,19 +3,19 @@ var thepage, input, tableform, downloadform;
 $(document).ready(function(){	
 		
 	thepage = document.getElementById("thepage");
-	input = document.getElementById("inputbar");
 	tableform = document.getElementById("tableform");
 	downloadform = document.getElementById("downloadform");
 	
 	makePageSections();
 	
 	inputSuggestion($("#inputSection"), "inputbar");
-	
+	input = document.getElementById("inputbar");
+
 	makeSynStack();
 });
 
-var term;
-var stack;
+var _term;
+var _stack;
 
 /* Not including subterms */
 
@@ -27,14 +27,15 @@ function simpleSearch(){
 	
 	showLoader();
 
+	console.log(input);
 	//get term or its synonym
-	term = synStack.getSyn(input.value);
-	if(term && term.includes('|')){	
+	_term = synStack.getSyn(input.value);
+	if(_term && _term.includes('|')){	
 		console.log("IS SYNONYM");
-		term = term.split('|')[1]; //term1.mainTerm.name;
+		_term = _term.split('|')[1]; //_term.mainTerm.name;
 	}
-	tableform.innerHTML = "Looking for term: " + term ;
-	console.log(term);
+	tableform.innerHTML = "Looking for term: " + _term ;
+	console.log(_term);
 	
 	
 	var subterms = document.getElementById("mappedCheckbox").checked;
@@ -42,13 +43,13 @@ function simpleSearch(){
 		// fetch subterms
 		var pay = JSON.stringify({
 			"statements" : [{
-				"statement" : "match (n:Term{name:{name}})-[:MAPPED]->(a) return a " , "parameters" : {"name": term}
+				"statement" : "match (n:Term{name:{name}})-[:MAPPED]->(a) return a " , "parameters" : {"name": _term}
 			}]
 		});
 		queryNeo4j(pay,findSimpleSubterms);
 	}else{
 		// fetch search term occurrences
-		queryNeo4j(getMentionsPayload(term), simpleSearchOnSuccess);	
+		queryNeo4j(getMentionsPayload(_term), simpleSearchOnSuccess);	
 	}
 }
 
@@ -56,9 +57,9 @@ function simpleSearch(){
 function simpleSearchOnSuccess(data){
 	console.log("Finished Search");
 
-	stack = new ThornStack();
+	_stack = new ThornStack();
 
-	addTermOrSubterm(data, stack);
+	addTermOrSubterm(data);
 	
 	showResult();
 }
@@ -74,14 +75,14 @@ function findSimpleSubterms(data){
 	
 	var results = data["results"][0];
 	var data2 = results["data"];
-	stack = new ThornStack();
+	_stack = new ThornStack();
 	
 	subTermCount = 0;
 	subTermMax = data2.length + 1;
 	console.log(subTermMax);
 	
 	// fetch input term
-	queryNeo4j(getMentionsPayload(term),addSimpleSubtermData);
+	queryNeo4j(getMentionsPayload(_term),addSimpleSubtermData);
 	
 	// fetch each subterm 
 	for (var i=0; i< data2.length ; i++){
@@ -95,7 +96,7 @@ function findSimpleSubterms(data){
 
 
 function addSimpleSubtermData(data){
-	addTermOrSubterm(data, stack);
+	addTermOrSubterm(data);
 	console.log("FINISHED SUBTERM or TERM");
 	
 	subTermCount++;
@@ -117,25 +118,25 @@ function addTermOrSubterm(data){
 		var pmid = data2[i]["row"][1]["pmid"];
 		var title = data2[i]["row"][1]["title"];
 		
-		var check = stack.get(name);
+		var check = _stack.get(name);
 
 		if(!check){
 			var newTerm = new Term(name,type,stype);
 			var isDrug = data2[i]["row"][0]["isDrug"];
 			if(isDrug=="true"){newTerm.isDrug=true;}
-			stack.add(name,newTerm);
-			newTerm.addArt(pmid,date,stack,title);
+			_stack.add(name,newTerm);
+			newTerm.addArt(pmid,date,_stack,title);
 		}else{			
-			check.addArt(pmid,date,stack,title);
+			check.addArt(pmid,date,_stack,title);
 		}	
 	}
 }
 
 function showResult(){
 	$("#loader").remove();
-	makeFilters(stack, input.value);
-	makeTables(stack, tableLimit, 0, "connected");
-	makeDownloadableCSV(input.value, stack);
+	makeFilters(_stack, input.value);
+	makeTables(_stack, tableLimit, 0, "connected");
+	makeDownloadableCSV(input.value, _stack);
 }
 
 function getMentionsPayload(name){
