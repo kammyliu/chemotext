@@ -94,7 +94,7 @@ function traverseTerms(stack, condition, operation){
 	}	
 }
 
-/* returns filtered stack */
+/* returns a new, filtered stack */
 function filterType(stack, type){
 	var newStack = new ThornStack();
 
@@ -115,113 +115,82 @@ function filterType(stack, type){
 	return newStack;
 }
 
+/* returns a new, filtered stack. Pass true for DateAfter, false for DateBefore */
+function filterDate(stack, removeBefore, dateValue){
+	var split = dateAfter.value.split("-");
+	var year = parseInt(split[0]);
+	var month = parseInt(split[1]);
+	var day = parseInt(split[2]);
+	var benchmark = new Date(year,month,day).getTime();
+
+	var toFilter = removeBefore ? nodeDateBefore : nodeDateAfter;
+		
+	var newStack = new ThornStack();
+
+	var term = stack.first;
+	while(term != null){
+		var termCopy = term.copy();
+		for(var i =0;i<term.stack.length;i++){	
+			if (toFilter(benchmark, term.stack[i])){
+				termCopy.count--;
+				termCopy.stack[i] = null;			
+			}
+		}
+	
+		if(termCopy.count > 0){
+			newStack.add(term.name,termCopy);
+		}
+		
+		var newArray = [];
+		for(var j=0;j<termCopy.stack.length;j++){
+			if(termCopy.stack[j]!=null){
+				newArray.push(termCopy.stack[j]);
+			}
+		}
+		termCopy.stack = newArray;
+		
+		term = term.right;
+	}
+	
+	if(isShared){
+		filterDateShared(newStack,year,month,day,removeBefore);
+	}
+	return newStack;
+}
+
 function filterStack(dropbox,stack,name){
 	console.log("Stack Length:"+ stack.length);
 
 	var dateAfter = document.getElementById("dateAfterInput");
 	var dateBefore = document.getElementById("dateBeforeInput");
-	var newStack = new ThornStack();
 	
-	var type = dropbox.value;
+	var newStack = stack;
 	
 	// filter by type
-	if(isArticle || type=="None"){
-		newStack = stack;
-	} else {
+	var type = dropbox.value;
+	if(!isArticle && type!="None"){
 		name = name+"_"+type;
-		newStack = filterType(stack, type);
+		newStack = filterType(newStack, type);
 	}
 
 	// filter by date after
-	var newnewStack = new ThornStack();
-	if(dateAfter.value==""){
-		newnewStack = newStack;
-	}else{
+	if(dateAfter.value!=""){
 		name = name + "_After" + dateAfter.value;
-		console.log(dateAfter.value);
-		var split = dateAfter.value.split("-");
-		var month = parseInt(split[1]);
-		var day = parseInt(split[2]);
-		var year = parseInt(split[0]);
-		//console.log("Check 4");
-		var term = newStack.first;
-		while(term != null){
-			var benchmark = new Date(year,month,day).getTime();
-
-			var termCopy = term.copy();
-			for(var i =0;i<term.stack.length;i++){	
-				if (nodeDateBefore(benchmark, term.stack[i])){
-					termCopy.count--;
-					termCopy.stack[i] = null;			
-				}
-			}
-		
-			if(termCopy.count > 0){
-				newnewStack.add(term.name,termCopy);
-			}
-			
-			var newArray = [];
-			for(var j=0;j<termCopy.stack.length;j++){
-				if(termCopy.stack[j]!=null){
-					newArray.push(termCopy.stack[j]);
-				}
-			}
-			termCopy.stack = newArray;
-			
-			term = term.right;
-		}
-		
-		if(isShared){
-			filterDateShared(newnewStack,year,month,day,true);
-		}
+		newStack = filterDate(newStack, true, dateAfter.value);
 	}
 
 	// filter by date after
-	var new3Stack = new ThornStack();
-	if(dateBefore.value==""){
-		new3Stack = newnewStack;
-	}else{
+	if(dateBefore.value!=""){
 		name = name + "_Before" + dateBefore.value;
-		var term = newnewStack.first;
-		var split = dateBefore.value.split("-");
-		var month = parseInt(split[1]);
-		var day = parseInt(split[2]);
-		var year = parseInt(split[0]);
-		//console.log(year);
-		while(term != null){
-			var benchmark = new Date(year,month,day).getTime();
-
-			var termCopy = term.copy();
-			for(var i =0;i<term.stack.length;i++){	
-				if (nodeDateAfter(benchmark, term.stack[i])){
-					termCopy.count--;
-					termCopy.stack[i] = null;			
-				}
-			}
-		
-			if(termCopy.count > 0){
-				new3Stack.add(term.name,termCopy);
-			
-			}
-			var newArray = [];
-			for(var j=0;j<termCopy.stack.length;j++){
-				if(termCopy.stack[j]!=null){
-					newArray.push(termCopy.stack[j]);
-				}
-			}
-			termCopy.stack = newArray;
-				
-			term = term.right;
-		}
-		if(isShared){
-			filterDateShared(newnewStack,year,month,day,false);
-		}
+		newStack = filterDate(newStack, false, dateBefore.value);
 	}
-	console.log("Check Final");
-	makeTables(new3Stack,10);
-	console.log("Check Final 2");
+	
+	console.log("Creating tables");
+	makeTables(newStack,10);
+	
+	console.log("Updating CSV");
 	if(!isArticle){
-		makeDownloadableCSV(name,new3Stack);
+		makeDownloadableCSV(name,newStack);
 	}
 }
 	
@@ -245,7 +214,7 @@ function errorHandler(e) {
 	console.log(e);
 }
 
-function onInitFs(fs, withPmids){
+function onInitFs(fs, stack, withPmids){
 	console.log('Opened File System:' + fs.name);
 	var fileName = name + (withPmids ? "_pmids_chemotext.csv" : "_chemotext.csv");
 	fs.root.getFile(fileName,{create:true}, function(fileEntry){
@@ -263,6 +232,7 @@ function onInitFs(fs, withPmids){
 						arts = arts+"\t"+node.stack[k].pmid;
 					}	
 				}
+				
 				data = data + node.name + ";" + node.count + arts;
 				if(isShared && !withPmids){ 
 					data = data + "\t" + node.sharedCount1 + "\t" + node.sharedCount2; 
@@ -290,7 +260,7 @@ function makeDownloadableCSV(name,stack){
 	$(".download-button").click(function(){
 		var withPmids = this.id!="csv";
 		window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
-		window.requestFileSystem(window.TEMPORARY, 5*1024*1024, function(fs){onInitFs(fs,withPmids)}, errorHandler);
+		window.requestFileSystem(window.TEMPORARY, 5*1024*1024, function(fs){onInitFs(fs,stack,withPmids)}, errorHandler);
 	});
 	
 	// var download = document.getElementById("csv");

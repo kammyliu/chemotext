@@ -151,7 +151,7 @@ function addSharedSubTermsOne(data){
 		var date = data2[i]["row"][1]["date"];
 		var pmid = data2[i]["row"][1]["pmid"];
 		var title = data2[i]["row"][1]["title"];
-
+		
 		var check = stack.get(name);
 
 		if(!check){
