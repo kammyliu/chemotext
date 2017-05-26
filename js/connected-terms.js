@@ -1,6 +1,8 @@
 var thepage, input, tableform, downloadform, displayText;
 
-isShared = false; isArticle = false;
+SEARCH_TYPE = "connected";
+
+isShared = false; isArticle = false; isPath = false;
 
 $(document).ready(function(){	
 		
@@ -117,7 +119,7 @@ function addTermOrSubterm(data){
 function showResult(){
 	$("#loader").remove();
 	makeFilters(_stack, input.value);
-	makeTables(_stack, tableLimit, 0, "connected");
+	makeTables(_stack, tableLimit, 0, SEARCH_TYPE);
 	makeDownloadableCSV(input.value, _stack);
 }
 

@@ -7,12 +7,12 @@ var subTermMax = 0;
 var subTermCount = 0; 
 var subTerms = [];
 
-var CORS = "https://cors-anywhere.herokuapp.com/";
+var CORS = "https://cors-anywhere.herokuapp.com/"; //GITHUB PAGES
 
 function makeSynStack(){
 	//console.log("StartSynStack");
 	readTextFile(CORS+"http://chemotext.mml.unc.edu/synstack.json",reconstructSynStack,"\r\n");
-	//readTextFile("http://chemotext.mml.unc.edu/synstack.json",reconstructSynStack,"\r\n");
+	//readTextFile("http://chemotext.mml.unc.edu/synstack.json",reconstructSynStack,"\r\n"); //GITHUB PAGES
 }
 	
 function reconstructSynStack(jsonObj){
@@ -61,7 +61,7 @@ function showSubterms(){
 
 function queryNeo4j(payload,successFunc){
 	$.ajax({ //443 works.
-		url: CORS+"http://chemotext.mml.unc.edu:7474/db/data/transaction/commit",
+		url: CORS+"http://chemotext.mml.unc.edu:7474/db/data/transaction/commit", //GITHUB PAGES
 		accepts: "application/json; charset=UTF-8",	
 		dataType:"json",
 		contentType:"application/json",
@@ -186,7 +186,7 @@ function filterStack(dropbox,stack,name){
 	}
 	
 	console.log("Creating tables");
-	makeTables(newStack,10);
+	makeTables(newStack,10,0);
 	
 	console.log("Updating CSV");
 	if(!isArticle){
@@ -214,7 +214,7 @@ function errorHandler(e) {
 	console.log(e);
 }
 
-function onInitFs(fs, stack, withPmids){
+function onInitFs(fs, name, stack, withPmids){
 	console.log('Opened File System:' + fs.name);
 	var fileName = name + (withPmids ? "_pmids_chemotext.csv" : "_chemotext.csv");
 	fs.root.getFile(fileName,{create:true}, function(fileEntry){
@@ -246,7 +246,7 @@ function onInitFs(fs, stack, withPmids){
 			
 			fileWriter.addEventListener("writeend", function() {
 				//window.open("filesystem:http://chemotext.mml.unc.edu/temporary/"+fileName);
-				window.open("filesystem:https://kammyliu.github.io/temporary/"+fileName);
+				window.open("filesystem:https://kammyliu.github.io/temporary/"+fileName);	//GITHUB PAGES
 				
 			}, false);
 			var blob = new Blob([data],{type: 'text/plain'});
@@ -258,25 +258,11 @@ function onInitFs(fs, stack, withPmids){
 
 	
 function makeDownloadableCSV(name,stack){
-	
 	$(".download-button").click(function(){
 		var withPmids = this.id!="csv";
 		window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
-		window.requestFileSystem(window.TEMPORARY, 5*1024*1024, function(fs){onInitFs(fs,stack,withPmids)}, errorHandler);
+		window.requestFileSystem(window.TEMPORARY, 5*1024*1024, function(fs){onInitFs(fs,name,stack,withPmids)}, errorHandler);
 	});
-	
-	// var download = document.getElementById("csv");
-	// download.onclick = function
-		// window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
-		// window.requestFileSystem(window.TEMPORARY, 5*1024*1024, function(fs){onInitFs(fs,false)}, errorHandler);
-	// }
-	
-	// var download2 = document.getElementById("csv-with-mpids");
-	// download2.onclick = function(){
-		// withPmids = true;
-		// window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
-		// window.requestFileSystem(window.TEMPORARY, 5*1024*1024, onInitFs2, errorHandler)	
-	// }
 }
 
 function openArticleList(node){		
@@ -314,7 +300,7 @@ function makeTables(stack,limit,index=0,type){
 	
 	updateTableFooter(stack,limit,index, type);
 	
-	switch (type) {
+	switch (SEARCH_TYPE) {
 		case 'connected':
 			makeConnectedTermsTable(stack, index, indexLimit);
 			return;
