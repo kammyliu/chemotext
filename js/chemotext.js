@@ -9,7 +9,7 @@ var subTerms = [];
 
 function makeSynStack(){
 	//console.log("StartSynStack");
-	readTextFile("http://chemotext.mml.unc.edu/synstack.json",reconstructSynStack,"\r\n");
+	readTextFile("https://cors-anywhere.herokuapp.com/http://chemotext.mml.unc.edu/synstack.json",reconstructSynStack,"\r\n");
 }
 	
 function reconstructSynStack(jsonObj){
