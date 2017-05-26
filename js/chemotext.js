@@ -7,9 +7,11 @@ var subTermMax = 0;
 var subTermCount = 0; 
 var subTerms = [];
 
+var CORS = "https://cors-anywhere.herokuapp.com/";
+
 function makeSynStack(){
 	//console.log("StartSynStack");
-	readTextFile("https://cors-anywhere.herokuapp.com/http://chemotext.mml.unc.edu/synstack.json",reconstructSynStack,"\r\n");
+	readTextFile(CORS+"http://chemotext.mml.unc.edu/synstack.json",reconstructSynStack,"\r\n");
 	//readTextFile("http://chemotext.mml.unc.edu/synstack.json",reconstructSynStack,"\r\n");
 }
 	
@@ -59,7 +61,7 @@ function showSubterms(){
 
 function queryNeo4j(payload,successFunc){
 	$.ajax({ //443 works.
-		url: "http://chemotext.mml.unc.edu:7474/db/data/transaction/commit",
+		url: CORS+"http://chemotext.mml.unc.edu:7474/db/data/transaction/commit",
 		accepts: "application/json; charset=UTF-8",	
 		dataType:"json",
 		contentType:"application/json",
