@@ -667,16 +667,11 @@ function makeDownloadableCSV(name,stack){
 				}
 				
 				download2.onclick = function(){
-					
 					window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
-					window.requestFileSystem(window.TEMPORARY, 5*1024*1024, onInitFs2, errorHandler)
-					
-					
+					window.requestFileSystem(window.TEMPORARY, 5*1024*1024, onInitFs2, errorHandler)	
 				}
 				section2.appendChild(download2);
 				downloadform.appendChild(section2);
-
-	
 	}
 
 	
