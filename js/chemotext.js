@@ -9,6 +9,12 @@ var subTerms = [];
 
 var CORS = "https://cors-anywhere.herokuapp.com/"; //GITHUB PAGES
 
+var tableform, thepage;
+$(document).ready(function(){
+	thepage = document.getElementById("thepage");
+	tableform = document.getElementById("tableform");
+});
+
 function makeSynStack(){
 	//console.log("StartSynStack");
 	readTextFile(CORS+"http://chemotext.mml.unc.edu/synstack.json",reconstructSynStack,"\r\n");
@@ -71,7 +77,7 @@ function queryNeo4j(payload,successFunc){
 		error:function(xhr,err,msg){
 			console.log(xhr);
 			console.log(err+": "+msg);
-			$("#loader").remove();
+			$("#loader").hide();
 			$(displayText).text("Connection to Neo4j Database rejected");
 		}
 	});
@@ -186,7 +192,7 @@ function filterStack(dropbox,stack,name){
 	}
 	
 	console.log("Creating tables");
-	makeTables(newStack,10,0);
+	makeTables(newStack,tableLimit,0);
 	
 	console.log("Updating CSV");
 	if(!isArticle){
@@ -281,9 +287,7 @@ function openArticleList(node){
 	newpage.document.write(html)
 }
 
-function makeTables(stack,limit,index=0,type){
-		
-	var tableform = document.getElementById("tableform");
+function makeTables(stack,limit,index=0,type){		
 	$(tableform).find("tr").slice(1).remove();	//remove all tr except the first one
 
 	if(stack.length==0){
@@ -552,8 +556,6 @@ function makeSTypes(parent, id, withNone){
 }
 	
 function makePageSections(){
-	var thepage = document.getElementById("thepage");
-
 	thepage.addEventListener('submit', function(e) {
 		//console.log("Page Event Listener");
 		e.preventDefault();
@@ -577,11 +579,8 @@ function makePageSections(){
 	$(filterSection).append('<button type="submit" id="filter-type-button">Filter</button>');
 	$(filterSection).append('<p>Date After:<input id="dateAfterInput" type="date">'+ 
 		'Date Before:<input id="dateBeforeInput" type="date"></p>');
-		
-	$("#mappedResults").append('<button onclick="showSubterms()">Click Here to see Subterms</button>');
-}
-
-function showLoader(){
-	var thepage = document.getElementById("thepage");
+	
+	$("#results").prepend('<button onclick="showSubterms()" id="show-subterms">Click Here to see Subterms</button>');
+	
 	$(thepage).append('<img src="img/ajax-loader.gif" alt="Loading circle" id="loader">');
 }

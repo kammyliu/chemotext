@@ -1,12 +1,10 @@
-var thepage, input, tableform, downloadform, displayText;
+var input, downloadform, displayText;
 
 SEARCH_TYPE = "connected";
 
 isShared = false; isArticle = false; isPath = false;
 
 $(document).ready(function(){	
-	thepage = document.getElementById("thepage");
-	tableform = document.getElementById("tableform");
 	downloadform = document.getElementById("downloadform");
 	displayText = document.getElementById("displayText");
 	
@@ -20,23 +18,25 @@ $(document).ready(function(){
 
 var _term;
 var _stack;
+var _subterms; //flag for if subterms are included
 
 /* Not including subterms */
 
 function simpleSearch(){
 
-	showLoader();
+	$("#results").hide();
+	$("#loader").show();
 
 	//get term or its synonym
 	_term = synStack.getSyn(input.value);
 	if(_term && _term.includes('|')){	
 		_term = _term.split('|')[1]; //_term.mainTerm.name;
 	}
-	$(displayText).text("Looking for term: " + _term);
+	//$(displayText).text("Looking for term: " + _term);
 	console.log("Synonym: "+_term);
 	
-	var subterms = document.getElementById("mappedCheckbox").checked;
-	if(subterms){
+	_subterms = document.getElementById("mappedCheckbox").checked;
+	if(_subterms){
 		queryNeo4j(getSubtermsPayload(_term), findSimpleSubterms);	// fetch subterms
 	}else{
 		queryNeo4j(getMentionsPayload(_term), simpleSearchOnSuccess);	// fetch search term occurrences
@@ -63,7 +63,7 @@ function findSimpleSubterms(data){
 	
 	subTermCount = 0;
 	subTermMax = data2.length + 1;
-	console.log(subTermMax);
+	//console.log(subTermMax);
 	
 	// fetch input term
 	queryNeo4j(getMentionsPayload(_term),addSimpleSubtermData);
@@ -116,14 +116,19 @@ function addTermOrSubterm(data){
 }
 
 function showResult(){
-	$("#loader").remove();
+	$("#loader").hide();
+	$("#results").show();
+	
+	if (_subterms){
+		$("#show-subterms").show();
+	}
+	
 	makeFilters(_stack, input.value);
 	makeTables(_stack, tableLimit, 0, SEARCH_TYPE);
 	makeDownloadableCSV(input.value, _stack);
 }
 
 function makeConnectedTermsTable(stack, index, indexLimit){
-	
 	
 	//skip up to 'index'
 	var node = stack.first;

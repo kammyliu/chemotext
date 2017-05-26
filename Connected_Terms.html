@@ -25,39 +25,42 @@
 		<li><a href="Article_Search.html">Find Articles</a></li> 
 	</ul>
 	
-	<main id="thepage" autocomplete="off" style="padding-top: 15px">
-		<p id="introSection" style="padding-top: 15px;">
-			<table>
-				<tr>
-					<td id="introText">This search gives you all terms that co-exist in an article with the term that you enter. The count represents the number of articles where they co-occur </td>
-					<td id="introGraphic"><img src="img/Single_Search_Image.png" width="299" height="195"></td>
-				</tr>
-			</table>
-		</p>
+	<main id="thepage" autocomplete="off">
+		<div id="introSection">
+			<p id="introText">This search gives you all terms that co-exist in an article with the term that you enter. The count represents the number of articles where they co-occur. </p>
+			<img src="img/Single_Search_Image.png" width="299" height="195">
+		</div>
 	
-		<form autocomplete="off" id="inputSection" style="padding-top: 15px;">
+		<form autocomplete="off" id="inputSection">
+			<!-- autocomplete input field added later -->
 			<button type="submit" onclick="simpleSearch()">Search</button>
-		</form>
-		
-		<p id="mappedSection">
 			<input type="checkbox" id="mappedCheckbox"> Click to Include Subterms
-			<p id="mappedResults">
-			</p>
-		</p>
-		
-		<p id="displayText"> </p>
-
-		
-		<form id="tableform" style="padding-top: 15px;">
-			<table class="center" >
-				<tr>
-					<th>Terms</th>
-					<th class="countCol" style="text-align:center;">Count</th>
-				</tr>
-			</table>
 		</form>
-		<p id="downloadform" style="text-align: center; padding-top: 15px;"></p>
-		<form id="filterSection" style="padding-top: 15px;"></form>
+		
+		<section id="results">
+
+			<!-- "show subterms" button added later -->
+			
+			<p id="displayText"> </p>
+			
+			<form id="tableform" style="padding-top: 15px;">
+				<table class="center" >
+					<tr>
+						<th>Terms</th>
+						<th class="countCol" style="text-align:center;">Count</th>
+					</tr>
+				</table>
+				<!-- other sections added later -->
+			</form>
+			
+			<div id="downloadform">
+				<!-- download buttons added later -->
+			</div>
+			
+			<form id="filterSection">
+				<!-- fields and a submit button added later -->
+			</form>
+		</section>
 	</main>
 	
 	<script src="js/classes.js"></script>
