@@ -200,11 +200,11 @@ function compareNodeDate(benchmark, node){
 	return date - benchmark;
 }
 // return if node date is before the benchmark
-function noteDateBefore(benchmark, node){	
+function nodeDateBefore(benchmark, node){	
 	return compareNodeDate(benchmark, node) < 0;
 }
 // return if node date is after the benchmark
-function noteDateAfter(benchmark, node){
+function nodeDateAfter(benchmark, node){
 	return compareNodeDate(benchmark, node) > 0;
 }
 

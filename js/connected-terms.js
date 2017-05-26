@@ -5,7 +5,6 @@ SEARCH_TYPE = "connected";
 isShared = false; isArticle = false; isPath = false;
 
 $(document).ready(function(){	
-		
 	thepage = document.getElementById("thepage");
 	tableform = document.getElementById("tableform");
 	downloadform = document.getElementById("downloadform");
