@@ -1,5 +1,7 @@
 var thepage, input, tableform, downloadform, displayText;
 
+isShared = false; isArticle = false;
+
 $(document).ready(function(){	
 		
 	thepage = document.getElementById("thepage");
@@ -120,6 +122,8 @@ function showResult(){
 }
 
 function makeConnectedTermsTable(stack, index, indexLimit){
+	
+	
 	//skip up to 'index'
 	var node = stack.first;
 	for(var i=0;i<index;i++){

@@ -98,38 +98,21 @@ function traverseTerms(stack, condition, operation){
 function filterType(stack, type){
 	var newStack = new ThornStack();
 
-	if(type == "Disease" || type == "Chemical" || type == "Other"){
-		traverseTerms(stack, 
-			function(term){return term.type==type;},
-			function(term){newStack.add(term.name, term.copy());}
-		);
+	var addToStack = function(term){
+		newStack.add(term.name, term.copy());
+	};
 	
-		// var term = stack.first;
-		// while(term != null){
-			// if(term.type == type){
-				// newStack.add(term.name,term.copy());
-			// }
-			// term = term.right;
-		// }
-	}else if(type=="Drug"){
-		traverseTerms(stack, 
-			function(term){return term.isDrug;},
-			function(term){newStack.add(term.name, term.copy());}
-		);	
-	}else{
-		console.log("Check -3");
-		var term = stack.first;
-		while(true){
-			if(term.stype == type){
-				newStack.add(term.name,term.copy());
-			}
-			if(term.right!=null){
-				term = term.right;
-			}else{
-				break;
-			}
-		}		
-	}	
+	var condition;
+	if(type == "Disease" || type == "Chemical" || type == "Other"){
+		condition = function(term){return term.type==type;};
+	} else if(type=="Drug"){
+		condition = function(term){return term.isDrug;};
+	} else {
+		condition = function(term){return term.stype==type;};
+	}
+	
+	traverseTerms(stack, condition, addToStack);		
+	return newStack;
 }
 
 function filterStack(dropbox,stack,name){
@@ -141,6 +124,7 @@ function filterStack(dropbox,stack,name){
 	
 	var type = dropbox.value;
 	
+	// filter by type
 	if(isArticle || type=="None"){
 		newStack = stack;
 	} else {
@@ -148,14 +132,11 @@ function filterStack(dropbox,stack,name){
 		newStack = filterType(stack, type);
 	}
 
-	//OK
-	console.log("Check 1");
+	// filter by date after
 	var newnewStack = new ThornStack();
 	if(dateAfter.value==""){
-		console.log("Check 2");
 		newnewStack = newStack;
 	}else{
-		console.log("Check 3");
 		name = name + "_After" + dateAfter.value;
 		console.log(dateAfter.value);
 		var split = dateAfter.value.split("-");
@@ -164,40 +145,21 @@ function filterStack(dropbox,stack,name){
 		var year = parseInt(split[0]);
 		//console.log("Check 4");
 		var term = newStack.first;
-		while(true){
-			//break;
-			//console.log("Check 5");
+		while(term != null){
+			var benchmark = new Date(year,month,day).getTime();
+
 			var termCopy = term.copy();
 			for(var i =0;i<term.stack.length;i++){	
-				if(term.stack[i]==null){
-					console.log(term.stack);
-				}
-				
-				if(term.stack[i].year > year){
-				
-				}else if(term.stack[i].year == year){
-					if(term.stack[i].month > month){
-					
-					}else if(term.stack[i].month == month){
-						if(term.stack[i].day < day){
-							termCopy.count--;
-							termCopy.stack[i] = null;
-						}
-					}else{
-						termCopy.count--;
-						termCopy.stack[i] = null;
-					}
-				}else{
+				if (nodeDateBefore(benchmark, term.stack[i])){
 					termCopy.count--;
-					termCopy.stack[i] = null;
+					termCopy.stack[i] = null;			
 				}
-			
 			}
 		
 			if(termCopy.count > 0){
-				//console.log("Do we even Exist");
 				newnewStack.add(term.name,termCopy);
 			}
+			
 			var newArray = [];
 			for(var j=0;j<termCopy.stack.length;j++){
 				if(termCopy.stack[j]!=null){
@@ -206,61 +168,35 @@ function filterStack(dropbox,stack,name){
 			}
 			termCopy.stack = newArray;
 			
-			if(term.right!=null){
-				term = term.right;
-			}else{
-				break;
-			}
+			term = term.right;
 		}
 		
 		if(isShared){
 			filterDateShared(newnewStack,year,month,day,true);
 		}
 	}
-	
-	console.log("Check 6");
+
+	// filter by date after
 	var new3Stack = new ThornStack();
 	if(dateBefore.value==""){
 		new3Stack = newnewStack;
-		console.log("Check 7");
 	}else{
-		console.log("Check 8");
 		name = name + "_Before" + dateBefore.value;
 		var term = newnewStack.first;
 		var split = dateBefore.value.split("-");
 		var month = parseInt(split[1]);
 		var day = parseInt(split[2]);
 		var year = parseInt(split[0]);
-		console.log(year);
-		while(true){
+		//console.log(year);
+		while(term != null){
+			var benchmark = new Date(year,month,day).getTime();
+
 			var termCopy = term.copy();
-			for(var i =0;i<term.stack.length;i++){
-				
-				if(term.stack[i] == null){
-				
-				}else if(term.stack[i].year < year){
-					
-				}else if(term.stack[i].year == year){
-					if(term.stack[i].month < month){
-					
-					}else if(term.stack[i].month == month){
-						if(term.stack[i].day <= day){
-							if(term.stack[i].pmid=="26147141"){
-								console.log(term.stack[i].year);
-							}
-						}else{
-							termCopy.count--;
-							termCopy.stack[i] = null;
-						}
-					}else{
-						termCopy.count--;
-						termCopy.stack[i] = null;
-					}
-				}else{
+			for(var i =0;i<term.stack.length;i++){	
+				if (nodeDateAfter(benchmark, term.stack[i])){
 					termCopy.count--;
-					termCopy.stack[i] = null;
+					termCopy.stack[i] = null;			
 				}
-			
 			}
 		
 			if(termCopy.count > 0){
@@ -275,11 +211,7 @@ function filterStack(dropbox,stack,name){
 			}
 			termCopy.stack = newArray;
 				
-			if(term.right!=null){
-				term = term.right;
-			}else{
-				break;
-			}
+			term = term.right;
 		}
 		if(isShared){
 			filterDateShared(newnewStack,year,month,day,false);
