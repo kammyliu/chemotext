@@ -20,7 +20,23 @@
 	width: 88%;
 }
 
-ul{
+.table-arrow{
+	width: 20px;
+	height: 20px;
+}
+#prev-arrow{
+	margin-right: 20px;
+}
+#next-arrow{
+	margin-left: 20px;
+}
+
+.download-button {
+	width: 150px;
+	display: block;
+}
+
+#nav{
 	list-style-type: none;
     margin: 0;
     padding: 0;

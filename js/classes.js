@@ -26,10 +26,8 @@ class Term {
 		this.isDrug = false;
 		
 		var isSelected = false;
-		
 		var isSynonym = false;
 		var mainTerm = null;
-		
 		
 		this.sharedCount1 = 0;
 		this.stack1 = [];
@@ -63,59 +61,51 @@ class Term {
 	}
 	
 	checkPosition(stack){
-			var isGoing = true;
-			var ccc = 0;
-			while(isGoing){
-				ccc++;
-				
-				
-				if(this.left==null){
-					stack.first = this;
-					return;
-				}
-				if(ccc>stack.length+1){
-					console.log("we got a problem here");
-					console.log(this.name +  " " + this.count);
-					console.log(this.right.name +" " + this.left.name);
-					return;
-				}
-				
-				if(this.left.count<this.count){
-					
-					if(this.right==null){
-						stack.end = this.left;
-						this.left.right = null;
-						this.right = this.left;
-						this.left = this.left.left;
-						this.right.left = this;
-						if(this.left==null){
-						}else{
-							this.left.right = this;
-						}
-					}else{
-					
-						this.right.left = this.left;
-						this.left.right = this.right;
-						this.right = this.left;
-						this.left = this.left.left;
-						this.right.left = this;
-						if(this.left==null){
-						}else{
-							this.left.right = this;
-						}
+		var ccc = 0;
+		while(true){
+			ccc++;
+			if(this.left==null){
+				stack.first = this;
+				return;
+			}
+			if(ccc>stack.length+1){
+				console.log("we got a problem here");
+				console.log(this.name +  " " + this.count);
+				console.log(this.right.name +" " + this.left.name);
+				return;
+			}
+			
+			if(this.left.count<this.count){
+				if(this.right==null){
+					stack.end = this.left;
+					this.left.right = null;
+					this.right = this.left;
+					this.left = this.left.left;
+					this.right.left = this;
+					if(this.left!=null){
+						this.left.right = this;
 					}
 				}else{
-					
-					return;
+					this.right.left = this.left;
+					this.left.right = this.right;
+					this.right = this.left;
+					this.left = this.left.left;
+					this.right.left = this;
+					if(this.left!=null){
+						this.left.right = this;
+					}
 				}
+			}else{	
+				return;
 			}
+		}
 	}
 	
 	addArt(pmid,date,stack,title){
-			this.count++;
-			var art = new Art(pmid,date,title);
-			this.stack.push(art);
-			this.checkPosition(stack);
+		this.count++;
+		var art = new Art(pmid,date,title);
+		this.stack.push(art);
+		this.checkPosition(stack);
 	}
 	
 	addArtShared(pmid,date,stack,title){
@@ -164,7 +154,6 @@ class NumStack {
 				return false;
 			}
 			if(i==length){
-				
 				if(array[0]==[]){
 					return false;
 				}else{
@@ -190,142 +179,8 @@ class NumStack {
 	}
 	
 }
-		
-class OldThornStack {
-	constructor(){
-		this.first = null;
-		this.end = null;
-		this.thornstack = [];
-		this.length = 0;
-	}
-	add(tag,object){
-		var chars = tag.split('');
-		var length = chars.length;
-		var array = this.thornstack;
-		for(var i=0;i<length+1;i++){
-			if (array.length==0){
-				for(var j=0;j<41;j++){
-					array.push([]);
-				}
-			}
-			if(i==length){
-				array[0] = object;
-				if(this.first==null){
-					
-					this.first = object;
-					this.end = object;	
-				}else{
-					this.end.right = object;
-					object.left = this.end;
-					this.end = object;
-				}
-				this.length++;
-				object.checkPosition(this); 
-				break;
-			}
-			var pos = this.chartonum(chars[i]);
-			array = array[pos];
-		}		
-	}
-	get(tag){
-		var chars = tag.split('');
-		var length = chars.length;
-		var array = this.thornstack;
-		for(var i=0;i<length+1;i++){
-			if(array.length==0){
-				return false;
-			}
-			if(i==length){
-				
-				if(array[0]==[]){
-					return false;
-				}else{
-					return array[0];
-				}
-			}
-			var pos = this.chartonum(chars[i]);
-			array = array[pos];
-		}
-	}
-	search(tag){
-		var chars = tag.split('');
-		var length = chars.length;
-		var array = this.thornstack;
-		for(var i=0;i<length+1;i++){
-			if(array.length==0){
-				return false;
-			}
-			if(i==length){
-				return this.searchFind(array);
-			}
-			var pos = this.chartonum(chars[i]);
-			array = array[pos];
-		}
-	}
-	searchFind(array){
-		for(var i=0;i<array.length;i++){
-			if(array[i]==[] || array[i].length==0){
-				
-			}else if(i==0){
-				//console.log(array);
-				return array[i];
-			}else{
-				var check = this.searchFind(array[i]);
-				if(check==false){
-				}else{
-					return check;
-				}
-			}	
-		}
-		return false;
-	
-	}
-	
-	chartonum(cha){
-		if (cha == 'a' || cha == 'A'){ return 1; }
-		if (cha == 'b' || cha == 'B'){ return 2; }
-		if (cha == 'c' || cha == 'C'){ return 3; }
-		if (cha == 'd' || cha == 'D'){ return 4; }
-		if (cha == 'e' || cha == 'E'){ return 5; }
-		if (cha == 'f' || cha == 'F'){ return 6; }
-		if (cha == 'g' || cha == 'G'){ return 7; }
-		if (cha == 'h' || cha == 'H'){ return 8; }
-		if (cha == 'i' || cha == 'I'){ return 9; }
-		if (cha == 'j' || cha == 'J'){ return 10; }
-		if (cha == 'k' || cha == 'K'){ return 11; }
-		if (cha == 'l' || cha == 'L'){ return 12; }
-		if (cha == 'm' || cha == 'M'){ return 13; }
-		if (cha == 'n' || cha == 'N'){ return 14; }
-		if (cha == 'o' || cha == 'O'){ return 15; }
-		if (cha == 'p' || cha == 'P'){ return 16; }
-		if (cha == 'q' || cha == 'Q'){ return 17; }
-		if (cha == 'r' || cha == 'R'){ return 18; }
-		if (cha == 's' || cha == 'S'){ return 19; }
-		if (cha == 't' || cha == 'T'){ return 20; }
-		if (cha == 'u' || cha == 'U'){ return 21; }
-		if (cha == 'v' || cha == 'V'){ return 22; }
-		if (cha == 'w' || cha == 'W'){ return 23; }
-		if (cha == 'x' || cha == 'X'){ return 24; }
-		if (cha == 'y' || cha == 'Y'){ return 25; }
-		if (cha == 'z' || cha == 'Z'){ return 26; }
-		if (cha == '0'){ return 27; }
-		if (cha == '1'){ return 28; }
-		if (cha == '2'){ return 29; }
-		if (cha == '3'){ return 30; }
-		if (cha == '4'){ return 31; }
-		if (cha == '5'){ return 32; }
-		if (cha == '6'){ return 33; }
-		if (cha == '7'){ return 34; }
-		if (cha == '8'){ return 35; }
-		if (cha == '9'){ return 36; }
-		if (cha == ','){ return 37; }
-		if (cha == ';'){ return 38; }
-		if (cha == '-'){ return 39; }
-		else{ return 40; }
-	}
-	
-}
-	
+
+
 class ThornStack {
 	constructor(withCountCode=true){
 		this.first = null;
@@ -339,7 +194,6 @@ class ThornStack {
 	add(tag,object){
 		if(tag==null){
 			console.log("SUPER PROBLEM");
-			console.log(tag);
 			console.log(object);
 			return;
 		}
@@ -347,11 +201,9 @@ class ThornStack {
 		var length = chars.length;
 		var array = this.thornstack;
 		var arrayMissing = true;
-		for(var i=0;i<length+1;i++){
+		for(var i=0;i<=length;i++){
 			var pos = this.chartonum(chars[i]);
 			if(i==length){
-				
-				
 				array.splice(0,0,[0,object]);
 				this.length++;
 				//EXTRA STUFF
@@ -396,13 +248,12 @@ class ThornStack {
 	}
 
 	getSyn(tag){
-		
-		
 		var chars = tag.split('');
 		var length = chars.length;
 		
 		var array = this.thornstack;
-		for(var i=0;i<length+1;i++){
+		
+		for(var i=0;i<=length;i++){
 			var pos = this.chartonum(chars[i]);
 		
 			if(array.length==0){
@@ -416,7 +267,6 @@ class ThornStack {
 							console.log("LAST");
 							last = array[j][1];
 							console.log(last);
-							
 						}
 					}
 					return last;
@@ -445,6 +295,7 @@ class ThornStack {
 		var length = chars.length;
 		
 		var array = this.thornstack;
+		
 		for(var i=0;i<length+1;i++){
 			var pos = this.chartonum(chars[i]);
 		
@@ -473,6 +324,7 @@ class ThornStack {
 			}
 		}
 	}
+	
 	getTest(tag){
 		var chars = tag.split('');
 		console.log(chars);
@@ -482,8 +334,6 @@ class ThornStack {
 			console.log(chars[i]);
 			var pos = this.chartonum(chars[i]);
 			if(array.length==0){
-				console.log("Here1");
-				console.log(array);
 				return false;
 			}
 			if(i==length){
@@ -566,48 +416,35 @@ class ThornStack {
 	}
 	
 	chartonum(cha){
-		if (cha == 'a' || cha == 'A'){ return 1; }
-		if (cha == 'b' || cha == 'B'){ return 2; }
-		if (cha == 'c' || cha == 'C'){ return 3; }
-		if (cha == 'd' || cha == 'D'){ return 4; }
-		if (cha == 'e' || cha == 'E'){ return 5; }
-		if (cha == 'f' || cha == 'F'){ return 6; }
-		if (cha == 'g' || cha == 'G'){ return 7; }
-		if (cha == 'h' || cha == 'H'){ return 8; }
-		if (cha == 'i' || cha == 'I'){ return 9; }
-		if (cha == 'j' || cha == 'J'){ return 10; }
-		if (cha == 'k' || cha == 'K'){ return 11; }
-		if (cha == 'l' || cha == 'L'){ return 12; }
-		if (cha == 'm' || cha == 'M'){ return 13; }
-		if (cha == 'n' || cha == 'N'){ return 14; }
-		if (cha == 'o' || cha == 'O'){ return 15; }
-		if (cha == 'p' || cha == 'P'){ return 16; }
-		if (cha == 'q' || cha == 'Q'){ return 17; }
-		if (cha == 'r' || cha == 'R'){ return 18; }
-		if (cha == 's' || cha == 'S'){ return 19; }
-		if (cha == 't' || cha == 'T'){ return 20; }
-		if (cha == 'u' || cha == 'U'){ return 21; }
-		if (cha == 'v' || cha == 'V'){ return 22; }
-		if (cha == 'w' || cha == 'W'){ return 23; }
-		if (cha == 'x' || cha == 'X'){ return 24; }
-		if (cha == 'y' || cha == 'Y'){ return 25; }
-		if (cha == 'z' || cha == 'Z'){ return 26; }
-		if (cha == '0'){ return 27; }
-		if (cha == '1'){ return 28; }
-		if (cha == '2'){ return 29; }
-		if (cha == '3'){ return 30; }
-		if (cha == '4'){ return 31; }
-		if (cha == '5'){ return 32; }
-		if (cha == '6'){ return 33; }
-		if (cha == '7'){ return 34; }
-		if (cha == '8'){ return 35; }
-		if (cha == '9'){ return 36; }
-		if (cha == ','){ return 37; }
-		if (cha == ';'){ return 38; }
-		if (cha == '-'){ return 39; }
+		baseCharToNum(cha, true);
+	}
+}
+
+
+
+function baseCharToNum(cha, includeSpace){
+	var upper = cha.toUpperCase();
+	var code = upper.charCodeAt(0);
+	
+	// is a letter
+	if (code >= 65 && code <= 90){
+		return code-64;	//1 - 26
+	}
+	
+	//is a number
+	if (code >= 48 && code <= 57){
+		return code-21;	//27 - 36
+	}
+	
+	if (cha == ','){ return 37; }
+	if (cha == ';'){ return 38; }
+	if (cha == '-'){ return 39; }
+
+	if (includeSpace){
 		if (cha == ' '){ return 40;}
 		else{ return 41; }
 	}
 	
+	else { return 40; }
 }
 	
