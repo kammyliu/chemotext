@@ -14,7 +14,11 @@ function makeSynStack(){
 	
 function reconstructSynStack(jsonObj){
 	console.log("Getting Ready to Parse JSON");
+	try {
 	synStack.thornstack = JSON.parse(jsonObj);
+	} catch (e){
+	console.log(jsonObj);
+	}
 	console.log("parsed JSON");
 }	
 
@@ -796,10 +800,10 @@ function makePageSections(){
 		e.preventDefault();
 	}, false);
 	
-	$(tableform).append('<img src="previous.png" class="table-arrow" id="prev-arrow">');
+	$(tableform).append('<img src="img/previous.png" class="table-arrow" id="prev-arrow">');
 	$(tableform).append('<input value="'+tableLimit+'">');
 	$(tableform).append('<button id="table-limit-button" type="submit">Set Table Limit</button>');	
-	$(tableform).append('<img src="next.png" class="table-arrow" id="next-arrow">');
+	$(tableform).append('<img src="img/next.png" class="table-arrow" id="next-arrow">');
 	$(tableform).append('<p>Total Count: <span id="results-count"></span></p>');
 
 	var downloadform = document.getElementById("downloadform");
