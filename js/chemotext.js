@@ -10,6 +10,7 @@ var subTerms = [];
 function makeSynStack(){
 	//console.log("StartSynStack");
 	readTextFile("https://cors-anywhere.herokuapp.com/http://chemotext.mml.unc.edu/synstack.json",reconstructSynStack,"\r\n");
+	//readTextFile("http://chemotext.mml.unc.edu/synstack.json",reconstructSynStack,"\r\n");
 }
 	
 function reconstructSynStack(jsonObj){
@@ -692,8 +693,9 @@ function inputSuggestion($inputSection, inputId){
 		'" list="datalist-'+inputId+'">');
 	
 	$("#"+inputId).keyup(function(keyEvent){
-		var input = $(this).val();
-		var check = synStack.search(input);
+		var inputTerm = $(this).val();
+		console.log(inputTerm);
+		var check = synStack.search(inputTerm);
 		var keyC = keyEvent.keyCode;
 		
 		//console.log(keyC);
