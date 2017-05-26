@@ -112,14 +112,10 @@ function filterType(stack, type){
 			// term = term.right;
 		// }
 	}else if(type=="Drug"){
-		var term = stack.first;
-		while(term != null){
-			if(term.isDrug){
-				newStack.add(term.name,term.copy());
-			}
-			term = term.right;
-		}
-		
+		traverseTerms(stack, 
+			function(term){return term.isDrug;},
+			function(term){newStack.add(term.name, term.copy());}
+		);	
 	}else{
 		console.log("Check -3");
 		var term = stack.first;
@@ -541,6 +537,8 @@ function updateTableFooter(stack,limit,index, type){
 
 	$("#table-limit-button")[0].onclick = function(){
 		tableLimit = parseInt(this.value);
+		console.log(this);
+		console.log(tableLimit);
 		makeTables(stack,tableLimit,0, type);
 	};
 	
