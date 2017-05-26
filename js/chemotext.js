@@ -536,9 +536,7 @@ function updateTableFooter(stack,limit,index, type){
 	$("#prev-arrow")[0].onclick = function(){makeTables(stack,limit,index-limit, type);}
 
 	$("#table-limit-button")[0].onclick = function(){
-		tableLimit = parseInt(this.value);
-		console.log(this);
-		console.log(tableLimit);
+		tableLimit = parseInt(document.getElementById("table-limit").value);
 		makeTables(stack,tableLimit,0, type);
 	};
 	
@@ -673,7 +671,7 @@ function makePageSections(){
 	
 	// table pagination and labels
 	$(tableform).append('<img src="img/previous.png" class="table-arrow" id="prev-arrow">');
-	$(tableform).append('<input value="'+tableLimit+'">');
+	$(tableform).append('<input id="table-limit" value="'+tableLimit+'">');
 	$(tableform).append('<button id="table-limit-button" type="submit">Set Table Limit</button>');	
 	$(tableform).append('<img src="img/next.png" class="table-arrow" id="next-arrow">');
 	$(tableform).append('<p>Total Count: <span id="results-count"></span></p>');
