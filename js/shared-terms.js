@@ -50,6 +50,7 @@ function sharedSearchOne(data){
 	console.log("Finished Query 1");
 	_stack = new ThornStack();
 	addTermOrSubterm(_stack, data);
+	console.log(_stack);
 	queryNeo4j(payload2,sharedSearchTwo);
 }	
 
@@ -132,10 +133,6 @@ function addSharedSubTermsTwo(data){
 
 
 
-
-
-
-
 function makeSharedTermsTable(stack, index, indexLimit){
 	
 	//skip up to 'index'
@@ -174,9 +171,6 @@ function makeSharedTermsTable(stack, index, indexLimit){
 		node = node.right;
 	}
 }
-
-
-
 
 
 
