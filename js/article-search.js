@@ -65,6 +65,7 @@ function articleSearch(){
 	 
 	 queryNeo4j(data, function(data,xhr,status){
 		console.log("Finished Search");
+		console.log(data);
 		//tableform.innerHTML = JSON.stringify(data);
 		var data = data["results"][0]["data"];
 		var stack = new ThornStack(false);
@@ -101,9 +102,8 @@ function makeArticleSearchTable(stack, index, indexLimit){
 	*/
 	for(var j=index;j<indexLimit;j++){
 		var pmid = stack.list[j];
-		$tbody.append('<tr><td><a href=http://www.ncbi.nlm.nih.gov/pubmed/"'
-			+pmid+'">'+pmid+'</a></td></tr>');
-		
+		$tbody.append('<tr><td><a href="http://www.ncbi.nlm.nih.gov/pubmed/'+pmid+'">'
+			+pmid+'</a></td></tr>');
 	}
 }
 	
