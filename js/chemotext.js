@@ -504,9 +504,10 @@ function addSimpleSubtermData(data){
 function getSelfOrSynonym(string){
 	var term = synStack.get(string);
 	if(term && term.includes('|')){
-		term = term.split('|')[1]; //term.mainTerm.name;
+		return term.split('|')[1]; //term.mainTerm.name;
+	} else {
+		return string;
 	}
-	return term;
 }
 	
 //Table filter always includes "None". path-search intermediary step doesn't
@@ -675,8 +676,12 @@ function showResult(stack, csvName, subterms, type){
 		$("#show-subterms").show();
 	}
 	
-	makeFilters(stack, csvName);
+	if (document.getElementById("filterSection") != null) {
+		makeFilters(stack, csvName);
+	}
+	if (document.getElementById("downloadform") != null) {
+		makeDownloadableCSV(csvName, stack);
+	}	
 	makeTables(stack, tableLimit, 0, type);
-	makeDownloadableCSV(csvName, stack);
-	
+
 }
