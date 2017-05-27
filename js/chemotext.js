@@ -565,7 +565,7 @@ function makePageSections(){
 	// download buttons
 	var downloadform = document.getElementById("downloadform");
 	$(downloadform).append('<button type="button" id="csv" class="download-button">View CSV</button>');
-	$(downloadform).append('<button type="button" id="csv-with-mpids" class="download-button">CSV with pmids</button>');
+	$(downloadform).append('<button type="button" id="csv-with-pmids" class="download-button">CSV with pmids</button>');
 
 	// filter fields
 	var filterSection = document.getElementById("filterSection");
