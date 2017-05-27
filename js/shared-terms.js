@@ -1,7 +1,5 @@
 SEARCH_TYPE = "shared";
 
-var isShared = true; isArticle = false; isPath = false;
-
 var input, input2;
 
 $(document).ready(function(){	

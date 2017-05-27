@@ -160,7 +160,7 @@ function filterDate(stack, removeBefore, dateValue){
 		term = term.right;
 	}
 	
-	if(isShared){
+	if(SEARCH_TYPE=="shared"){
 		filterDateShared(newStack,year,month,day,removeBefore);
 	}
 	return newStack;
@@ -197,7 +197,7 @@ function filterStack(dropbox,stack,name){
 	makeTables(newStack,tableLimit,0);
 	
 	console.log("Updating CSV");
-	if(!isArticle){
+	if(SEARCH_TYPE!="article"){
 		makeDownloadableCSV(name,newStack);
 	}
 }
@@ -228,7 +228,7 @@ function onInitFs(fs, name, stack, withPmids){
 	fs.root.getFile(fileName,{create:true}, function(fileEntry){
 		fileEntry.createWriter(function(fileWriter){
 			var data = "";
-			if(isShared && !withPmids){	
+			if(SEARCH_TYPE == "shared" && !withPmids){	
 				var split = name.split("_");
 				data = "Term \t Both \t" + split[0] + "\t" + split[1] + "\n";
 			}
@@ -242,7 +242,7 @@ function onInitFs(fs, name, stack, withPmids){
 				}
 				
 				data = data + node.name + ";" + node.count + arts;
-				if(isShared && !withPmids){ 
+				if(SEARCH_TYPE == "shared" && !withPmids){ 
 					data = data + "\t" + node.sharedCount1 + "\t" + node.sharedCount2; 
 				}
 				data = data + "\n";
@@ -318,13 +318,13 @@ function makeTables(stack,limit,index=0,type, tableElement){
 	}
 	 
 	var newchemicalarray = [];
-	if(!isArticle){
+	if(SEARCH_TYPE != "article"){
 		var node = stack.first;
 		for(var i=0;i<index;i++){
 			node = node.right;
 		}
 		for(var j=index;j<indexLimit;j++){
-			if(isShared){
+			if(SEARCH_TYPE == "shared"){
 				newchemicalarray.push([node.name,node.count,node,node.sharedCount1,node.sharedCount2]);
 			}else if(isPath){
 				newchemicalarray.push([node.name,node.count,node,node.isSelected,node]);
@@ -366,7 +366,7 @@ function makeTables(stack,limit,index=0,type, tableElement){
 			});
 		}
 		
-		if(!isArticle){
+		if(SEARCH_TYPE != "article"){
 			var col2 = document.createElement("TD");
 			col2.className = "countCol";
 			col1.innerHTML = xx[0];
@@ -418,7 +418,7 @@ function makeTables(stack,limit,index=0,type, tableElement){
 			col1.appendChild(link);
 			newrow.appendChild(col1);
 		}
-		if(isShared){
+		if(SEARCH_TYPE == "shared"){
 			var col4 = document.createElement("TD");
 			var col5 = document.createElement("TD");
 			col4.innerHTML = " "+xx[3]+" ";
