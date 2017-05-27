@@ -22,21 +22,16 @@ var _subterms; //flag for if subterms are included
 
 var triangleTerm;
 function triangleSearch(){
-	SEARCH_TYPE = "path-subresults";
-
-	tableform = document.getElementById("subresults-tableform");
-
 	$(displayText).text("");
 	$("#results").hide();
 	$("#show-subterms").hide();
 	$("#loader").show();
-	$("#partial-results").show();
-	
+	$("#path-subresults").hide();
+
 	var term = getSelfOrSynonym(input.value);
 	var type = selectBar.value;
 	
-	console.log(term);
-	console.log(type);	
+	//console.log(term); console.log(type);	
 	
 	_subterms = checkbox.checked;
 	if(_subterms){
@@ -63,21 +58,22 @@ function triangleSearch(){
 		queryNeo4j(data,triangleSearchOnSuccess);
 	}	
 }
-	
+	var stack, newStack;
 function triangleSearchOnSuccess(data){
 	console.log("Finished Search");
 	
-	var stack = new ThornStack();
+	stack = new ThornStack();
 		
 	addTermOrSubterm(stack, data);
+
+	SEARCH_TYPE = "path-subresults";
+	tableform = document.getElementById("subresults-tableform");
+	makeTables(stack,tableLimit,0, "path-subresults");
 	
 	$(loader).hide();
 	$("#path-subresults").show();
 	
-	tableform = document.getElementById("tableform");
-	makeTables(stack,tableLimit,0, "path-subresults");
-		
-	var newStack = new ThornStack();
+ newStack = new ThornStack();
 	
 	setFinishSearchHandler();
 	
