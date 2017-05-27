@@ -1,4 +1,3 @@
-var isPath = true;
 var countER = 6;
 SEARCH_TYPE = "path-subresults";	//second step is "path-final-results"
 
