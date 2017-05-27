@@ -25,6 +25,7 @@ var _subterms; //flag for if subterms are included
 function simpleSearch(){
 
 	$("#results").hide();
+	$("#show-subterms").hide();
 	$("#loader").show();
 
 	//get term or its synonym
@@ -116,6 +117,12 @@ function addTermOrSubterm(data){
 }
 
 function showResult(){
+	
+	if(_stack.length==0){
+		$(displayText).text("No Results");
+		return;
+	}
+	
 	$("#loader").hide();
 	$("#results").show();
 	

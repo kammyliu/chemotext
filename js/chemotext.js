@@ -264,7 +264,8 @@ function onInitFs(fs, name, stack, withPmids){
 
 	
 function makeDownloadableCSV(name,stack){
-	$(".download-button").click(function(){
+	$(".download-button").off("click");
+	$(".download-button").on(function(){
 		var withPmids = this.id!="csv";
 		window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
 		window.requestFileSystem(window.TEMPORARY, 5*1024*1024, function(fs){onInitFs(fs,name,stack,withPmids)}, errorHandler);
@@ -290,11 +291,7 @@ function openArticleList(node){
 function makeTables(stack,limit,index=0,type){		
 	$(tableform).find("tr").slice(1).remove();	//remove all tr except the first one
 
-	if(stack.length==0){
-		$(displayText).text("No Results");
-		return;
-	}
-	
+
 	var maintable = $(tableform).find("table")[0];
 	
 	var indexLimit = index+limit;
@@ -438,7 +435,7 @@ function updateTableFooter(stack,limit,index, type){
 
 	$("#results-count").text(stack.length);
 	
-	if(index-limit < 0){
+	if(index == 0){
 		$("#prev-arrow").hide();
 	} else {
 		$("#prev-arrow").show();
@@ -463,9 +460,9 @@ function inputSuggestion($inputSection, inputId){
 		var keyC = keyEvent.keyCode;
 		
 		//console.log(keyC);
+		//console.log(check);
+
 		if(check && check!=[] && keyC!=37 && keyC!=38 && keyC!=39 && keyC!=40){
-			//console.log(check);
-			//console.log(check.length);
 			var newDataList = document.getElementById("datalist-"+inputId);
 			newDataList.innerHTML = "";
 			for(var i=0;i<check.length;i++){
@@ -476,8 +473,6 @@ function inputSuggestion($inputSection, inputId){
 				option.value = check[i];
 				newDataList.appendChild(option);	
 			}
-		}else{
-			//console.log(check);
 		}
 	});
 }
@@ -557,7 +552,6 @@ function makeSTypes(parent, id, withNone){
 	
 function makePageSections(){
 	thepage.addEventListener('submit', function(e) {
-		//console.log("Page Event Listener");
 		e.preventDefault();
 	}, false);
 	
@@ -580,7 +574,9 @@ function makePageSections(){
 	$(filterSection).append('<p>Date After:<input id="dateAfterInput" type="date">'+ 
 		'Date Before:<input id="dateBeforeInput" type="date"></p>');
 	
+	// show subterms button
 	$("#results").prepend('<button onclick="showSubterms()" id="show-subterms">Click Here to see Subterms</button>');
 	
+	// loading circle
 	$(thepage).append('<img src="img/ajax-loader.gif" alt="Loading circle" id="loader">');
 }
