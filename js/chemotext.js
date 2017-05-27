@@ -312,6 +312,9 @@ function makeTables(stack,limit,index=0,type, tableElement){
 		case 'path-subresults':
 			makePathSubresultsTable(stack, index, indexLimit);		
 			return;
+		case 'path-final-results':
+			makePathFinalResultsTable(stack,index,indexLimit);
+			return;
 		case 'article':
 			makeArticleSearchTable(stack, index, indexLimit);
 			return;

@@ -1,6 +1,6 @@
 var isPath = true;
 var countER = 6;
-SEARCH_TYPE = "path-subresults";	//second step is "connected"
+SEARCH_TYPE = "path-subresults";	//second step is "path-final-results"
 
 var input, selectBar;
 
@@ -188,8 +188,7 @@ function postRequest(term,type,stack,csvName){
 			if(countER==0){
 				console.log("FINISHED: "+stack.length)
 
-				SEARCH_TYPE = "connected";
-				
+				SEARCH_TYPE = "path-final-results";
 				showResult(stack, input.value+"_Path"+csvName, _subterms, SEARCH_TYPE);
 			}	
 		 },
@@ -242,4 +241,43 @@ function makePathSubresultsTable(stack, index, indexLimit){
 		term.isSelected = this.checked;
 	});
 }	
+
+
+function makePathFinalResultsTable(stack, index, indexLimit){
+	
+	//skip up to 'index'
+	var node = stack.first;
+	for(var i=0;i<index;i++){
+		node = node.right;	
+	}
+	
+	$(tableform).find("tr").remove();	
+	
+	$tbody.append('<tr><th>Terms</th><th class="countCol">Count</th></tr>');
+	
+	/*append TR: 
+		<tr>
+			<td>name</td>
+			<td class="countCol">
+				<button type="button" class="articleButton">count</button>
+			</td>
+		</tr>
+	*/
+	var $tbody = $("#tableform").find("tbody");
+	for(var j=index;j<indexLimit;j++){
+		if (node == null) break;
+		
+		$tr = $("<tr/>");
+		$tr.append('<td>'+node.name+'</td>');
+		$buttonTd = $("<td/>", {"class": "countCol"}).append( $("<button/>", {
+			type: "button", 
+			"class": "articleButton", 
+			text: node.count, 
+			click: function(node){ return function(){openArticleList(node);} }(node)
+		}));
+		$tbody.append($tr.append($buttonTd));
+
+		node = node.right;
+	}
+}
 
