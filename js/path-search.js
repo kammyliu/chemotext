@@ -75,6 +75,8 @@ function setFinishSearchHandler(){
 	
 	var button = document.getElementById("finish-search");
 	button.onclick = function(){
+		$("#loader").show()
+	
 		var checkedTerms = [];
 		var checkedString = "Your B Terms: ";
 		var term = stack.first;
@@ -112,6 +114,7 @@ function showSubresults(){
 	$("#results").show();
 	$("#path-subresults").show();
 	$("#downloadform").hide();
+	//$("#filterSection").hide();
 	$(displayText).text("Choose the B Terms you want to search with");
 
 	newStack = new ThornStack();
@@ -170,7 +173,7 @@ function postRequest(term,type,stack,csvName){
 	}
 		
 	$.ajax({ //443 works.
-		url: CORS+"http://chemotext.mml.unc.edu:7474/db/data/transaction/commit",			
+		url: CORS+"http://chemotext.mml.unc.edu:7474/db/data/transaction/commit", //GITHUB PAGES			
 		accepts: "application/json; charset=UTF-8",
 		dataType:"json",
 		contentType:"application/json",		
@@ -179,7 +182,6 @@ function postRequest(term,type,stack,csvName){
 		success:function(data,xhr,status)
 		{
 			console.log("Finished Search");
-
 			addTermOrSubterm(stack, data);
 			
 			countER--;
@@ -187,9 +189,10 @@ function postRequest(term,type,stack,csvName){
 			//console.log("Count: "+countER);
 			if(countER==0){
 				console.log("FINISHED: "+stack.length)
-
 				SEARCH_TYPE = "path-final-results";
 				showResult(stack, input.value+"_Path"+csvName, _subterms, SEARCH_TYPE);
+				$("#path-subresults").hide();
+				$("#downloadform").show();
 			}	
 		 },
 		error:function(xhr,err,msg){
@@ -252,6 +255,7 @@ function makePathFinalResultsTable(stack, index, indexLimit){
 	}
 	
 	$(tableform).find("tr").remove();	
+	var $tbody = $("#tableform").find("tbody");
 	
 	$tbody.append('<tr><th>Terms</th><th class="countCol">Count</th></tr>');
 	
@@ -263,7 +267,6 @@ function makePathFinalResultsTable(stack, index, indexLimit){
 			</td>
 		</tr>
 	*/
-	var $tbody = $("#tableform").find("tbody");
 	for(var j=index;j<indexLimit;j++){
 		if (node == null) break;
 		
