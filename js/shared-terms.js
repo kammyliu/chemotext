@@ -50,7 +50,7 @@ function sharedSearch(){
 function sharedSearchOne(data){
 	console.log("Finished Query 1");
 	_stack = new ThornStack();
-	addTermOrSubterm(data);
+	addTermOrSubterm(_stack, data);
 	queryNeo4j(payload2,sharedSearchTwo);
 }	
 
@@ -138,6 +138,52 @@ function getSelfOrSynonym(string){
 	}
 	return term;
 }
+
+
+
+
+function makeSharedTermsTable(stack, index, indexLimit){
+	
+	//skip up to 'index'
+	var node = stack.first;
+	for(var i=0;i<index;i++){
+		node = node.right;	
+	}
+	
+	/*append TR: 
+		<tr>
+			<td>name</td>
+			<td class="countCol">
+				<button type="button" class="articleButton">count</button>
+			</td>
+			<td>term1 count</td>
+			<td>term2 count</td>
+		</tr>
+	*/
+	var $tbody = $("#tableform").find("tbody");
+	for(var j=index;j<indexLimit;j++){
+		if (node == null) break;
+		
+		$tr = $("<tr/>");
+		$tr.append('<td>'+node.name+'</td>');
+		$buttonTd = $("<td/>", {"class": "countCol"}).append( $("<button/>", {
+			type: "button", 
+			"class": "articleButton", 
+			text: node.count, 
+			click: function(node){ return function(){openArticleList(node);} }(node)
+		}));
+		$tr.append($buttonTd);
+		$tr.append('<td>'+node.sharedCount1+'</td>');
+		$tr.append('<td>'+node.sharedCount2+'</td>');
+		$tbody.append($tr);
+		
+		node = node.right;
+	}
+}
+
+
+
+
 
 
 /* helper that adds an article to the stack */

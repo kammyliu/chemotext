@@ -293,7 +293,6 @@ function openArticleList(node){
 function makeTables(stack,limit,index=0,type){		
 	$(tableform).find("tr").slice(1).remove();	//remove all tr except the first one
 
-
 	var maintable = $(tableform).find("table")[0];
 	
 	var indexLimit = index+limit;
@@ -306,6 +305,9 @@ function makeTables(stack,limit,index=0,type){
 	switch (SEARCH_TYPE) {
 		case 'connected':
 			makeConnectedTermsTable(stack, index, indexLimit);
+			return;
+		case 'shared':
+			makeSharedTermsTable(stack, index, indexLimit);
 			return;
 	}
 	 
