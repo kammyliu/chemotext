@@ -2,17 +2,18 @@ var countER = 6;
 var tableLimit = 10;
 var synStack = new ThornStack(withCountCode=false);
 synStack.extra = false;
-
 var subTermMax = 0;
 var subTermCount = 0; 
 var subTerms = [];
+var SEARCH_TYPE;
 
 var CORS = "https://cors-anywhere.herokuapp.com/"; //GITHUB PAGES
 
-var tableform, thepage;
+var tableform, thepage, displayText;
 $(document).ready(function(){
 	thepage = document.getElementById("thepage");
 	tableform = document.getElementById("tableform");
+	displayText = document.getElementById("displayText");
 });
 
 function makeSynStack(){
@@ -90,6 +91,7 @@ function makeFilters(stack,name){
 	filterType.onclick = function(){ filterStack(select,stack,name); }
 }
 
+// see about collapsing this into just filterType
 function traverseTerms(stack, condition, operation){
 	var term = stack.first;
 	while(term != null){
@@ -579,4 +581,69 @@ function makePageSections(){
 	
 	// loading circle
 	$(thepage).append('<img src="img/ajax-loader.gif" alt="Loading circle" id="loader">');
+}
+
+
+function getMentionsPayload(name){
+	return JSON.stringify({
+		"statements" : [{
+			"statement" : "match (n:Term{name:{name}})-[:MENTIONS]-(a)-[:MENTIONS]-(m) return m, a " , "parameters" : {"name": name}
+		}]
+	});
+}
+
+function getSubtermsPayload(name){
+	return JSON.stringify({
+		"statements" : [{
+			"statement" : "match (n:Term{name:{name}})-[:MAPPED]->(a) return a " , "parameters" : {"name": name}
+		}]
+	});
+}
+
+
+function addTermOrSubterm(stack, data){
+	var results = data["results"][0];
+	var data2 = results["data"];
+	
+	for (var i=0; i< data2.length ; i++){
+		var name = data2[i]["row"][0]["name"];
+		var type = data2[i]["row"][0]["type"];
+		var stype = data2[i]["row"][0]["stype"];
+		var date = data2[i]["row"][1]["date"];
+		var pmid = data2[i]["row"][1]["pmid"];
+		var title = data2[i]["row"][1]["title"];
+		
+		var check = stack.get(name);
+
+		if(!check){
+			var newTerm = new Term(name,type,stype);
+			var isDrug = data2[i]["row"][0]["isDrug"];
+			if(isDrug=="true"){newTerm.isDrug=true;}
+			stack.add(name,newTerm);
+			newTerm.addArt(pmid,date,stack,title);
+		}else{			
+			check.addArt(pmid,date,stack,title);
+		}	
+	}
+}
+
+
+function showResult(stack, csvName, subterms){
+	
+	if(stack.length==0){
+		$(displayText).text("No Results");
+		return;
+	}
+	
+	$("#loader").hide();
+	$("#results").show();
+	
+	if (subterms){
+		$("#show-subterms").show();
+	}
+	
+	makeFilters(stack, csvName);
+	makeTables(stack, tableLimit, 0, SEARCH_TYPE);
+	makeDownloadableCSV(csvName, stack);
+	
 }

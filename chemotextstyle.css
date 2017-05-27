@@ -33,13 +33,17 @@
 	margin-left: 20px;
 }
 
+/* Other */
+
+img {
+	height: 300px;
+}
+
 .download-button {
 	width: 150px;
 	display: block;
 }
 
-
-/* Other */
 
 #results, #loader, #show-subterms{
 	display: none;

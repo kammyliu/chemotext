@@ -1,12 +1,9 @@
-var input, downloadform, displayText;
-
 SEARCH_TYPE = "connected";
 
 isShared = false; isArticle = false; isPath = false;
 
+var input;
 $(document).ready(function(){	
-	downloadform = document.getElementById("downloadform");
-	displayText = document.getElementById("displayText");
 	
 	makePageSections();
 	
@@ -48,7 +45,7 @@ function simpleSearch(){
 
 function simpleSearchOnSuccess(data){
 	_stack = new ThornStack();
-	addTermOrSubterm(data);
+	addTermOrSubterm(_stack,data);
 	showResult();
 }
 
@@ -57,18 +54,18 @@ function simpleSearchOnSuccess(data){
 /* Including subterms */
 
 function findSimpleSubterms(data){
-	subTerms = [];
-		
-	var results = data["results"][0];
-	var data2 = results["data"];
 	_stack = new ThornStack();
 	
+	subTerms = [];
 	subTermCount = 0;
 	subTermMax = data2.length + 1;
 	//console.log(subTermMax);
 	
 	// fetch input term
 	queryNeo4j(getMentionsPayload(_term),addSimpleSubtermData);
+			
+	var results = data["results"][0];
+	var data2 = results["data"];
 	
 	// fetch each subterm 
 	for (var i=0; i< data2.length ; i++){
@@ -80,7 +77,7 @@ function findSimpleSubterms(data){
 
 
 function addSimpleSubtermData(data){
-	addTermOrSubterm(data);
+	addTermOrSubterm(_stack,data);
 	//console.log("FINISHED SUBTERM or TERM");
 	
 	subTermCount++;
@@ -89,52 +86,8 @@ function addSimpleSubtermData(data){
 	}
 }
 
+
 /* GENERAL */
-
-function addTermOrSubterm(data){
-	var results = data["results"][0];
-	var data2 = results["data"];
-	for (var i=0; i< data2.length ; i++){
-		var name = data2[i]["row"][0]["name"];
-		var type = data2[i]["row"][0]["type"];
-		var stype = data2[i]["row"][0]["stype"];
-		var date = data2[i]["row"][1]["date"];
-		var pmid = data2[i]["row"][1]["pmid"];
-		var title = data2[i]["row"][1]["title"];
-		
-		var check = _stack.get(name);
-
-		if(!check){
-			var newTerm = new Term(name,type,stype);
-			var isDrug = data2[i]["row"][0]["isDrug"];
-			//console.log(typeof isDrug);
-			if(isDrug=="true"){newTerm.isDrug=true;}
-			_stack.add(name,newTerm);
-			newTerm.addArt(pmid,date,_stack,title);
-		}else{			
-			check.addArt(pmid,date,_stack,title);
-		}	
-	}
-}
-
-function showResult(){
-	
-	if(_stack.length==0){
-		$(displayText).text("No Results");
-		return;
-	}
-	
-	$("#loader").hide();
-	$("#results").show();
-	
-	if (_subterms){
-		$("#show-subterms").show();
-	}
-	
-	makeFilters(_stack, input.value);
-	makeTables(_stack, tableLimit, 0, SEARCH_TYPE);
-	makeDownloadableCSV(input.value, _stack);
-}
 
 function makeConnectedTermsTable(stack, index, indexLimit){
 	
@@ -171,18 +124,3 @@ function makeConnectedTermsTable(stack, index, indexLimit){
 }
 
 
-function getMentionsPayload(name){
-	return JSON.stringify({
-		"statements" : [{
-			"statement" : "match (n:Term{name:{name}})-[:MENTIONS]-(a)-[:MENTIONS]-(m) return m, a " , "parameters" : {"name": name}
-		}]
-	});
-}
-
-function getSubtermsPayload(name){
-	return JSON.stringify({
-		"statements" : [{
-			"statement" : "match (n:Term{name:{name}})-[:MAPPED]->(a) return a " , "parameters" : {"name": name}
-		}]
-	});
-}

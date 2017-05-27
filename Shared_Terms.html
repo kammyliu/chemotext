@@ -25,36 +25,45 @@
 		<li><a href="Article_Search.html">Find Articles</a></li> 
 	</ul>
 	
-	<main id="thepage" autocomplete="off" style="padding-top: 15px;">
-		<p id="introSection" style="padding-top: 15px;">
-			<table>
-				<tr>
-					<td id="introText"> This search inputs two terms and gives you three results -- all terms that co-exist with either term or both terms in an article. The counts respresent the number of articles where they co-occur or articles that they are present in</td>
-					<td id="introGraphic">
-						<img src="img/Shared_Terms_Image.png" width="273" height="182">
-					</td>
-				</tr>
-			</table>
-		</p>
-		<form autocomplete="off" id="inputSection" style="padding-top: 15px;">
-			<p id="inputSection2" style="padding-top: 15px;"> </p>
+	<main id="thepage" autocomplete="off">
+		<div id="introSection">
+			<p id="introText">This search inputs two terms and gives you three results -- 
+				all terms that co-exist with either term or both terms in an article. 
+				The counts respresent the number of articles where they co-occur or articles that they are present in. </p>
+			<img src="img/Shared_Terms_Image.png">
+		</div>
+
+		<form autocomplete="off" id="inputSection">
+			<!-- autocomplete input fields added later -->
 			<button type="submit" onclick="sharedSearch()">Search</button>
+			<input type="checkbox" id="mappedCheckbox"> Click to Include Subterms
 		</form>
-		<p id="mappedSection">
-			<input type="checkbox" id="mappedCheckbox"> Click to Include Subterms<p id="mappedResults"></p>
-		</p>
-		<form id="tableform" style="padding-top: 15px;">
-			<table class="center">
-				<tr>
-					<td>Terms</td>
-					<td class="countCol" style="text-align:center;">Same Article</td>
-					<td class="countCol"><span id="term1-label">Term 1</span> Only</td>
-					<td class="countCol"><span id="term2-label">Term 2</span> Only</td>
-				</tr>
-			</table>
-		</form>
-		<p id="downloadform" style="text-align: center; padding-top: 15px;"></p>
-		<form id="filterSection" style="padding-top: 15px;"></form>
+		
+		<section id="results">
+			<!-- "show subterms" button added later -->
+			
+			<p id="displayText"> </p>
+			
+			<form id="tableform">
+				<table class="center">
+					<tr>
+						<td>Terms</td>
+						<td class="countCol">Same Article</td>
+						<td class="countCol"><span id="term1-label">Term 1</span> Only</td>
+						<td class="countCol"><span id="term2-label">Term 2</span> Only</td>
+					</tr>
+				</table>
+				<!-- other sections added later -->
+			</form>
+			
+			<div id="downloadform">
+				<!-- download buttons added later -->
+			</div>
+			
+			<form id="filterSection">
+				<!-- fields and a submit button added later -->
+			</form>
+		</section>
 	</main>
 	
 	<script src="js/classes.js"></script>
