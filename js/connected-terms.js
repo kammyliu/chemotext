@@ -46,7 +46,7 @@ function simpleSearch(){
 function simpleSearchOnSuccess(data){
 	_stack = new ThornStack();
 	addTermOrSubterm(_stack,data);
-	showResult();
+	showResult(_stack, input.value, _subterms);
 }
 
 
@@ -82,7 +82,7 @@ function addSimpleSubtermData(data){
 	
 	subTermCount++;
 	if(subTermCount==subTermMax){
-		showResult();
+		showResult(_stack, input.value, _subterms);
 	}
 }
 

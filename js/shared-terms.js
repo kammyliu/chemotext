@@ -74,7 +74,7 @@ function findSharedSubTermsOne(data){
 	
 	subTerms = [];	
 	subTermCount = 0;
-	subTermMax = data2.length + 1;
+	subTermMax = data["results"][0]["data"].length + 1;
 	//console.log(subTermMax);
 	
 	queryNeo4j(getMentionsPayload(sharedTerm1),addSharedSubTermsOne);
