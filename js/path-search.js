@@ -75,7 +75,6 @@ function setFinishSearchHandler(){
 	
 	var button = document.getElementById("finish-search");
 	button.onclick = function(){
-		isPath = false;
 		var checkedTerms = [];
 		var checkedString = "Your B Terms: ";
 		var term = stack.first;
@@ -94,7 +93,7 @@ function setFinishSearchHandler(){
 		checkedString += " Your C Term Type: " + selectBar2.value;
 		$(displayText).text(checkedString);
 		countER = checkedTerms.length;
-		//console.log(countER);
+		console.log(countER);
 		for(var j=0;j<checkedTerms.length;j++){
 			console.log("Post Request");
 			term = checkedTerms[j];
@@ -106,6 +105,7 @@ function setFinishSearchHandler(){
 	
 function showSubresults(){
 	SEARCH_TYPE = "path-subresults";
+	makeFilters(stack, "");
 	makeTables(stack,tableLimit,0, SEARCH_TYPE);
 
 	$(loader).hide();
