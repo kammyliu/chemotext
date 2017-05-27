@@ -110,6 +110,8 @@ function showSubresults(){
 
 	$(loader).hide();
 	$("#results").show();
+	$("#path-subresults").show();
+	$("#downloadform").hide();
 	$(displayText).text("Choose the B Terms you want to search with");
 
 	newStack = new ThornStack();
