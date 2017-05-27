@@ -620,7 +620,7 @@ function makePageSections(){
 function getMentionsPayload(name){
 	return JSON.stringify({
 		"statements" : [{
-			"statement" : "match (n:Term{name:{name}})-[:MENTIONS]-(a)-[:MENTIONS]-(m) return m, a " , "parameters" : {"name": '"'+name+'"'}
+			"statement" : "match (n:Term{name:{name}})-[:MENTIONS]-(a)-[:MENTIONS]-(m) return m, a " , "parameters" : {"name": name}
 		}]
 	});
 }
@@ -628,7 +628,7 @@ function getMentionsPayload(name){
 function getSubtermsPayload(name){
 	return JSON.stringify({
 		"statements" : [{
-			"statement" : "match (n:Term{name:{name}})-[:MAPPED]->(a) return a " , "parameters" : {"name": '"'+name+'"'}
+			"statement" : "match (n:Term{name:{name}})-[:MAPPED]->(a) return a " , "parameters" : {"name": name}
 		}]
 	});
 }
