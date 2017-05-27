@@ -57,7 +57,8 @@ function triangleSearch(){
 		queryNeo4j(data,triangleSearchOnSuccess);
 	}	
 }
-	var stack, newStack;
+var stack, newStack;
+
 function triangleSearchOnSuccess(data){
 	console.log("Finished Search");
 	
@@ -121,9 +122,7 @@ function showSubresults(){
 }
 
 
-function addTriangleSubTerm(data){
-	var stack = simpleStack;
-	
+function addTriangleSubTerm(data){	
 	addTermOrSubterm(stack, data);
 	
 	console.log("FINISHED SUBTERM or TERM");
@@ -140,7 +139,7 @@ function findTriangleSubTerms(data){
 	var data2=data["results"][0]["data"];
 	subTermMax = data2.length + 1;
 	
-	simpleStack = new ThornStack();
+	stack = new ThornStack();
 	
 	queryNeo4j(getMentionsPayload(triangleTerm),addTriangleSubTerm);
 	
