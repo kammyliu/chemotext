@@ -207,7 +207,7 @@ function makePathSubresultsTable(stack, index, indexLimit){
 	var $tbody = $(tableform).find("tbody");
 	$(tableform).find("tr").remove();	
 	
-	$tbody.apppend('<tr><th class="countCol"></th><th>Terms</th><th class="countCol">Count</th></tr>');
+	$tbody.append('<tr><th class="countCol"></th><th>Terms</th><th class="countCol">Count</th></tr>');
 	
 	/*append TR: 
 		<tr>
