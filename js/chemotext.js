@@ -67,6 +67,7 @@ function showSubterms(){
 
 
 function queryNeo4j(payload,successFunc){
+	console.log("Query: "+payload);
 	$.ajax({ //443 works.
 		url: CORS+"http://chemotext.mml.unc.edu:7474/db/data/transaction/commit", //GITHUB PAGES
 		accepts: "application/json; charset=UTF-8",	
