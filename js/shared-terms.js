@@ -61,6 +61,7 @@ function sharedSearchTwo(data){
 	
 	_stack = newstack;
 	
+	console.log(_stack);
 	showResult(_stack, input.value+"_"+input2.value, _subterms, SEARCH_TYPE);
 }
 
