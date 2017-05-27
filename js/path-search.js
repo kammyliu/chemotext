@@ -51,7 +51,7 @@ function triangleSearch(){
 			});
 		}
 		//queryNeo4j(getSubtermsPayload(triangleTerm),findTriangleSubTerms);
-		queryNeo4j(data),findTriangleSubTerms);
+		queryNeo4j(data,findTriangleSubTerms);
 		//"statement" : "match (n:Term{name:{name}})-[:MAPPED]->(a) return a " , "parameters" : {"name": term}
 		//"statement" : "match (n:Term{name:{name}})-[:MENTIONS]-(a)-[:MENTIONS]-(m) return m, a " , "parameters" : {"name": name}
 
