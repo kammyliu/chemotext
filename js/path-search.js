@@ -67,7 +67,6 @@ function triangleSearchOnSuccess(data){
 	addTermOrSubterm(stack, data);
 
 	SEARCH_TYPE = "path-subresults";
-	tableform = document.getElementById("subresults-tableform");
 	makeTables(stack,tableLimit,0, "path-subresults");
 	
 	$(loader).hide();
@@ -151,7 +150,6 @@ function findTriangleSubTerms(data){
 
 function postRequest(term,type,stack,count,csvName){
 	var input = document.getElementById("inputbar");
-	var tableform = document.getElementById("tableform");
 	var selectBar = document.getElementById("selectBar");
 	var downloadform = document.getElementById("downloadform");
 	
@@ -190,7 +188,6 @@ function postRequest(term,type,stack,count,csvName){
 				console.log("FINISHED: "+stack.length)
 
 				SEARCH_TYPE = "connected";
-
 				makeTables(stack,tableLimit,0,SEARCH_TYPE);
 				makeDownloadableCSV(input.value+"_Path"+csvName,stack);
 			}	
@@ -219,7 +216,7 @@ function makePathSubresultsTable(stack, index, indexLimit){
 			</td>
 		</tr>
 	*/
-	var $tbody = $("#tableform").find("tbody");
+	var $tbody = $("#subresults-table").find("tbody");
 	for(var j=index;j<indexLimit;j++){
 		if (node == null) break;
 		

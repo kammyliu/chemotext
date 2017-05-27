@@ -290,10 +290,11 @@ function openArticleList(node){
 	newpage.document.write(html)
 }
 
-function makeTables(stack,limit,index=0,type){		
+function makeTables(stack,limit,index=0,type, tableElement){		
 	$(tableform).find("tr").slice(1).remove();	//remove all tr except the first one
 
 	var maintable = $(tableform).find("table")[0];
+	if (tableElement) mainTable = tableElement;
 	
 	var indexLimit = index+limit;
 	if(indexLimit>stack.length){
