@@ -1,6 +1,6 @@
 var isPath = true;
 var countER = 6;
-SEARCH_TYPE = "path-subresults";
+SEARCH_TYPE = "path-subresults";	//second step is "connected"
 
 var input, selectBar;
 
@@ -170,7 +170,7 @@ function postRequest(term,type,stack,csvName){
 	}
 		
 	$.ajax({ //443 works.
-		url: "http://chemotext.mml.unc.edu:7474/db/data/transaction/commit",			
+		url: CORS+"http://chemotext.mml.unc.edu:7474/db/data/transaction/commit",			
 		accepts: "application/json; charset=UTF-8",
 		dataType:"json",
 		contentType:"application/json",		

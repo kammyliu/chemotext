@@ -176,7 +176,7 @@ function filterStack(dropbox,stack,name){
 	
 	// filter by type
 	var type = dropbox.value;
-	if(!isArticle && type!="None"){
+	if(SEARCH_TYPE!="article" && type!="None"){
 		name = name+"_"+type;
 		newStack = filterType(newStack, type);
 	}
@@ -293,8 +293,7 @@ function openArticleList(node){
 function makeTables(stack,limit,index=0,type, tableElement){		
 	$(tableform).find("tr").slice(1).remove();	//remove all tr except the first one
 
-	var maintable = $(tableform).find("table")[0];
-	if (tableElement) mainTable = tableElement;
+	//var maintable = $(tableform).find("table")[0];
 	
 	var indexLimit = index+limit;
 	if(indexLimit>stack.length){

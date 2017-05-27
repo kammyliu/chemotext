@@ -1,7 +1,5 @@
 SEARCH_TYPE = "connected";
 
-isShared = false; isArticle = false; isPath = false;
-
 var input;
 $(document).ready(function(){	
 	
@@ -48,7 +46,7 @@ function simpleSearchOnSuccess(data){
 	_stack = new ThornStack();
 	//console.log(data);
 	addTermOrSubterm(_stack,data);
-	showResult(_stack, input.value, _subterms);
+	showResult(_stack, input.value, _subterms, SEARCH_TYPE);
 }
 
 
