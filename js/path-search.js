@@ -143,6 +143,7 @@ function showSubresults(){
 
 
 function findTriangleSubTerms(data){
+	console.log(data);
 	subTerms = [];
 	subTermCount = 0;
 	var data2=data["results"][0]["data"];
