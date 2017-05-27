@@ -32,7 +32,7 @@ function simpleSearch(){
 		_term = synonym.split('|')[1]; //synonym.mainTerm.name;
 	}
 	//$(displayText).text("Looking for term: " + _term);
-	console.log("Synonym: "+_term);
+	console.log("Term: "+_term);
 	
 	_subterms = document.getElementById("mappedCheckbox").checked;
 	if(_subterms){
@@ -45,6 +45,7 @@ function simpleSearch(){
 
 function simpleSearchOnSuccess(data){
 	_stack = new ThornStack();
+	console.log(data);
 	addTermOrSubterm(_stack,data);
 	showResult(_stack, input.value, _subterms);
 }
@@ -58,7 +59,7 @@ function findSimpleSubterms(data){
 	
 	subTerms = [];
 	subTermCount = 0;
-	subTermMax = data2.length + 1;
+	subTermMax = data["results"][0]["data"].length + 1;
 	//console.log(subTermMax);
 	
 	// fetch input term
