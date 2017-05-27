@@ -1,4 +1,3 @@
-var countER = 6;
 var tableLimit = 10;
 var synStack = new ThornStack(withCountCode=false);
 synStack.extra = false;
@@ -310,6 +309,12 @@ function makeTables(stack,limit,index=0,type){
 		case 'shared':
 			makeSharedTermsTable(stack, index, indexLimit);
 			return;
+		case 'path-subresults':
+			makePathSubresultsTable(stack, index, indexLimit);		
+			return;
+		case 'article':
+			makeArticleSearchTable(stack, index, indexLimit);
+			return;
 	}
 	 
 	var newchemicalarray = [];
@@ -482,6 +487,16 @@ function inputSuggestion($inputSection, inputId){
 	});
 }
 	
+	
+function addSimpleSubtermData(data){
+	addTermOrSubterm(_stack,data);
+	//console.log("FINISHED SUBTERM or TERM");
+	
+	subTermCount++;
+	if(subTermCount==subTermMax){
+		showResult(_stack, input.value, _subterms);
+	}
+}
 	
 function getSelfOrSynonym(string){
 		var term = synStack.get(string);
