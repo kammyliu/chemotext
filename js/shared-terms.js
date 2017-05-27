@@ -63,7 +63,7 @@ function sharedSearchTwo(data){
 	
 	_stack = newstack;
 	
-	showResult(_stack, input.value+"_"+input2.value, _subterms);
+	showResult(_stack, input.value+"_"+input2.value, _subterms, SEARCH_TYPE);
 }
 
 
@@ -127,7 +127,7 @@ function addSharedSubTermsTwo(data){
 	subTermCount++;
 	if(subTermCount==subTermMax){
 		stack = newstack;
-		showResult(stack, input.value+"_"+input2.value, _subterms);
+		showResult(stack, input.value+"_"+input2.value, _subterms, SEARCH_TYPE);
 	}
 }
 

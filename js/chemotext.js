@@ -494,7 +494,7 @@ function addSimpleSubtermData(data){
 	
 	subTermCount++;
 	if(subTermCount==subTermMax){
-		showResult(_stack, input.value, _subterms);
+		showResult(_stack, input.value, _subterms, SEARCH_TYPE);
 	}
 }
 	
@@ -653,7 +653,7 @@ function addTermOrSubterm(stack, data){
 }
 
 
-function showResult(stack, csvName, subterms){
+function showResult(stack, csvName, subterms, type){
 	
 	if(stack.length==0){
 		$(displayText).text("No Results");
@@ -669,7 +669,7 @@ function showResult(stack, csvName, subterms){
 	}
 	
 	makeFilters(stack, csvName);
-	makeTables(stack, tableLimit, 0, SEARCH_TYPE);
+	makeTables(stack, tableLimit, 0, type);
 	makeDownloadableCSV(csvName, stack);
 	
 }

@@ -1,5 +1,6 @@
 var isPath = true;
 var countER = 6;
+SEARCH_TYPE = "path-subresults";
 
 var input, selectBar;
 
@@ -21,6 +22,8 @@ var _subterms; //flag for if subterms are included
 
 var triangleTerm;
 function triangleSearch(){
+	SEARCH_TYPE = "path-subresults";
+
 	tableform = document.getElementById("subresults-tableform");
 
 	$(displayText).text("");
@@ -190,7 +193,9 @@ function postRequest(term,type,stack,count,csvName){
 			if(countER==0){
 				console.log("FINISHED: "+stack.length)
 
-				makeTables(stack,tableLimit,0,"connected");
+				SEARCH_TYPE = "connected";
+
+				makeTables(stack,tableLimit,0,SEARCH_TYPE);
 				makeDownloadableCSV(input.value+"_Path"+csvName,stack);
 			}	
 		 },
