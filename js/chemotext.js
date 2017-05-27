@@ -634,6 +634,7 @@ function showResult(stack, csvName, subterms){
 	
 	if(stack.length==0){
 		$(displayText).text("No Results");
+		$("#loader").hide();
 		return;
 	}
 	

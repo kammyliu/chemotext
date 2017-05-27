@@ -17,10 +17,10 @@ var _term;
 var _stack;
 var _subterms; //flag for if subterms are included
 
-/* Not including subterms */
 
 function simpleSearch(){
 
+	$(displayText).text("");
 	$("#results").hide();
 	$("#show-subterms").hide();
 	$("#loader").show();
@@ -42,10 +42,11 @@ function simpleSearch(){
 	}
 }
 
+/* Not including subterms */
 
 function simpleSearchOnSuccess(data){
 	_stack = new ThornStack();
-	console.log(data);
+	//console.log(data);
 	addTermOrSubterm(_stack,data);
 	showResult(_stack, input.value, _subterms);
 }

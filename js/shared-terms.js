@@ -23,6 +23,7 @@ var _stack;
 var _subterms; //flag for if subterms are included
 
 function sharedSearch(){
+	$(displayText).text("");
 	$("#results").hide();
 	$("#show-subterms").hide();
 	$("#loader").show();
