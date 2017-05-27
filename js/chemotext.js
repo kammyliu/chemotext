@@ -265,7 +265,7 @@ function onInitFs(fs, name, stack, withPmids){
 	
 function makeDownloadableCSV(name,stack){
 	$(".download-button").off("click");
-	$(".download-button").on(function(){
+	$(".download-button").click(function(){
 		var withPmids = this.id!="csv";
 		window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
 		window.requestFileSystem(window.TEMPORARY, 5*1024*1024, function(fs){onInitFs(fs,name,stack,withPmids)}, errorHandler);
