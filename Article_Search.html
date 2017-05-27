@@ -24,34 +24,36 @@
 		<li class="active"><a href="Article_Search.html">Find Articles</a></li> 
 	</ul>
 	
-	<main id="thepage" autocomplete="off" style="padding-top: 15px;">
-		<p id="introSection" style="padding-top: 15px;">
-			<table>
-				<tr>
-					<td id="introText"> Enter one or multiple terms and Chemotext will return all the articles that co-occur with your input terms.</td>
-					<td id="introGraphic">
-						<img src="img/articlePicture.png" width="225" height="165">
-					</td>
-				</tr>
-			</table>
-			<ul id="displayText" style="margin-top: 50px;"> </ul>
-		</p>
-		<form autocomplete="off" id="inputSection" style="padding-top: 15px;">
+	
+	<main id="thepage" autocomplete="off">
+		<div id="introSection">
+			<p id="introText">Enter one or multiple terms and Chemotext will return 
+			all the articles that co-occur with your input terms.</p>
+			<img src="img/articlePicture.png">
+		</div>
+	
+
+		<ul id="terms-list"></ul>
+		<form autocomplete="off" id="inputSection" >
 			<button id="add-term-button" type="submit">Add Term</button>
-			<button type="button" onclick="articleSearch()" style="visibility: hidden;">Search</button>
-		</form>
-		<p id="mappedSection"></p>
-		
-		<form id="tableform" style="padding-top: 15px;">
-			<table class="center">
-				<tr>
-					<td style="text-align: center;">Articles</td>
-				</tr>
-			</table>
+			<button type="button" disabled onclick="articleSearch()" >Search</button>
 		</form>
 		
-		<p id="downloadform" style="text-align: center; padding-top: 15px;"></p>
-		<form id="filterSection" style="padding-top: 15px;"></form>
+		<p id="displayText"></p>
+
+		<section id="results">
+			<!-- "show subterms" button added later. Kept hidden -->
+			
+			<form id="tableform">
+				<table class="center" >
+					<tr>
+						<th>Articles</th>
+					</tr>
+				</table>
+				<!-- other sections added later -->
+			</form>
+			
+		</section>
 	</main>
 	
 	<script src="js/classes.js"></script>

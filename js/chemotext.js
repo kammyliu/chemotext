@@ -502,7 +502,7 @@ function addSimpleSubtermData(data){
 }
 	
 function getSelfOrSynonym(string){
-		var term = synStack.get(string);
+	var term = synStack.get(string);
 	if(term && term.includes('|')){
 		term = term.split('|')[1]; //term.mainTerm.name;
 	}
@@ -593,16 +593,20 @@ function makePageSections(){
 
 	// download buttons
 	var downloadform = document.getElementById("downloadform");
-	$(downloadform).append('<button type="button" id="csv" class="download-button">View CSV</button>');
-	$(downloadform).append('<button type="button" id="csv-with-pmids" class="download-button">CSV with pmids</button>');
-
+	if (downloadform != null){
+		$(downloadform).append('<button type="button" id="csv" class="download-button">View CSV</button>');
+		$(downloadform).append('<button type="button" id="csv-with-pmids" class="download-button">CSV with pmids</button>');
+	}
+	
 	// filter fields
 	var filterSection = document.getElementById("filterSection");
-	$(filterSection).append('<select id="typeSelect"></select>');
-	makeSTypes("typeSelect", true);	
-	$(filterSection).append('<button type="submit" id="filter-type-button">Filter</button>');
-	$(filterSection).append('<p>Date After:<input id="dateAfterInput" type="date">'+ 
-		'Date Before:<input id="dateBeforeInput" type="date"></p>');
+	if (filterSection != null){
+		$(filterSection).append('<select id="typeSelect"></select>');
+		makeSTypes("typeSelect", true);	
+		$(filterSection).append('<button type="submit" id="filter-type-button">Filter</button>');
+		$(filterSection).append('<p>Date After:<input id="dateAfterInput" type="date">'+ 
+			'Date Before:<input id="dateBeforeInput" type="date"></p>');
+	}
 	
 	// show subterms button
 	$("#results").prepend('<button onclick="showSubterms()" id="show-subterms">Click Here to see Subterms</button>');

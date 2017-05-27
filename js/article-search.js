@@ -1,67 +1,50 @@
-var isArticle = true;
-var tableform, articleBar, displayText;
+SEARCH_TYPE = "article";
+
+var articleBar, termsList, searchbutton;
 
 $(document).ready(function(){	
 	makePageSections();
 
 	inputSuggestion($("#inputSection"), "articleBar");
-	
-	tableform = document.getElementById("tableform");
 	articleBar = document.getElementById("articleBar");
-	displayText = document.getElementById("displayText");
-		
-	$("#add-term-button")[0].onclick = function(){
-		var input = document.getElementById("articleBar");
-		if(input.value==""){
-			//articleSearch();
-		}else{
-			searchbutton.style.visibility = "visible";
+	termsList = document.getElementById("terms-list");
+	searchbutton = document.getElementById("searchbutton");
+	
+	$("#add-term-button").click(function(){
+		if(articleBar.value!=""){
+			searchbutton.disabled = false;
 			addToArticleArray()
 		}
-	}
+	});
 	
 	makeSynStack();
 });
 
 
 
-function addToArticleArray(){
+function addToArticleArray(){	
+	var term = getSelfOrSynonym(articleBar.value);
+	$(termsList).append('<li><span>'+term+'</span><button type="button" onclick="deleteFromArticleArray(this)">X</button></li>');
 	
-	while(tableform.firstChild){
-		tableform.removeChild(tableform.firstChild);
-	}
-	
-	var check = synStack.get(articleBar.value);
-	if(check){
-		if(check.includes("|")){
-			check = check.split("|")[1];
-		}
-
-		$(displayText).append('<li><span>'+check+'</span><button type="button" onclick="deleteFromArticleArray(this)">X</button></li>');
-	}
 	articleBar.value = "";
-	// id= articleBar. check to see if Term exists and if it does add to array in memory and list on computer.
 }
 
 
 function deleteFromArticleArray(button){
-	
-	while(tableform.firstChild){
-		tableform.removeChild(tableform.firstChild);
-	}
-	
 	$(button).parent().remove();
-	
+	if ($(termsList).children().length == 0){
+			searchbutton.disabled = true;		
+	}
 	//console.log("Delete");
 }
 
 function articleSearch(){
+	$(displayText).text("");
+	$("#results").hide();
+	$("#loader").show();
 	
-	if(articleBar.value!=""){
-		//addToArticleArray();
-	}
-	
-	var articleArray = $(displayText).find("span").each(function(i, el){
+	var articleArray = [];
+	$(termsList).find("span").each(function(i, el){
 		articleArray.push($(this).text());
 	});
 	
@@ -74,49 +57,55 @@ function articleSearch(){
 	}
 	var data = JSON.stringify({
 			"statements" : [{
-				"statement" : matchStr+" return a;" , "parameters" : params
+				"statement" : matchStr+" return a;", 
+				"parameters" : params
 			}]
      });
 	 
-	//take array, do query, make Tables. and Date Filter.
-	$.ajax({ //443 works.
-		url: "http://chemotext.mml.unc.edu:7474/db/data/transaction/commit",
-		accepts: "application/json; charset=UTF-8",
-		dataType:"json",
-		contentType:"application/json",
-		//headers: { "X-Stream": "false" },
-		
-		data: data,
-		type:"POST",
-		success:function(data,xhr,status)
-		{
-			console.log("Finished Search");
-			//tableform.innerHTML = JSON.stringify(data);
-			var data = data["results"][0]["data"];
-			var stack = new ThornStack(false);
-			for(var i=0;i<data.length;i++){
-				var date = data[i]["row"][0]["date"];
-				var pmid = data[i]["row"][0]["pmid"];
-				var title = data[i]["row"][0]["title"];
+	 
+	 queryNeo4j(data, function(data,xhr,status){
+		console.log("Finished Search");
+		//tableform.innerHTML = JSON.stringify(data);
+		var data = data["results"][0]["data"];
+		var stack = new ThornStack(false);
+		for(var i=0;i<data.length;i++){
+			var date = data[i]["row"][0]["date"];
+			var pmid = data[i]["row"][0]["pmid"];
+			var title = data[i]["row"][0]["title"];
 
-				var art = new Art(pmid,date,title);
-				stack.add(pmid,art);
-			}
-			//console.log(stack.length);
-			makeTables(stack,tableLimit);
-			//makeFilters(stack,"articles");
-		 },
-		error:function(xhr,err,msg){
-			console.log(xhr);
-			console.log(err);
-			console.log(msg);
-			//thepage.removeChild(loader);
-			$("#loader").remove();
-			tableform.innerHTML = "Connection to Neo4j Database rejected";
+			var art = new Art(pmid,date,title);
+			stack.add(pmid,art);
 		}
-	});
+		
+		showResult(stack, "", false, SEARCH_TYPE);
+		//console.log(stack.length);
+		//makeTables(stack,tableLimit);
+		//makeFilters(stack,"articles");
+	 });
+	 
+	
 }
 
+
+function makeArticleSearchTable(stack, index, indexLimit){
+
+	var $tbody = $("#tableform").find("tbody");
+
+
+	/*append TR: 
+		<tr>
+			<td>
+				<a href="url">pmid</a>
+			</td>
+		</tr>
+	*/
+	for(var j=index;j<indexLimit;j++){
+		var pmid = stack.list[j];
+		$tbody.append('<tr><td><a href=http://www.ncbi.nlm.nih.gov/pubmed/"'
+			+pmid+'">'+pmid+'</a></td></tr>');
+		
+	}
+}
 	
 
 
