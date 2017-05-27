@@ -38,14 +38,14 @@ function triangleSearch(){
 		if(type == "Disease" || type == "Other" || type == "Chemical"){
 			data = JSON.stringify({				
 				"statements" : [{
-					"statement" : "match (n:Term{name:{name}})-[:MAPPED]->(a)-[a:Term{type:{type}}] return a",
+					"statement" : "match (n:Term{name:{name}})-[:MAPPED]->(a:Term{type:{type}}) return a",
 					"parameters" : {"name": triangleTerm, "type":type}
 				}]			
 			});		
 		}else{
 			data = JSON.stringify({
 				"statements" : [{
-					"statement" : "match (n:Term{name:{name}})-[:MAPPED]->(a)-[a:Term{type:{type}}] return a",
+					"statement" : "match (n:Term{name:{name}})-[:MAPPED]->(a:Term{stype:{type}}) return a",
 					"parameters" : {"name": triangleTerm, "type":type}
 				}]			
 			});
