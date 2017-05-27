@@ -8,7 +8,7 @@ $(document).ready(function(){
 	inputSuggestion($("#inputSection"), "articleBar");
 	articleBar = document.getElementById("articleBar");
 	termsList = document.getElementById("terms-list");
-	searchbutton = document.getElementById("searchbutton");
+	searchbutton = document.getElementById("search-button");
 	
 	$("#add-term-button").click(function(){
 		if(articleBar.value!=""){
