@@ -43,28 +43,6 @@
 
 				<button type="submit" onclick="triangleSearch()">Search</button>
 				<input type="checkbox" id="mappedCheckbox"> Click to Include Subterms
-				
-				<section id="path-subresults">
-					<p>Choose the B Terms you want to search with</p>
-
-					<div id="subresults-table">
-						<table class="center">
-							<tr>
-								<th class="countCol"></th>
-								<th>Terms</th>
-								<th class="countCol">Count</th>
-							</tr>
-						</table>
-						<!-- other sections added later -->
-					</div>
-					
-					<p id="b-terms"></p>
-					
-					<p>Choose the type of C Terms you want to search for</p>
-					<select id="triType"></select>
-					<button id="finish-search">Finish Search</button>
-				</section>
-				
 			</form>
 			
 			<p id="displayText"></p>
@@ -73,14 +51,16 @@
 			
 				<form id="tableform">
 					<table class="center">
-						<tr>
-							<th class="countCol"></th>
-							<th>Terms</th>
-							<th class="countCol">Count</th>
-						</tr>
+						<tbody></tbody>
 					</table>
 					<!-- other sections added later -->
 				</form>
+				
+				<section id="path-subresults">					
+					<p>Choose the type of C Terms you want to search for</p>
+					<select id="triType"></select>
+					<button id="finish-search">Finish Search</button>
+				</section>
 				
 				<div id="downloadform">
 					<!-- download buttons added later -->

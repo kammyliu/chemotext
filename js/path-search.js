@@ -66,15 +66,7 @@ function triangleSearchOnSuccess(data){
 		
 	addTermOrSubterm(stack, data);
 
-	SEARCH_TYPE = "path-subresults";
-	makeTables(stack,tableLimit,0, "path-subresults");
-	
-	$(loader).hide();
-	$("#path-subresults").show();
-	
- newStack = new ThornStack();
-	
-	setFinishSearchHandler();
+	showSubresults();
 	
 }	
 	
@@ -99,20 +91,33 @@ function setFinishSearchHandler(){
 			}
 			term = term.right;
 		}
-		//checkedString = checkedString + " Your C Term Type: " + selectBar2.value;
-		$("#b-terms").text(checkedString);
+		checkedString += " Your C Term Type: " + selectBar2.value;
+		$(displayText).text(checkedString);
 		countER = checkedTerms.length;
-		console.log(countER);
+		//console.log(countER);
 		for(var j=0;j<checkedTerms.length;j++){
 			console.log("Post Request");
 			term = checkedTerms[j];
-			postRequest(term.name,selectBar2.value,newStack,countER,csvName)
+			postRequest(term.name,selectBar2.value,newStack,csvName)
 		}
 	};
 }
 	
-	/*
-function addTriangleSubTerms(data){
+	
+function showSubresults(){
+	SEARCH_TYPE = "path-subresults";
+	makeTables(stack,tableLimit,0, SEARCH_TYPE);
+
+	$(loader).hide();
+	$("#results").show();
+	$(displayText).text("Choose the B Terms you want to search with");
+
+	newStack = new ThornStack();
+	setFinishSearchHandler();	
+}
+
+
+function addTriangleSubTerm(data){
 	var stack = simpleStack;
 	
 	addTermOrSubterm(stack, data);
@@ -121,15 +126,9 @@ function addTriangleSubTerms(data){
 	subTermCount++;
 	
 	if(subTermCount==subTermMax){
-		stack = simpleStack;
-		
-		tableform = document.getElementById("tableform");
-		makeTables(stack,tableLimit,0);
-	
-		var newStack = new ThornStack();
-		setFinishSearchHandler();
+		showSubresults();
 	}
-	}*/
+}
 
 function findTriangleSubTerms(data){
 	subTerms = [];
@@ -138,17 +137,17 @@ function findTriangleSubTerms(data){
 	
 	simpleStack = new ThornStack();
 	
-	queryNeo4j(getMentionsPayload(triangleTerm),addSimpleSubtermData);
+	queryNeo4j(getMentionsPayload(triangleTerm),addTriangleSubTerm);
 	
 	for (var i=0; i< data2.length ; i++){
 		var name = data2[i]["row"][0]["name"];	
 		subTerms.push(name);
-		queryNeo4j(getMentionsPayload(name),addSimpleSubtermData);			
+		queryNeo4j(getMentionsPayload(name),addTriangleSubTerm);			
 	}	
 }
 
 
-function postRequest(term,type,stack,count,csvName){
+function postRequest(term,type,stack,csvName){
 	var input = document.getElementById("inputbar");
 	var selectBar = document.getElementById("selectBar");
 	var downloadform = document.getElementById("downloadform");
@@ -188,8 +187,8 @@ function postRequest(term,type,stack,count,csvName){
 				console.log("FINISHED: "+stack.length)
 
 				SEARCH_TYPE = "connected";
-				makeTables(stack,tableLimit,0,SEARCH_TYPE);
-				makeDownloadableCSV(input.value+"_Path"+csvName,stack);
+				
+				showResult(stack, input.value+"_Path"+csvName, _subterms, SEARCH_TYPE);
 			}	
 		 },
 		error:function(xhr,err,msg){
@@ -205,6 +204,11 @@ function makePathSubresultsTable(stack, index, indexLimit){
 		node = node.right;	
 	}
 	
+	var $tbody = $(tableform).find("tbody");
+	$(tableform).find("tr").remove();	
+	
+	$tbody.apppend('<tr><th class="countCol"></th><th>Terms</th><th class="countCol">Count</th></tr>');
+	
 	/*append TR: 
 		<tr>
 			<td class="countCol">
@@ -216,22 +220,16 @@ function makePathSubresultsTable(stack, index, indexLimit){
 			</td>
 		</tr>
 	*/
-	var $tbody = $("#subresults-table").find("tbody");
+
 	for(var j=index;j<indexLimit;j++){
 		if (node == null) break;
 		
 		$tr = $("<tr/>");
 		$tr.append('<td class="countCol"><input '+
-			node.isSelected?'checked ':'' +
+			(node.isSelected?'checked ':'') +
 			'type="checkbox" name="'+node.name+'"></td>');
 		$tr.append('<td>'+node.name+'</td>');
-		$buttonTd = $("<td/>", {"class": "countCol"}).append( $("<button/>", {
-			type: "button", 
-			"class": "articleButton", 
-			text: node.count, 
-			click: function(node){ return function(){openArticleList(node);} }(node)
-		}));
-		$tr.append($buttonTd);
+		$tr.append('<td>'+node.count+'</td>');
 		$tbody.append($tr);
 		
 		node = node.right;
