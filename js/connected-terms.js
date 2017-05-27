@@ -29,9 +29,10 @@ function simpleSearch(){
 	$("#loader").show();
 
 	//get term or its synonym
-	_term = synStack.getSyn(input.value);
-	if(_term && _term.includes('|')){	
-		_term = _term.split('|')[1]; //_term.mainTerm.name;
+	_term = input.value;
+	var synonym = synStack.getSyn(_term);
+	if(synonym && synonym.includes('|')){	
+		_term = synonym.split('|')[1]; //synonym.mainTerm.name;
 	}
 	//$(displayText).text("Looking for term: " + _term);
 	console.log("Synonym: "+_term);
