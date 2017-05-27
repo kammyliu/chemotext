@@ -137,7 +137,8 @@ function addTriangleSubTerm(data){
 function findTriangleSubTerms(data){
 	subTerms = [];
 	subTermCount = 0;
-	subTermMax = data["results"][0]["data"].length + 1;
+	var data2=data["results"][0]["data"];
+	subTermMax = data2.length + 1;
 	
 	simpleStack = new ThornStack();
 	
@@ -184,7 +185,7 @@ function postRequest(term,type,stack,csvName){
 			addTermOrSubterm(stack, data);
 			
 			countER--;
-			$(displayText).text("Percent Done: " + (100-(countER*20))); 
+			//$(displayText).text("Percent Done: " + (100-(countER*20))); 
 			//console.log("Count: "+countER);
 			if(countER==0){
 				console.log("FINISHED: "+stack.length)
@@ -192,6 +193,7 @@ function postRequest(term,type,stack,csvName){
 				showResult(stack, input.value+"_Path"+csvName, _subterms, SEARCH_TYPE);
 				$("#path-subresults").hide();
 				$("#downloadform").show();
+				$("#show-subterms").hide();
 			}	
 		 },
 		error:function(xhr,err,msg){
