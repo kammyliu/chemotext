@@ -1,18 +1,18 @@
 <html>
 	<head> 
 		<title>Chemotext | Path Search</title>
+		
 		<!-- Latest compiled and minified CSS   MOON ANTLERS TEARS-->
 		<link href='http://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 		<link rel="stylesheet" type="text/css" href="chemotextstyle.css">
-		
+
 		<!-- jQuery library -->
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-		
 		<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+
 		<link rel="SHORTCUT ICON" href="https://chembench.mml.unc.edu/theme/img/mml.ico">
-		<link rel="icon" href="https://chembench.mml.unc.edu/theme/img/mml.ico" type="image/ico">
-		
+		<link rel="icon" href="https://chembench.mml.unc.edu/theme/img/mml.ico" type="image/ico">	
 	</head>
 	<body class="container">
 		<h1 id="header"><img id="logo" src="img/ctLogo.jpg">Chemotext</h1>
@@ -24,43 +24,76 @@
 			<li><a href="Article_Search.html">Find Articles</a></li> 
 		</ul>
 		
-		<main id="thepage" autocomplete="off" style="padding-top: 15px;">
-			<p id="introSection" style="padding-top: 15px;">
-				<table>
-					<tr>
-						<td id="introText">In this search you input an A term and the type of B term you wish to search for. Chemotext  will then display a list of the B terms through the same method as Connected Terms search. You then choose which B terms you wish do continue mediating the search through and the  the type of C term you wish to search for. Chemotext will then process this request and display the list of C terms. This path search allows you to look for new relationships between A and C terms through a mediating B term. </td>
-						<td id="introGraphic">
-							<img src="img/Path_Search_Image.png" width="225" height="195">
-						</td>
-					</tr>
-				</table>
-			</p>
+		<main id="thepage" autocomplete="off" >
+			<div id="introSection">
+				<p id="introText">In this search you input an A term and the type of B term you wish to search for. 
+					Chemotext will then display a list of the B terms through the same method as Connected Terms search. 
+					You then choose which B terms you wish do continue mediating the search through
+					and the type of C term you wish to search for. 
+					Chemotext will then process this request and display the list of C terms. 
+					This path search allows you to look for new relationships between A and C terms
+					through a mediating B term. </p>
+				<img src="img/Path_Search_Image.png">
+			</div>
 			
-			<form autocomplete="off" id="inputSection" style="padding-top: 15px;">
-				<p style="padding-top: 15px;" id="selectBar-section">Choose the Type of B Terms to search for </p>
-				<p>
-					<button type="submit" onclick="triangleSearch()">Search</button>
-				</p>
-				<p id="displayText"></p>
-			</form>
-			<p id="mappedSection">
+			<form autocomplete="off" id="inputSection" >
+				<!-- input for first term added later -->
+				<p id="selectBar-section">Choose the Type of B Terms to search for </p>
+				<select id="selectBar"></select>
+
+				<button type="submit" onclick="triangleSearch()">Search</button>
 				<input type="checkbox" id="mappedCheckbox"> Click to Include Subterms
-				<p id="mappedResults"></p>
-			</p>
-			<form id="tableform" style="padding-top: 15px;">
-				<table class="center">
-					<tr>
-						<th class="countCol"></th>
-						<th>Terms</th>
-						<th class="countCol" style="text-align: center;">Count</th>
-					</tr>
-				</table>
+				
+				<section id="path-subresults">
+					<p>Choose the B Terms you want to search with</p>
+
+					<form id="subresults-tableform">
+						<table class="center">
+							<tr>
+								<th class="countCol"></th>
+								<th>Terms</th>
+								<th class="countCol">Count</th>
+							</tr>
+						</table>
+						<!-- other sections added later -->
+					</form>
+					
+					<p id="b-terms"></p>
+					
+					<p>Choose the type of C Terms you want to search for</p>
+					<select id="triType"></select>
+					<button id="finish-search">Finish Search</button>
+				</section>
+				
 			</form>
-			<p id="downloadform" style="text-align: center; padding-top: 15px;"></p>
-			<form id="filterSection" style="padding-top: 15px;"></form>
+			
+			<p id="displayText"></p>
+
+			<section id="results">
+			
+				<form id="tableform">
+					<table class="center">
+						<tr>
+							<th class="countCol"></th>
+							<th>Terms</th>
+							<th class="countCol">Count</th>
+						</tr>
+					</table>
+					<!-- other sections added later -->
+				</form>
+				
+				<div id="downloadform">
+					<!-- download buttons added later -->
+				</div>
+				
+				<form id="filterSection">
+					<!-- fields and a submit button added later -->
+				</form>
+			</section>
 		</main>
 		<script src="js/classes.js"></script>
 		<script src="js/chemotext.js"></script>
+		<script src="js/connected-terms.js"></script>
 		<script src="js/path-search.js"></script>
 	</body>
 </html>

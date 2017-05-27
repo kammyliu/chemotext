@@ -34,7 +34,7 @@ function sharedSearch(){
 	var term1 = getSelfOrSynonym(input.value);
 	var term2 = getSelfOrSynonym(input2.value);
 		
-	_subterms = document.getElementById("mappedCheckbox").checked;
+	_subterms = checkbox.checked;
 	if(_subterms){
 		sharedTerm1 = term1;
 		sharedTerm2 = term2;
@@ -132,13 +132,7 @@ function addSharedSubTermsTwo(data){
 }
 
 
-function getSelfOrSynonym(string){
-	var term = synStack.get(string);
-	if(term && term.includes('|')){
-		term = term.split('|')[1]; //term.mainTerm.name;
-	}
-	return term;
-}
+
 
 
 

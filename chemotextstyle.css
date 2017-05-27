@@ -45,7 +45,7 @@
 }
 
 
-#results, #loader, #show-subterms{
+#results, #loader, #show-subterms, #path-subresults{
 	display: none;
 }
 

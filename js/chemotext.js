@@ -9,11 +9,12 @@ var SEARCH_TYPE;
 
 var CORS = "https://cors-anywhere.herokuapp.com/"; //GITHUB PAGES
 
-var tableform, thepage, displayText;
+var tableform, thepage, displayText, checkbox;
 $(document).ready(function(){
 	thepage = document.getElementById("thepage");
 	tableform = document.getElementById("tableform");
 	displayText = document.getElementById("displayText");
+	checkbox = document.getElementById("mappedCheckbox");
 });
 
 function makeSynStack(){
@@ -481,10 +482,18 @@ function inputSuggestion($inputSection, inputId){
 	});
 }
 	
+	
+function getSelfOrSynonym(string){
+		var term = synStack.get(string);
+	if(term && term.includes('|')){
+		term = term.split('|')[1]; //term.mainTerm.name;
+	}
+	return term;
+}
+	
 //Table filter always includes "None". path-search intermediary step doesn't
-function makeSTypes(parent, id, withNone){
-	var select = document.createElement("select");
-	select.id = id;
+function makeSTypes(id, withNone){
+	var select = document.getElementById(id);
 	
 	if(withNone){
 		$(select).append('<option value="None">No Filter</option>');
@@ -549,9 +558,7 @@ function makeSTypes(parent, id, withNone){
 			option.innerHTML = '- - ' + stypes[i];
 		}
 		select.appendChild(option);
-	}
-	
-	parent.appendChild(select);
+	}	
 }
 	
 function makePageSections(){
@@ -573,7 +580,8 @@ function makePageSections(){
 
 	// filter fields
 	var filterSection = document.getElementById("filterSection");
-	makeSTypes(filterSection, "typeSelect", true);	
+	$(filterSection).append('<select id="typeSelect"></select>');
+	makeSTypes("typeSelect", true);	
 	$(filterSection).append('<button type="submit" id="filter-type-button">Filter</button>');
 	$(filterSection).append('<p>Date After:<input id="dateAfterInput" type="date">'+ 
 		'Date Before:<input id="dateBeforeInput" type="date"></p>');
