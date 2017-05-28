@@ -17,7 +17,7 @@ main {
 }
 
 #tableform, #downloadform, #filterSection, 
-#inputSection, #displayText, #path-subresults {
+#inputSection, #displayText, #path-subresults, #selections {
 	text-align: center;
 }
 
