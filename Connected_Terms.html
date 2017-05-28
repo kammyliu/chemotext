@@ -1,18 +1,13 @@
 <html>
 <head> 
 	<title>Chemotext | Find Connected Terms</title>
-	
-	<!-- Latest compiled and minified CSS   MOON ANTLERS TEARS-->
-	<link href='http://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
-	<link rel="stylesheet" type="text/css" href="chemotextstyle.css">
-	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+	<link rel="icon" href="https://chembench.mml.unc.edu/assets/images/mml.ico" type="image/ico">
 
-	<!-- jQuery library -->
+	<link href='https://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="chemotextstyle.css">
+
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-	
-	<link rel="SHORTCUT ICON" href="https://chembench.mml.unc.edu/theme/img/mml.ico">
-	<link rel="icon" href="https://chembench.mml.unc.edu/theme/img/mml.ico" type="image/ico">
 </head>
 
 <body class="container">
@@ -27,14 +22,17 @@
 	
 	<main id="thepage" autocomplete="off">
 		<div id="introSection">
-			<p id="introText">This search gives you all terms that co-exist in an article with the term that you enter. The count represents the number of articles where they co-occur. </p>
 			<img src="img/Single_Search_Image.png">
+			<p id="introText">This search gives you all terms that co-exist in an article with the term that you enter. The count represents the number of articles where they co-occur. </p>
 		</div>
 	
 		<form autocomplete="off" id="inputSection">
 			<!-- autocomplete input field added later -->
 			<button type="submit" onclick="simpleSearch()">Search</button>
-			<input type="checkbox" id="mappedCheckbox"> Click to Include Subterms
+			<div id="subterm-checkbox">
+				<input type="checkbox" id="mappedCheckbox"> 
+				Click to Include Subterms
+			</div>
 		</form>
 		
 		<p id="displayText"></p>

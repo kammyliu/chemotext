@@ -1,76 +1,75 @@
 <html>
-	<head> 
-		<title>Chemotext | Path Search</title>
+<head> 
+	<title>Chemotext | Path Search</title>
 		
-		<!-- Latest compiled and minified CSS   MOON ANTLERS TEARS-->
-		<link href='http://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
-		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-		<link rel="stylesheet" type="text/css" href="chemotextstyle.css">
+	<link rel="icon" href="https://chembench.mml.unc.edu/assets/images/mml.ico" type="image/ico">
 
-		<!-- jQuery library -->
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-		<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+	<link href='https://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" type="text/css" href="chemotextstyle.css">
 
-		<link rel="SHORTCUT ICON" href="https://chembench.mml.unc.edu/theme/img/mml.ico">
-		<link rel="icon" href="https://chembench.mml.unc.edu/theme/img/mml.ico" type="image/ico">	
-	</head>
-	<body class="container">
-		<h1 id="header"><img id="logo" src="img/ctLogo.jpg">Chemotext</h1>
-		<ul id="nav">
-			<li><a href="index.html">Home</a></li>
-			<li><a href="Connected_Terms.html">Find Connected Terms</a></li>
-			<li><a href="Shared_Terms.html">Find Shared Terms</a></li>
-			<li class="active"><a href="Path_Search.html">Path Search</a></li> 
-			<li><a href="Article_Search.html">Find Articles</a></li> 
-		</ul>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+</head>
+<body class="container">
+	<h1 id="header"><img id="logo" src="img/ctLogo.jpg">Chemotext</h1>
+	<ul id="nav">
+		<li><a href="index.html">Home</a></li>
+		<li><a href="Connected_Terms.html">Find Connected Terms</a></li>
+		<li><a href="Shared_Terms.html">Find Shared Terms</a></li>
+		<li class="active"><a href="Path_Search.html">Path Search</a></li> 
+		<li><a href="Article_Search.html">Find Articles</a></li> 
+	</ul>
+	
+	<main id="thepage" autocomplete="off" >
+		<div id="introSection">
+			<img src="img/Path_Search_Image.png">
+			<p id="introText">In this search you input an A term and the type of B term you wish to search for. 
+				Chemotext will then display a list of the B terms through the same method as Connected Terms search. 
+				You then choose which B terms you wish do continue mediating the search through
+				and the type of C term you wish to search for. 
+				Chemotext will then process this request and display the list of C terms. 
+				This path search allows you to look for new relationships between A and C terms
+				through a mediating B term. </p>
+		</div>
 		
-		<main id="thepage" autocomplete="off" >
-			<div id="introSection">
-				<p id="introText">In this search you input an A term and the type of B term you wish to search for. 
-					Chemotext will then display a list of the B terms through the same method as Connected Terms search. 
-					You then choose which B terms you wish do continue mediating the search through
-					and the type of C term you wish to search for. 
-					Chemotext will then process this request and display the list of C terms. 
-					This path search allows you to look for new relationships between A and C terms
-					through a mediating B term. </p>
-				<img src="img/Path_Search_Image.png">
-			</div>
+		<form autocomplete="off" id="inputSection" >
+			<!-- input for first term added later -->
+			<p id="selectBar-section">Choose the Type of B Terms to search for </p>
+			<select id="selectBar"></select>
+
+			<div><button type="submit" onclick="triangleSearch()">Search</button></div>
 			
-			<form autocomplete="off" id="inputSection" >
-				<!-- input for first term added later -->
-				<p id="selectBar-section">Choose the Type of B Terms to search for </p>
-				<select id="selectBar"></select>
+			<!-- hide while broken  -->
+			<div id="subterm-checkbox" style="display: none">
+				<input type="checkbox" id="mappedCheckbox"> 
+				Click to Include Subterms
+			</div>
+		</form>
+		
+		<p id="displayText"></p>
 
-				<button type="submit" onclick="triangleSearch()">Search</button>
-				<input type="checkbox" id="mappedCheckbox" style="display: none"> 
-				<!-- Click to Include Subterms -->
-					<!-- hide while broken  -->
+		<section id="results">
+		
+			<form id="tableform">
+				<table class="center">
+					<tbody></tbody>
+				</table>
+				<!-- other sections added later -->
 			</form>
 			
-			<p id="displayText"></p>
-
-			<section id="results">
-			
-				<form id="tableform">
-					<table class="center">
-						<tbody></tbody>
-					</table>
-					<!-- other sections added later -->
-				</form>
-				
-				<div id="downloadform">
-					<!-- download buttons added later -->
-				</div>
-								
-				<section id="path-subresults">					
-					<p>Choose the type of C Terms you want to search for</p>
-					<select id="triType"></select>
-					<button id="finish-search">Finish Search</button>
-				</section>
+			<div id="downloadform">
+				<!-- download buttons added later -->
+			</div>
+							
+			<section id="path-subresults">					
+				<p>Choose the type of C Terms you want to search for</p>
+				<select id="triType"></select>
+				<button id="finish-search">Finish Search</button>
 			</section>
-		</main>
-		<script src="js/classes.js"></script>
-		<script src="js/chemotext.js"></script>
-		<script src="js/path-search.js"></script>
-	</body>
+		</section>
+	</main>
+	<script src="js/classes.js"></script>
+	<script src="js/chemotext.js"></script>
+	<script src="js/path-search.js"></script>
+</body>
 </html>

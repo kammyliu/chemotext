@@ -2,13 +2,10 @@ SEARCH_TYPE = "connected";
 
 var input;
 $(document).ready(function(){	
-	
 	makePageSections();
 	
 	inputSuggestion($("#inputSection"), "inputbar");
 	input = document.getElementById("inputbar");
-
-	makeSynStack();
 });
 
 var _term;
@@ -21,7 +18,7 @@ function simpleSearch(){
 	$(displayText).text("");
 	$("#results").hide();
 	$("#show-subterms").hide();
-	$("#loader").show();
+	showLoader();
 
 	//get term or its synonym
 	_term = input.value;

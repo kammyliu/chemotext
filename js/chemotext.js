@@ -8,6 +8,8 @@ var SEARCH_TYPE;
 
 var CORS = "https://cors-anywhere.herokuapp.com/"; //GITHUB PAGES
 
+makeSynStack();
+
 var tableform, thepage, displayText, checkbox;
 $(document).ready(function(){
 	thepage = document.getElementById("thepage");
@@ -23,13 +25,13 @@ function makeSynStack(){
 }
 	
 function reconstructSynStack(jsonObj){
-	console.log("Getting Ready to Parse JSON");
+	console.log("Retreived synstack");
 	try {
-	synStack.thornstack = JSON.parse(jsonObj);
+		synStack.thornstack = JSON.parse(jsonObj);
 	} catch (e){
-	console.log(jsonObj);
+		console.log(jsonObj);
 	}
-	console.log("parsed JSON");
+	console.log("Parsed synstack");
 }	
 
 function readTextFile(file,success,terminator){
@@ -42,16 +44,12 @@ function readTextFile(file,success,terminator){
 				var allText = rawFile.responseText;
 				var split = allText.split(terminator);
 				success(split);
-				//console.log(allText);
-			}else{
-				//console.log("Failure READING");
 			}
-		}else{
-			//console.log("FailureER");
 		}
 	}
 	rawFile.send(null);
-	//console.log("DONE");
+	
+	console.log("Fetching synstack");
 }
 
 
@@ -67,7 +65,7 @@ function showSubterms(){
 
 
 function queryNeo4j(payload,successFunc){
-	console.log("Query: "+payload);
+	console.log(payload);
 	$.ajax({ //443 works.
 		url: CORS+"http://chemotext.mml.unc.edu:7474/db/data/transaction/commit", //GITHUB PAGES
 		accepts: "application/json; charset=UTF-8",	
@@ -605,9 +603,9 @@ function makePageSections(){
 	if (filterSection != null){
 		$(filterSection).append('<select id="typeSelect"></select>');
 		makeSTypes("typeSelect", true);	
+		$(filterSection).append('<div>Date After:<input id="dateAfterInput" type="date">'+ 
+			'Date Before:<input id="dateBeforeInput" type="date"></div>');
 		$(filterSection).append('<button type="submit" id="filter-type-button">Filter</button>');
-		$(filterSection).append('<p>Date After:<input id="dateAfterInput" type="date">'+ 
-			'Date Before:<input id="dateBeforeInput" type="date"></p>');
 	}
 	
 	// show subterms button
@@ -661,6 +659,9 @@ function addTermOrSubterm(stack, data){
 	}
 }
 
+function showLoader(){
+	$("#loader").css('display', 'block');
+}
 
 function showResult(stack, csvName, subterms, type){
 	

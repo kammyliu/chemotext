@@ -1,4 +1,27 @@
-/* Header section */
+/* General */
+
+body {
+	font-family: Lato, sans-serif;
+}
+
+main {
+	font-size: medium;
+}
+
+#loader{
+	margin: auto;
+}
+
+#results, #loader, #show-subterms, #path-subresults{
+	display: none;
+}
+
+#tableform, #downloadform, #filterSection, 
+#inputSection, #displayText, #path-subresults {
+	text-align: center;
+}
+
+/* Header */
 
 #header {
 	color: #7BAFD4;
@@ -11,17 +34,41 @@
 	width: 75px;
 }
 
+/* Navigation menu */
+
 #nav{
 	list-style-type: none;
     margin: 0;
     padding: 0;
 	overflow: hidden;
 	border: black solid 1px;
-   background-color: #7BAFD4;
+	background-color: #7BAFD4;
 	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #e0f3fa), color-stop(50%, #d8f0fc), color-stop(51%, #b8e2f6), color-stop(100%, #b6dffd));
 }
 
+#nav li {
+	float: left;
+}
+
+#nav li a {
+    display: block;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+	border-color: black;
+}
+
+#nav li:hover a{
+   background: #709DC4;
+   color: white;
+}
+
+.active{
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #ffffff), color-stop(50%, #f3f3f3), color-stop(51%, #ededed), color-stop(100%, #ffffff));
+}
+
 /* Results table */
+
 .table-arrow{
 	width: 20px;
 	height: 20px;
@@ -33,95 +80,53 @@
 	margin-left: 20px;
 }
 
-/* Other */
+table.center{
+	border-spacing: 20px 5px;
+	border-collapse: separate;
+	/* table-layout: fixed; */
+	margin: auto;
+}
+
+/* Intro section */
 
 #introSection img {
-	height: 300px;
+	height: 250px;
+	float: right;
+}
+
+#introSection+* {
+	clear: both;
+}
+
+#introText {
+	padding-top: 50px;
+}
+
+/* Other */
+
+.suggestion-bar, #selectBar{
+	margin: 10px;
+	width: 500px;
+	max-width: 100%;
+}
+
+#filterSection input {
+    margin: 10px;
+}
+
+#downloadform {
+	margin: 20px 0;
 }
 
 .download-button {
 	width: 150px;
-	display: block;
+	margin: 0 10px;
 }
 
-
-#results, #loader, #show-subterms, #path-subresults{
-	display: none;
+#terms-list{
+	list-style-type: none;
+}
+#terms-list button{
+	margin: 0 10px;
 }
 
-.suggestion-bar{
-	width: 500px;
-}
-
-
-.container{
-	/*width: 980px; */
-	margin-left: 6%;
-	margin-right: 6%;
-	width: 88%;
-}
-
-
-li {
-	float: left;
-}
-
-li a {
-    display: block;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
-	font-family: Lato, sans-serif;
-	border-color: black;
-}
-
-li span:hover {
-   background: #709DC4;
-}
-
-.active{
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #ffffff), color-stop(50%, #f3f3f3), color-stop(51%, #ededed), color-stop(100%, #ffffff));
-}
-
-#thepage {
-	text-align: center;
-	font-family: Lato, sans-serif;
-	font-size: 15;
-}
-
-#tableform {
-	text-align: center;
-	font-family: Lato, sans-serif;
-	font-size: 15;
-}
-
-#theform {
-	text-align: center;
-}
-
-
-td.countCol{
-	width: 50px;
-}
-
-button.articleButton{
-	width: 50px;
-	margin-top: 2.5px;
-	margin-bottom: 2.5px;
-	margin-right: 5px;
-}
-
-table.center{
-	border-spacing: 5px 5px;
-	table-layout: fixed;
-	width: 60%;
-	margin-left: auto;
-	margin-right: auto;
-	font-family: Lato, sans-serif;
-	font-size: 15;
-}
-
-div.picDescription{
-	width : 50%;
-	margin-left : 0%;
-}

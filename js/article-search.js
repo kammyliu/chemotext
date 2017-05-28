@@ -16,8 +16,6 @@ $(document).ready(function(){
 			addToArticleArray()
 		}
 	});
-	
-	makeSynStack();
 });
 
 
@@ -41,7 +39,7 @@ function deleteFromArticleArray(button){
 function articleSearch(){
 	$(displayText).text("");
 	$("#results").hide();
-	$("#loader").show();
+	showLoader();
 	
 	var articleArray = [];
 	$(termsList).find("span").each(function(i, el){
@@ -53,21 +51,28 @@ function articleSearch(){
 	for(var i =1;i<articleArray.length;i++){
 		var name = "name"+i;
 		params[name] = articleArray[i];
-		matchStr = matchStr + " match (n"+articleArray[i]+":Term {name:{"+name+"}})-[:MENTIONS]-(a)";
+		matchStr += " match (n"+articleArray[i]+":Term {name:{"+name+"}})-[:MENTIONS]-(a)";
 	}
-	var data = JSON.stringify({
+	var payload = JSON.stringify({
 			"statements" : [{
 				"statement" : matchStr+" return a;", 
 				"parameters" : params
 			}]
      });
 	 
+	 console.log(payload);
 	 
-	 queryNeo4j(data, function(data,xhr,status){
+	 queryNeo4j(payload, function(data,xhr,status){
 		console.log("Finished Search");
-		console.log(data);
+		//console.log(data);
 		//tableform.innerHTML = JSON.stringify(data);
-		var data = data["results"][0]["data"];
+		var data = data["results"][0];
+		if (typeof myVar != 'undefined'){
+			$("#loader").hide();
+			$(displayText).text("No Results");
+			return;
+		}
+		data = data["data"];
 		var stack = new ThornStack(false);
 		for(var i=0;i<data.length;i++){
 			var date = data[i]["row"][0]["date"];

@@ -10,8 +10,6 @@ $(document).ready(function(){
 	
 	input = document.getElementById("inputbar");
 	input2 = document.getElementById("inputbar2");
-	
-	makeSynStack();
 });
 
 var sharedTerm1;
@@ -24,7 +22,7 @@ function sharedSearch(){
 	$(displayText).text("");
 	$("#results").hide();
 	$("#show-subterms").hide();
-	$("#loader").show();
+	showLoader();
 	
 	$("#term1-label").text(input.value);
 	$("#term2-label").text(input2.value);
@@ -50,7 +48,7 @@ function sharedSearchOne(data){
 	console.log("Finished Query 1");
 	_stack = new ThornStack();
 	addTermOrSubterm(_stack, data);
-	console.log(_stack);
+	//console.log(_stack);
 	queryNeo4j(payload2,sharedSearchTwo);
 }	
 
@@ -62,7 +60,7 @@ function sharedSearchTwo(data){
 	
 	_stack = newstack;
 	
-	console.log(_stack);
+	//console.log(_stack);
 	showResult(_stack, input.value+"_"+input2.value, _subterms, SEARCH_TYPE);
 }
 

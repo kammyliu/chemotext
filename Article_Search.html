@@ -1,18 +1,14 @@
 <html>
 <head> 
 	<title>Chemotext | Article Search</title>
-	
-	<!-- Latest compiled and minified CSS   MOON ANTLERS TEARS-->
-	<link href='http://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+
+	<link rel="icon" href="https://chembench.mml.unc.edu/assets/images/mml.ico" type="image/ico">
+
+	<link href='https://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 	<link rel="stylesheet" type="text/css" href="chemotextstyle.css">
-	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 
-	<!-- jQuery library -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-
-	<link rel="SHORTCUT ICON" href="https://chembench.mml.unc.edu/theme/img/mml.ico">
-	<link rel="icon" href="https://chembench.mml.unc.edu/theme/img/mml.ico" type="image/ico">
 </head>
 <body class="container">
 	<h1 id="header"><img id="logo" src="img/ctLogo.jpg">Chemotext</h1>
@@ -27,22 +23,21 @@
 	
 	<main id="thepage" autocomplete="off">
 		<div id="introSection">
+			<img src="img/articlePicture.png">
 			<p id="introText">Enter one or multiple terms and Chemotext will return 
 			all the articles that co-occur with your input terms.</p>
-			<img src="img/articlePicture.png">
 		</div>
 	
 
 		<ul id="terms-list"></ul>
 		<form autocomplete="off" id="inputSection" >
 			<button id="add-term-button" type="submit">Add Term</button>
-			<button type="button" id="search-button" disabled onclick="articleSearch()" >Search</button>
+			<div><button type="button" id="search-button" disabled onclick="articleSearch()" >Search</button></div>
 		</form>
 		
 		<p id="displayText"></p>
 
 		<section id="results">
-			<!-- "show subterms" button added later. Kept hidden -->
 			
 			<form id="tableform">
 				<table class="center" >

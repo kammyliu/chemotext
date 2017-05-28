@@ -2,19 +2,14 @@
 <head> 
 	<title>Chemotext | Find Shared Terms</title>
 	
-	<!-- Latest compiled and minified CSS   MOON ANTLERS TEARS-->
-	<link href='http://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+	<link rel="icon" href="https://chembench.mml.unc.edu/assets/images/mml.ico" type="image/ico">
+
+	<link href='https://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 	<link rel="stylesheet" type="text/css" href="chemotextstyle.css">
-	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-	
-	<!-- jQuery library -->
+
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-	<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-
-	<link rel="SHORTCUT ICON" href="https://chembench.mml.unc.edu/theme/img/mml.ico">
-	<link rel="icon" href="https://chembench.mml.unc.edu/theme/img/mml.ico" type="image/ico">
 </head>
-
 <body class="container">
 	<h1 id="header"><img id="logo" src="img/ctLogo.jpg">Chemotext</h1>
 	<ul id="nav">
@@ -27,16 +22,19 @@
 	
 	<main id="thepage" autocomplete="off">
 		<div id="introSection">
+			<img src="img/Shared_Terms_Image.png">
 			<p id="introText">This search inputs two terms and gives you three results -- 
 				all terms that co-exist with either term or both terms in an article. 
 				The counts respresent the number of articles where they co-occur or articles that they are present in. </p>
-			<img src="img/Shared_Terms_Image.png">
 		</div>
 
 		<form autocomplete="off" id="inputSection">
 			<!-- autocomplete input fields added later -->
-			<button type="submit" onclick="sharedSearch()">Search</button>
-			<input type="checkbox" id="mappedCheckbox"> Click to Include Subterms
+			<div><button type="submit" onclick="sharedSearch()">Search</button></div>
+			<div id="subterm-checkbox">
+				<input type="checkbox" id="mappedCheckbox"> 
+				Click to Include Subterms
+			</div>
 		</form>
 		
 		<section id="results">

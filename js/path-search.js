@@ -12,9 +12,7 @@ $(document).ready(function(){
 	makeSTypes("triType", false);
 
 	input = document.getElementById("inputbar");
-	selectBar = document.getElementById("selectBar");
-	
-	makeSynStack();
+	selectBar = document.getElementById("selectBar");	
 });
 
 var _subterms; //flag for if subterms are included
@@ -24,7 +22,7 @@ function triangleSearch(){
 	$(displayText).text("");
 	$("#results").hide();
 	$("#show-subterms").hide();
-	$("#loader").show();
+	showLoader();
 	$("#path-subresults").hide();
 
 	var triangleTerm = getSelfOrSynonym(input.value);
@@ -87,7 +85,6 @@ function triangleSearchOnSuccess(data){
 	addTermOrSubterm(stack, data);
 
 	showSubresults();
-	
 }	
 	
 function setFinishSearchHandler(){
@@ -95,7 +92,7 @@ function setFinishSearchHandler(){
 	
 	var button = document.getElementById("finish-search");
 	button.onclick = function(){
-		$("#loader").show()
+		showLoader()
 	
 		var checkedTerms = [];
 		var checkedString = "Your B Terms: ";
@@ -127,7 +124,7 @@ function setFinishSearchHandler(){
 	
 function showSubresults(){
 	SEARCH_TYPE = "path-subresults";
-	makeFilters(stack, "");
+	//makeFilters(stack, "");
 	makeTables(stack,tableLimit,0, SEARCH_TYPE);
 
 	$(loader).hide();
