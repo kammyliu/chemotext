@@ -14,6 +14,7 @@ var _subterms; //flag for if subterms are included
 
 
 function simpleSearch(){
+	if (input.value == "") return;
 
 	$(displayText).text("");
 	$("#results").hide();

@@ -291,8 +291,6 @@ function openArticleList(node){
 
 function makeTables(stack,limit,index=0,type, tableElement){		
 	$(tableform).find("tr").slice(1).remove();	//remove all tr except the first one
-
-	//var maintable = $(tableform).find("table")[0];
 	
 	var indexLimit = index+limit;
 	if(indexLimit>stack.length){
@@ -318,121 +316,6 @@ function makeTables(stack,limit,index=0,type, tableElement){
 			makeArticleSearchTable(stack, index, indexLimit);
 			return;
 	}
-	 
-	var newchemicalarray = [];
-	if(SEARCH_TYPE != "article"){
-		var node = stack.first;
-		for(var i=0;i<index;i++){
-			node = node.right;
-		}
-		for(var j=index;j<indexLimit;j++){
-			if(SEARCH_TYPE == "shared"){
-				newchemicalarray.push([node.name,node.count,node,node.sharedCount1,node.sharedCount2]);
-			}else if(isPath){
-				newchemicalarray.push([node.name,node.count,node,node.isSelected,node]);
-			}else{
-				newchemicalarray.push([node.name,node.count,node]);
-			}
-			if(node.right==null){
-				break;
-			}
-			node = node.right;
-		}
-	}else{
-		for(var j=index;j<indexLimit;j++){
-			//console.log(stack.list[j]);
-			newchemicalarray.push(stack.list[j]);
-		}
-	}
-	
-	for(x in newchemicalarray){
-		xx = newchemicalarray[x];
-		var newrow = document.createElement("TR");
-		var col1 = document.createElement("TD");
-		
-		if(isPath){
-			var col6 = document.createElement("TD");
-			var checkbox = document.createElement("INPUT");
-			checkbox.setAttribute("type","checkbox");
-			col6.className = "countCol";
-			col6.appendChild(checkbox);
-			
-			newrow.appendChild(col6);
-			if(xx[3]){
-				checkbox.checked = true;
-			}
-			checkbox.name = xx[0];
-			$(checkbox).click(function(){
-				var term = stack.get(this.name);
-				term.isSelected = this.checked;
-			});
-		}
-		
-		if(SEARCH_TYPE != "article"){
-			var col2 = document.createElement("TD");
-			col2.className = "countCol";
-			col1.innerHTML = xx[0];
-			col2.innerHTML = xx[1];
-			if(!isPath){
-				var button = document.createElement("button");
-				button.innerHTML = xx[1];
-				button.type = "button";
-				button.className = "articleButton";
-				col2.innerHTML = "";
-				col2.appendChild(button);
-				button.onclick = (function(x){
-				return function(){
-					var limit = 20;
-					yy = newchemicalarray[x];
-					var node = yy[2];
-					var pmids = "Pmids=";
-					for(var i= 0;i<node.stack.length;i++){
-						pmids = pmids + node.stack[i].pmid + "|";
-					}
-					var html = "<html><head><title>" + node.name + "</title></head><body>";
-					for(var i= 0;i<node.stack.length;i++){
-						if(node.stack[i]!=null){						
-							var displayText = node.stack[i].pmid;
-							if(node.stack[i].title!=null){
-								displayText = node.stack[i].title;
-							}
-							html = html + "<p><a href=http://www.ncbi.nlm.nih.gov/pubmed/"+node.stack[i].pmid+">"+displayText+"</a></p>";
-						}
-					}
-					html = html + "</body></html>"
-					var newpage = window.open("");
-					newpage.document.write(html)
-				};
-				})(x);
-			}
-			
-			newrow.appendChild(col1);
-			newrow.appendChild(col2);
-		}
-		if(isArticle){
-			//console.log(xx);
-			var link = document.createElement("a");
-			link.href = "http://www.ncbi.nlm.nih.gov/pubmed/"+xx;
-			
-			link.innerHTML = xx;
-			link.style.textAlign = "center";
-			col1.style.textAlign = "center";
-			col1.appendChild(link);
-			newrow.appendChild(col1);
-		}
-		if(SEARCH_TYPE == "shared"){
-			var col4 = document.createElement("TD");
-			var col5 = document.createElement("TD");
-			col4.innerHTML = " "+xx[3]+" ";
-			col5.innerHTML = " "+xx[4]+" ";
-			col4.className = "countCol";
-			col5.className = "countCol";
-			newrow.appendChild(col4);
-			newrow.appendChild(col5);
-		}
-		maintable.appendChild(newrow);
-	} 
-	
 
 }
 function updateTableFooter(stack,limit,index, type){
@@ -685,5 +568,4 @@ function showResult(stack, csvName, subterms, type){
 		makeDownloadableCSV(csvName, stack);
 	}	
 	makeTables(stack, tableLimit, 0, type);
-
 }

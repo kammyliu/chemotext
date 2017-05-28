@@ -19,6 +19,9 @@ var _stack;
 var _subterms; //flag for if subterms are included
 
 function sharedSearch(){
+	if (input.value == "" || input2.value == ""){
+		return;
+	}
 	$(displayText).text("");
 	$("#results").hide();
 	$("#show-subterms").hide();

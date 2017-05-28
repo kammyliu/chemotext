@@ -19,6 +19,9 @@ var _subterms; //flag for if subterms are included
 
 var triangleTerm;
 function triangleSearch(){
+	if (input.value == ""){
+		return;
+	}
 	$(displayText).text("");
 	$("#results").hide();
 	$("#show-subterms").hide();
@@ -92,6 +95,9 @@ function setFinishSearchHandler(){
 	
 	var button = document.getElementById("finish-search");
 	button.onclick = function(){
+		if ($(tableform).find(":checked").length ==0){
+			return;
+		}
 		showLoader()
 	
 		var checkedTerms = [];
