@@ -23,18 +23,18 @@
 	<main id="thepage" autocomplete="off" >
 		<div id="introSection">
 			<img src="img/Path_Search_Image.png">
-			<p id="introText">In this search you input an A term and the type of B term you wish to search for. 
-				Chemotext will then display a list of the B terms through the same method as Connected Terms search. 
-				You then choose which B terms you wish do continue mediating the search through
-				and the type of C term you wish to search for. 
-				Chemotext will then process this request and display the list of C terms. 
-				This path search allows you to look for new relationships between A and C terms
-				through a mediating B term. </p>
+			<p id="introText">In this search you input an initial term and the type of intermediary term you wish to search for. 
+				Chemotext will then display a list of the intermediary terms through the same method as Connected Terms search. 
+				You then choose which intermediary terms you wish do continue mediating the search through
+				and the type of final term you wish to search for. 
+				Chemotext will then process this request and display the list of final terms. 
+				This path search allows you to look for new relationships between initial and final terms
+				through an intermediary term. </p>
 		</div>
 		
 		<form autocomplete="off" id="inputSection" >
 			<!-- input for first term added later -->
-			<p id="selectBar-section">Choose the Type of B Terms to search for </p>
+			<p id="selectBar-section">Choose the Type of Intermediary Terms to search for </p>
 			<select id="selectBar"></select>
 
 			<div><button type="submit" onclick="triangleSearch()">Search</button></div>
@@ -63,7 +63,7 @@
 			</div>
 							
 			<section id="path-subresults">					
-				<p>Choose the type of C Terms you want to search for</p>
+				<p>Choose the type of Final Terms you want to search for</p>
 				<select id="triType"></select>
 				<button id="finish-search">Finish Search</button>
 			</section>

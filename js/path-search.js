@@ -16,7 +16,7 @@ $(document).ready(function(){
 });
 
 var _subterms; //flag for if subterms are included
-var _type; //type of B terms
+var _type; //type of intermediary terms
 
 var triangleTerm;
 function triangleSearch(){
@@ -67,7 +67,7 @@ function setFinishSearchHandler(){
 		$("#results").hide();
 	
 		checkedTerms = [];
-		var checkedString = "Your B Terms: ";
+		var checkedString = "Your Intermediary Terms: ";
 		var csvName = "";
 		
 		$("td input:checked").parent().next().each(function(i,el){
@@ -77,7 +77,7 @@ function setFinishSearchHandler(){
 			csvName += "_" + term;			
 		});
 		
-		checkedString += " Your C Term Type: " + selectBar2.value;
+		checkedString += " Your Final Term Type: " + selectBar2.value;
 		$("#selections").text(checkedString);
 		countER = checkedTerms.length;
 		//console.log(countER);
@@ -86,7 +86,7 @@ function setFinishSearchHandler(){
 			term = checkedTerms[j];
 			postRequest(term, selectBar2.value, newStack,csvName)
 		}
-		$(displayText).text("B Terms Done: 0 out of "+checkedTerms.length);
+		$(displayText).text("Intermediary Terms Done: 0 out of "+checkedTerms.length);
 	};
 }
 	
@@ -106,7 +106,7 @@ function showSubresults(){
 	$("#path-subresults").show();
 	$("#downloadform").hide();
 	//$("#filterSection").hide();
-	$("#selections").text("Choose the B Terms you want to search with");
+	$("#selections").text("Choose the Intermediary Terms you want to search with");
 
 	newStack = new ThornStack();
 	setFinishSearchHandler();	
@@ -173,7 +173,7 @@ function postRequest(term,type,stack,csvName){
 		addTermOrSubterm(stack, data);
 		
 		countER--;
-		$(displayText).text("B Terms Done: "+(
+		$(displayText).text("Intermediary Terms Done: "+(
 			checkedTerms.length-countER)+" out of "+checkedTerms.length); 
 		//console.log("Count: "+countER);
 		if(countER==0){
