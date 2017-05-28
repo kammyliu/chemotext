@@ -21,6 +21,10 @@ main {
 	text-align: center;
 }
 
+#space{
+	height: 100px;
+}
+
 /* Header */
 
 #header {

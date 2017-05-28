@@ -485,6 +485,9 @@ function makePageSections(){
 	
 	// loading circle
 	$(thepage).append('<img src="img/ajax-loader.gif" alt="Loading circle" id="loader">');
+	
+	// empty space to add room to bottom
+	$("body").append('<div id="space"></div>');
 }
 
 
