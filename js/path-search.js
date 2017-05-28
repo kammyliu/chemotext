@@ -1,4 +1,3 @@
-var countER;
 SEARCH_TYPE = "path-subresults";	//second step is "path-final-results"
 
 var input, selectBar;
@@ -17,6 +16,7 @@ $(document).ready(function(){
 
 var _subterms; //flag for if subterms are included
 var _type; //type of intermediary terms
+var countER;
 
 var triangleTerm;
 function triangleSearch(){
@@ -35,7 +35,7 @@ function triangleSearch(){
 	
 	//console.log(term); console.log(type);	
 	
-	_subterms = checkbox.checked;
+	_subterms = subtermsCheckbox.checked;
 	if(_subterms){
 		queryNeo4j(getSubtermsPayload(triangleTerm),findTriangleSubTerms);
 	}else{
@@ -94,7 +94,7 @@ function setFinishSearchHandler(){
 	
 function showSubresults(){
 	SEARCH_TYPE = "path-subresults";
-	//makeFilters(stack, "");
+	//setFilterHandler(stack, "");
 	makeTables(stack,tableLimit,0, SEARCH_TYPE);
 
 	if(stack.length==0){
@@ -244,7 +244,7 @@ function makePathFinalResultsTable(stack, index, indexLimit){
 	}
 	
 	$(tableform).find("tr").remove();	
-	var $tbody = $("#tableform").find("tbody");
+	var $tbody = $(tableform).find("tbody");
 	
 	$tbody.append('<tr><th>Terms</th><th>Count</th></tr>');
 	

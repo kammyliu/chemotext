@@ -241,49 +241,7 @@ class ThornStack {
 			this.list.push(tag);
 		}
 	}
-
-	getSyn(tag){
-		var chars = tag.split('');
-		var length = chars.length;
-
-		var array = this.thornstack;
-		
-		for(var i=0;i<=length;i++){		
-			if(array.length==0){
-				return false;
-			}
-			if(i==length){
-				if(array[0][0]==0){
-					var last = array[0][1];
-					for(var j=0;j<array.length;j++){
-						if(array[j][0]==0){
-							console.log("LAST");
-							last = array[j][1];
-							console.log(last);
-						}
-					}
-					return last;
-					return array[0][1];
-				}else{
-					return false;
-				}
-			}
-			var isMissing = true;
-			var pos = this.chartonum(chars[i]);
-			for(var j=0;j<array.length;j++){
-				if(array[j][0]==pos){
-					array = array[j][1];
-					isMissing = false;
-					break;
-				}else if(array[j][0]>pos){
-					return false;
-				}
-			}
-			if(isMissing){
-				return false;
-			}
-		}
-	}
+	
 	get(tag){
 		var chars = tag.split('');
 		var length = chars.length;

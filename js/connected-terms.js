@@ -8,10 +8,8 @@ $(document).ready(function(){
 	input = document.getElementById("inputbar");
 });
 
-var _term;
-var _stack;
-var _subterms; //flag for if subterms are included
-
+// fields specific to each search execution
+var _term, _stack, _subterms;
 
 function simpleSearch(){
 	if (input.value == "") return;
@@ -21,16 +19,10 @@ function simpleSearch(){
 	$("#show-subterms").hide();
 	showLoader();
 
-	//get term or its synonym
-	_term = input.value;
-	var synonym = synStack.getSyn(_term);
-	if(synonym && synonym.includes('|')){	
-		_term = synonym.split('|')[1]; //synonym.mainTerm.name;
-	}
-	//$(displayText).text("Looking for term: " + _term);
+	_term = getSelfOrSynonym(input.value);
 	console.log("Term: "+_term);
 	
-	_subterms = document.getElementById("mappedCheckbox").checked;
+	_subterms = subtermsCheckbox.checked;
 	if(_subterms){
 		queryNeo4j(getSubtermsPayload(_term), findSimpleSubterms);	// fetch subterms
 	}else{
@@ -104,7 +96,7 @@ function makeConnectedTermsTable(stack, index, indexLimit){
 			</td>
 		</tr>
 	*/
-	var $tbody = $("#tableform").find("tbody");
+	var $tbody = $(tableform).find("tbody");
 	for(var j=index;j<indexLimit;j++){
 		if (node == null) break;
 		

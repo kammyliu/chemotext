@@ -67,7 +67,6 @@ function articleSearch(){
 	 queryNeo4j(payload, function(data,xhr,status){
 		console.log("Finished Search");
 		//console.log(data);
-		//tableform.innerHTML = JSON.stringify(data);
 		var data = data["results"][0];
 		if (typeof myVar != 'undefined'){
 			$("#loader").hide();
@@ -88,7 +87,7 @@ function articleSearch(){
 		showResult(stack, "", false, SEARCH_TYPE);
 		//console.log(stack.length);
 		//makeTables(stack,tableLimit);
-		//makeFilters(stack,"articles");
+		//setFilterHandler(stack,"articles");
 	 });
 	 
 	
@@ -97,7 +96,7 @@ function articleSearch(){
 
 function makeArticleSearchTable(stack, index, indexLimit){
 
-	var $tbody = $("#tableform").find("tbody");
+	var $tbody = $(tableform).find("tbody");
 
 
 	/*append TR: 

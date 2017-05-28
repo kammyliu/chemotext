@@ -33,7 +33,7 @@ function sharedSearch(){
 	var term1 = getSelfOrSynonym(input.value);
 	var term2 = getSelfOrSynonym(input2.value);
 		
-	_subterms = checkbox.checked;
+	_subterms = subtermsCheckbox.checked;
 	if(_subterms){
 		sharedTerm1 = term1;
 		sharedTerm2 = term2;
@@ -152,7 +152,7 @@ function makeSharedTermsTable(stack, index, indexLimit){
 			<td>term2 count</td>
 		</tr>
 	*/
-	var $tbody = $("#tableform").find("tbody");
+	var $tbody = $(tableform).find("tbody");
 	for(var j=index;j<indexLimit;j++){
 		if (node == null) break;
 		
