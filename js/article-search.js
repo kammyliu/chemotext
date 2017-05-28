@@ -51,8 +51,10 @@ function articleSearch(){
 	for(var i =1;i<articleArray.length;i++){
 		var name = "name"+i;
 		params[name] = articleArray[i];
-		matchStr += " match (n"+articleArray[i]+":Term {name:{"+name+"}})-[:MENTIONS]-(a)";
+		//matchStr += " match (n"+articleArray[i]+":Term {name:{"+name+"}})-[:MENTIONS]-(a)";
+		matchStr += " match (n"+i+":Term {name:{"+name+"}})-[:MENTIONS]-(a)";
 	}
+	
 	var payload = JSON.stringify({
 			"statements" : [{
 				"statement" : matchStr+" return a;", 
@@ -107,7 +109,7 @@ function makeArticleSearchTable(stack, index, indexLimit){
 	*/
 	for(var j=index;j<indexLimit;j++){
 		var pmid = stack.list[j];
-		$tbody.append('<tr><td><a href="http://www.ncbi.nlm.nih.gov/pubmed/'+pmid+'">'
+		$tbody.append('<tr><td><a target="_blank" href="http://www.ncbi.nlm.nih.gov/pubmed/'+pmid+'">'
 			+pmid+'</a></td></tr>');
 	}
 }

@@ -19,7 +19,6 @@ $(document).ready(function(){
 });
 
 function makeSynStack(){
-	//console.log("StartSynStack");
 	readTextFile(CORS+"http://chemotext.mml.unc.edu/synstack.json",reconstructSynStack,"\r\n");
 	//readTextFile("http://chemotext.mml.unc.edu/synstack.json",reconstructSynStack,"\r\n"); //GITHUB PAGES
 }
@@ -244,7 +243,7 @@ function onInitFs(fs, name, stack, withPmids){
 				if(SEARCH_TYPE == "shared" && !withPmids){ 
 					data = data + "\t" + node.sharedCount1 + "\t" + node.sharedCount2; 
 				}
-				data = data + "\n";
+				data += "\n";
 				if(node.right==null){
 					break;
 				}
@@ -254,7 +253,6 @@ function onInitFs(fs, name, stack, withPmids){
 			fileWriter.addEventListener("writeend", function() {
 				//window.open("filesystem:http://chemotext.mml.unc.edu/temporary/"+fileName);
 				window.open("filesystem:https://kammyliu.github.io/temporary/"+fileName);	//GITHUB PAGES
-				
 			}, false);
 			var blob = new Blob([data],{type: 'text/plain'});
 			fileWriter.write(blob);
@@ -373,15 +371,6 @@ function inputSuggestion($inputSection, inputId){
 }
 	
 	
-function addSimpleSubtermData(data){
-	addTermOrSubterm(_stack,data);
-	//console.log("FINISHED SUBTERM or TERM");
-	
-	subTermCount++;
-	if(subTermCount==subTermMax){
-		showResult(_stack, input.value, _subterms, SEARCH_TYPE);
-	}
-}
 	
 function getSelfOrSynonym(string){
 	var term = synStack.get(string);
@@ -502,7 +491,8 @@ function makePageSections(){
 function getMentionsPayload(name){
 	return JSON.stringify({
 		"statements" : [{
-			"statement" : "match (n:Term{name:{name}})-[:MENTIONS]-(a)-[:MENTIONS]-(m) return m, a " , "parameters" : {"name": name}
+			"statement" : "match (n:Term{name:{name}})-[:MENTIONS]-(a)-[:MENTIONS]-(m) return m, a " , 
+			"parameters" : {"name": name}
 		}]
 	});
 }
@@ -510,7 +500,8 @@ function getMentionsPayload(name){
 function getSubtermsPayload(name){
 	return JSON.stringify({
 		"statements" : [{
-			"statement" : "match (n:Term{name:{name}})-[:MAPPED]->(a) return a " , "parameters" : {"name": name}
+			"statement" : "match (n:Term{name:{name}})-[:MAPPED]->(a) return a " ,
+			"parameters" : {"name": name}
 		}]
 	});
 }

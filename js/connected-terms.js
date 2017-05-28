@@ -74,7 +74,15 @@ function findSimpleSubterms(data){
 }
 
 
-
+function addSimpleSubtermData(data){
+	addTermOrSubterm(_stack,data);
+	//console.log("FINISHED SUBTERM or TERM");
+	
+	subTermCount++;
+	if(subTermCount==subTermMax){
+		showResult(_stack, input.value, _subterms, SEARCH_TYPE);
+	}
+}
 
 
 /* GENERAL */
