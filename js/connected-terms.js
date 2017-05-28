@@ -99,7 +99,7 @@ function makeConnectedTermsTable(stack, index, indexLimit){
 	/*append TR: 
 		<tr>
 			<td>name</td>
-			<td class="countCol">
+			<td>
 				<button type="button" class="articleButton">count</button>
 			</td>
 		</tr>
@@ -110,7 +110,7 @@ function makeConnectedTermsTable(stack, index, indexLimit){
 		
 		$tr = $("<tr/>");
 		$tr.append('<td>'+node.name+'</td>');
-		$buttonTd = $("<td/>", {"class": "countCol"}).append( $("<button/>", {
+		$buttonTd = $("<td/>").append( $("<button/>", {
 			type: "button", 
 			"class": "articleButton", 
 			text: node.count, 

@@ -145,7 +145,7 @@ function makeSharedTermsTable(stack, index, indexLimit){
 	/*append TR: 
 		<tr>
 			<td>name</td>
-			<td class="countCol">
+			<td>
 				<button type="button" class="articleButton">count</button>
 			</td>
 			<td>term1 count</td>
@@ -158,7 +158,7 @@ function makeSharedTermsTable(stack, index, indexLimit){
 		
 		$tr = $("<tr/>");
 		$tr.append('<td>'+node.name+'</td>');
-		$buttonTd = $("<td/>", {"class": "countCol"}).append( $("<button/>", {
+		$buttonTd = $("<td/>").append( $("<button/>", {
 			type: "button", 
 			"class": "articleButton", 
 			text: node.count, 

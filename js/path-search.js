@@ -79,6 +79,7 @@ function setFinishSearchHandler(){
 		
 		checkedString += " Your Final Term Type: " + selectBar2.value;
 		$("#selections").text(checkedString);
+		
 		countER = checkedTerms.length;
 		//console.log(countER);
 		for(var j=0;j<checkedTerms.length;j++){
@@ -198,15 +199,15 @@ function makePathSubresultsTable(stack, index, indexLimit){
 	var $tbody = $(tableform).find("tbody");
 	$(tableform).find("tr").remove();	
 	
-	$tbody.append('<tr><th class="countCol"></th><th>Terms</th><th class="countCol">Count</th></tr>');
+	$tbody.append('<tr><th></th><th>Terms</th><th>Count</th></tr>');
 	
 	/*append TR: 
 		<tr>
-			<td class="countCol">
+			<td>
 				<input type="checkbox" [checked] name="name">		
 			</td>
 			<td>name</td>
-			<td class="countCol">
+			<td>
 				<button type="button" class="articleButton">count</button>
 			</td>
 		</tr>
@@ -216,7 +217,7 @@ function makePathSubresultsTable(stack, index, indexLimit){
 		if (node == null) break;
 		
 		$tr = $("<tr/>");
-		$tr.append('<td class="countCol"><input '+
+		$tr.append('<td><input '+
 			(node.isSelected?'checked ':'') +
 			'type="checkbox" name="'+node.name+'"></td>');
 		$tr.append('<td>'+node.name+'</td>');
@@ -226,10 +227,11 @@ function makePathSubresultsTable(stack, index, indexLimit){
 		node = node.right;
 	}
 	
-	// $("td input[type='checkbox']").click(function(){
-		// var term = stack.get(this.name);
-		// term.isSelected = this.checked;
-	// });
+	// used to make checks persistent when the table is rebuilt (from paging)
+	$("td input[type='checkbox']").click(function(){
+		var term = stack.get(this.name);
+		term.isSelected = this.checked;
+	});
 }	
 
 
@@ -244,12 +246,12 @@ function makePathFinalResultsTable(stack, index, indexLimit){
 	$(tableform).find("tr").remove();	
 	var $tbody = $("#tableform").find("tbody");
 	
-	$tbody.append('<tr><th>Terms</th><th class="countCol">Count</th></tr>');
+	$tbody.append('<tr><th>Terms</th><th>Count</th></tr>');
 	
 	/*append TR: 
 		<tr>
 			<td>name</td>
-			<td class="countCol">
+			<td>
 				<button type="button" class="articleButton">count</button>
 			</td>
 		</tr>
@@ -259,7 +261,7 @@ function makePathFinalResultsTable(stack, index, indexLimit){
 		
 		$tr = $("<tr/>");
 		$tr.append('<td>'+node.name+'</td>');
-		$buttonTd = $("<td/>", {"class": "countCol"}).append( $("<button/>", {
+		$buttonTd = $("<td/>").append( $("<button/>", {
 			type: "button", 
 			"class": "articleButton", 
 			text: node.count, 
