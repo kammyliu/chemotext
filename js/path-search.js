@@ -1,4 +1,4 @@
-var countER = 6;
+var countER;
 SEARCH_TYPE = "path-subresults";	//second step is "path-final-results"
 
 var input, selectBar;
@@ -16,6 +16,7 @@ $(document).ready(function(){
 });
 
 var _subterms; //flag for if subterms are included
+var _type; //type of B terms
 
 var triangleTerm;
 function triangleSearch(){
@@ -28,54 +29,16 @@ function triangleSearch(){
 	showLoader();
 	$("#path-subresults").hide();
 
-	var triangleTerm = getSelfOrSynonym(input.value);
-	var type = selectBar.value;
+	triangleTerm = getSelfOrSynonym(input.value);
+	_type = selectBar.value;
 	
 	//console.log(term); console.log(type);	
 	
 	_subterms = checkbox.checked;
 	if(_subterms){
-		var data;
-		if(type == "Disease" || type == "Other" || type == "Chemical"){
-			data = JSON.stringify({				
-				"statements" : [{
-					"statement" : "match (n:Term{name:{name}})-[:MAPPED]->(a:Term{type:{type}}) return a",
-					"parameters" : {"name": triangleTerm, "type":type}
-				}]			
-			});		
-		}else{
-			data = JSON.stringify({
-				"statements" : [{
-					"statement" : "match (n:Term{name:{name}})-[:MAPPED]->(a:Term{stype:{type}}) return a",
-					"parameters" : {"name": triangleTerm, "type":type}
-				}]			
-			});
-		}
-		//queryNeo4j(getSubtermsPayload(triangleTerm),findTriangleSubTerms);
-		queryNeo4j(data,findTriangleSubTerms);
-		//"statement" : "match (n:Term{name:{name}})-[:MAPPED]->(a) return a " , "parameters" : {"name": term}
-		//"statement" : "match (n:Term{name:{name}})-[:MENTIONS]-(a)-[:MENTIONS]-(m) return m, a " , "parameters" : {"name": name}
-
-
+		queryNeo4j(getSubtermsPayload(triangleTerm),findTriangleSubTerms);
 	}else{
-		var data;
-		if(type == "Disease" || type == "Other" || type == "Chemical"){
-			data = JSON.stringify({				
-				"statements" : [{
-					"statement" : "match (n:Term{name:{name}})-[:MENTIONS]-(a)-[:MENTIONS]-(m:Term{type:{type}}) return m, a",
-					"parameters" : {"name": triangleTerm, "type":type}
-				}]			
-			});		
-		}else{
-			data = JSON.stringify({
-				"statements" : [{
-					"statement" : "match (n:Term{name:{name}})-[:MENTIONS]-(a)-[:MENTIONS]-(m:Term{stype:{type}}) return m, a",
-					"parameters" : {"name": triangleTerm, "type":type}
-				}]			
-			});
-		}
-		
-		queryNeo4j(data,triangleSearchOnSuccess);
+		queryNeo4j(getMentionsByTypePayload(triangleTerm, _type),triangleSearchOnSuccess);
 	}	
 }
 var stack, newStack;
@@ -146,27 +109,43 @@ function showSubresults(){
 
 
 function findTriangleSubTerms(data){
-	console.log(data);
+	//console.log(data);
 	subTerms = [];
 	subTermCount = 0;
 	var data2=data["results"][0]["data"];
 	subTermMax = data2.length + 1;
 	
 	stack = new ThornStack();
-	
-	queryNeo4j(getMentionsPayload(triangleTerm), addTriangleSubTerm);
+
+
+	queryNeo4j(getMentionsByTypePayload(triangleTerm, _type), addTriangleSubTerm);
 	
 	for (var i=0; i< data2.length ; i++){
 		var name = data2[i]["row"][0]["name"];	
 		subTerms.push(name);
-		queryNeo4j(getMentionsPayload(name), addTriangleSubTerm);			
+		queryNeo4j(getMentionsByTypePayload(name, _type), addTriangleSubTerm);
 	}	
 }
 
 
+function getMentionsByTypePayload(name, type){
+	var statement;
+	if(type == "Disease" || type == "Other" || type == "Chemical"){
+		statement = "match (n:Term{name:{name}})-[:MENTIONS]-(a)-[:MENTIONS]-(m:Term{type:{type}}) return m, a";			
+	}else{
+		statement = "match (n:Term{name:{name}})-[:MENTIONS]-(a)-[:MENTIONS]-(m:Term{stype:{type}}) return m, a";
+	}	
+	
+	return JSON.stringify({
+		"statements" : [{
+			"statement" : statement,
+			"parameters" : {"name": name, "type":type}
+		}]			
+	});
+}
+
 function addTriangleSubTerm(data){	
 	addTermOrSubterm(stack, data);
-	
 	console.log("FINISHED SUBTERM or TERM");
 	subTermCount++;
 	

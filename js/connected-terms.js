@@ -52,6 +52,7 @@ function simpleSearchOnSuccess(data){
 /* Including subterms */
 
 function findSimpleSubterms(data){
+	console.log(data);
 	_stack = new ThornStack();
 	
 	subTerms = [];
