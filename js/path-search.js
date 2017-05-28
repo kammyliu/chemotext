@@ -132,6 +132,9 @@ function getMentionsByTypePayload(name, type){
 	var statement;
 	if(type == "Disease" || type == "Other" || type == "Chemical"){
 		statement = "match (n:Term{name:{name}})-[:MENTIONS]-(a)-[:MENTIONS]-(m:Term{type:{type}}) return m, a";			
+	}else if (type=="Drug"){
+		statement = "match (n:Term{name:{name}})-[:MENTIONS]-(a)-[:MENTIONS]-(m:Term{isDrug:{type}}) return m, a";
+		type="true";
 	}else{
 		statement = "match (n:Term{name:{name}})-[:MENTIONS]-(a)-[:MENTIONS]-(m:Term{stype:{type}}) return m, a";
 	}	
