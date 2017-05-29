@@ -7,9 +7,9 @@ class Art{
 			this.date = "Unknown";
 		}else{
 			this.date = date.toString();
-			this.year = parseInt(this.date[0] + "" + this.date[1] +"" + this.date[2] + "" + this.date[3]);
-			this.month = parseInt(this.date[4] + "" + this.date[5]);
-			this.day = parseInt(this.date[6] + "" + this.date[7]);
+			this.year = parseInt(this.date.substring(0,4));
+			this.month = parseInt(this.date.substring(4,6));
+			this.day = parseInt(this.date.substring(6,8));
 		}
 	}
 }
@@ -68,10 +68,7 @@ class Term {
 				stack.first = this;
 				return;
 			}
-			if(ccc>stack.length+1){
-				console.log("we got a problem here");
-				console.log(this.name +  " " + this.count);
-				console.log(this.right.name +" " + this.left.name);
+			if(ccc>stack.length+1){ //problem
 				return;
 			}
 			
@@ -127,42 +124,37 @@ class NumStack {
 	}
 	add(tag,object){
 		var chars = tag.toString().split('');
-		var length = chars.length;
 		var array = this.thornstack;
-		for(var i=0;i<length+1;i++){
+		for(var i=0;i<chars.length;i++){
 			if (array.length==0){
 				for(var j=0;j<11;j++){
 					array.push([]);
 				}
 			}
-			if(i==length){
-				array[0] = object;
-				this.stack.push(object);
-				break;
-			}
 			var pos = this.chartonum(chars[i]);
 			array = array[pos];
 		}		
+		array[0] = object;
+		this.stack.push(object);
 	}
+	
 	get(tag){
 		var chars = tag.toString().split('');
-		var length = chars.length;
 		var array = this.thornstack;
-		for(var i=0;i<length+1;i++){
+		for(var i=0;i<chars.length;i++){
 			if(array.length==0){
 				return false;
-			}
-			if(i==length){
-				if(array[0]==[]){
-					return false;
-				}else{
-					return array[0];
-				}
 			}
 			var pos = this.chartonum(chars[i]);
 			array = array[pos];
 		}
+		if(array[0]==[]){
+			return false;
+		}else{
+			return array[0];
+		}
 	}
+	
 	chartonum(cha){
 		if (cha == '0'){ return 1; }
 		if (cha == '1'){ return 2; }
@@ -190,6 +182,7 @@ class ThornStack {
 		this.extra = true;
 		this.withCountCode = withCountCode;
 	}
+	
 	add(tag,object){
 		var chars = tag.toString().split('');
 		var length = chars.length;
@@ -239,19 +232,11 @@ class ThornStack {
 	
 	get(tag){
 		var chars = tag.split('');
-		var length = chars.length;
 		var array = this.thornstack;
 		
-		for(var i=0;i<=length;i++){		
+		for(var i=0;i<chars.length;i++){		
 			if(array.length==0){
 				return false;
-			}
-			if(i==length){
-				if(array[0][0]==0){
-					return array[0][1];
-				}else{
-					return false;
-				}
 			}
 			var isMissing = true;
 			var pos = this.chartonum(chars[i]);
@@ -268,61 +253,22 @@ class ThornStack {
 				return false;
 			}
 		}
+		
+		if(array[0][0]==0){
+			return array[0][1];
+		}else{
+			return false;
+		}
 	}
-	
-	getTest(tag){
-		var chars = tag.split('');
-		console.log(chars);
-		var length = chars.length;
-		var array = this.thornstack;
-		for(var i=0;i<=length;i++){
-			console.log(chars[i]);
-			if(array.length==0){
-				return false;
-			}
-			if(i==length){
-				if(array[0][0]==0){
-					console.log("Here2");
-					console.log(array);
-					return array[0][1];
-				}else{
-					console.log("Here3");
-					console.log(array);
-					return false;
-				}
-			}
-			var isMissing = true;
-			var pos = this.chartonum(chars[i]);
 
-			for(var j=0;j<array.length;j++){
-				if(array[j][0]==pos){
-					array = array[j][1];
-					isMissing = false;
-					break;
-				}else if(array[j][0]>pos){
-					console.log("Here4");
-					console.log(array);
-					return false;
-				}
-			}
-			if(isMissing){
-				return false;
-			}
-		}
-	}
-	
+	/* Used to return top 5 results for autocompletion */
 	search(tag){
 		var chars = tag.split('');
-		var length = chars.length;
 		var array = this.thornstack;
 		
-		for(var i=0;i<=length;i++){
+		for(var i=0;i<chars.length;i++){
 			if(array.length==0){
 				return false;
-			}
-			
-			if(i==length){
-				return this.searchFind(array,[]);
 			}
 			
 			var pos = this.chartonum(chars[i]);
@@ -336,6 +282,8 @@ class ThornStack {
 				}
 			}
 		}
+		
+		return this.searchFind(array,[]);
 	}
 	
 	searchFind(array,check){
@@ -363,6 +311,7 @@ class ThornStack {
 		return check;
 	}
 	
+	/* Used only to compare the order of characters. Unnecessary */
 	chartonum(cha){
 		var upper = cha.toUpperCase();
 		var code = upper.charCodeAt(0);

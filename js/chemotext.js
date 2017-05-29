@@ -294,7 +294,7 @@ function setFilterHandler(stack,name){
 }
 
 /* Build the results table */
-function makeTables(stack,limit,index=0,type, tableElement){		
+function makeTables(stack,limit,index=0){		
 	$(tableform).find("tr").slice(1).remove();	//remove all tr except the first one
 	
 	var indexLimit = index+limit;
@@ -302,7 +302,7 @@ function makeTables(stack,limit,index=0,type, tableElement){
 		indexLimit = stack.length;
 	}
 	
-	updateTableFooter(stack,limit,index, type);
+	updateTableFooter(stack,limit,index);
 	
 	switch (SEARCH_TYPE) {
 		case 'connected':
@@ -325,15 +325,15 @@ function makeTables(stack,limit,index=0,type, tableElement){
 }
 
 /* Update the table footer section. Called by makeTables() */
-function updateTableFooter(stack,limit,index, type){
-	$("#prev-arrow")[0].onclick = function(){makeTables(stack,limit,index-limit, type);}
+function updateTableFooter(stack,limit,index){
+	$("#prev-arrow")[0].onclick = function(){makeTables(stack,limit,index-limit);}
 
 	$("#table-limit-button")[0].onclick = function(){
 		tableLimit = parseInt(document.getElementById("table-limit").value);
-		makeTables(stack,tableLimit,0, type);
+		makeTables(stack,tableLimit,0);
 	};
 	
-	$("#next-arrow")[0].onclick = function(){makeTables(stack,limit,index+limit, type);}
+	$("#next-arrow")[0].onclick = function(){makeTables(stack,limit,index+limit);}
 
 	$("#results-count").text(stack.length);
 	
