@@ -3,10 +3,9 @@ var SEARCH_TYPE;
 var tableLimit = 10;
 var synStack = new ThornStack(withCountCode=false);
 synStack.extra = false;
-var subTermMax = 0;
-var subTermCount = 0; 
-var subTerms = [];
-var SEARCH_TYPE;
+
+// fields specific to each search execution and used by this file
+var _subterms = [];
 
 var CORS = "https://cors-anywhere.herokuapp.com/"; //GITHUB PAGES
 
@@ -136,7 +135,7 @@ function makePageSections(){
 	}
 	
 	// show subterms button
-	$("#results").prepend('<button onclick="showSubterms()" id="show-subterms">Click Here to see Subterms</button>');
+	$("#results").prepend('<div id="subterm-wrapper"><button onclick="showSubterms()" id="show-subterms">Click Here to see Subterms</button></div>');
 	
 	// loading circle
 	$(content).append('<img src="img/ajax-loader.gif" alt="Loading circle" id="loader">');
@@ -253,7 +252,7 @@ function showLoader(){
 }
 
 /* show the final results for any search type */
-function showResult(stack, csvName, subterms, type){
+function showResult(stack, csvName, withSubterms){
 	
 	if(stack.length==0){
 		$(displayText).text("No Results");
@@ -264,7 +263,7 @@ function showResult(stack, csvName, subterms, type){
 	$("#loader").hide();
 	$("#results").show();
 	
-	if (subterms){
+	if (withSubterms){
 		$("#show-subterms").show();
 	}
 	
@@ -274,7 +273,7 @@ function showResult(stack, csvName, subterms, type){
 	if (document.getElementById("downloadform") != null) {
 		setDownloadHandler(csvName, stack);
 	}	
-	makeTables(stack, tableLimit, 0, type);
+	makeTables(stack, tableLimit, 0);
 }
 
 /* Set the click handler for downloading the CSV */
@@ -357,8 +356,8 @@ function updateTableFooter(stack,limit,index, type){
 /* Open a new page listing subterms */
 function showSubterms(){
 	var html = "<html><head><title>Subterms</title></head><body>";
-	for(var i= 0;i<subTerms.length;i++){
-		html = html + "<p>"+subTerms[i]+"</p>";
+	for(var i= 0;i<_subterms.length;i++){
+		html = html + "<p>"+_subterms[i]+"</p>";
 	}
 	html = html + "</body></html>"
 	var newpage = window.open("");

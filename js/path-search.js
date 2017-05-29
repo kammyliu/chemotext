@@ -10,19 +10,29 @@ $(document).ready(function(){
 	makeSTypes("selectBar", false);
 	makeSTypes("triType", false);
 
-	input = document.getElementById("inputbar");
+input = document.getElementById("inputbar");
 	selectBar = document.getElementById("selectBar");	
 });
 
-var _subterms; //flag for if subterms are included
-var _type; //type of intermediary terms
-var countER;
+// fields specific to each search execution
+var _type; //type of B terms
+var _termA;
+var _stack;
 
-var triangleTerm;
+var _withSubterms = false;
+var _subtermMax;
+var _finishedSubterms=0;
+//var _subterms declared in chemotext.js
+
+// for second stage
+var _checkedTermsLeft;
+var _checkedTerms = [];
+
+
+
 function triangleSearch(){
-	if (input.value == ""){
-		return;
-	}
+	if (input.value == "") return;
+		
 	$(displayText).text("");
 	$("#selections").text("");
 	$("#results").hide();
@@ -30,31 +40,82 @@ function triangleSearch(){
 	showLoader();
 	$("#path-subresults").hide();
 
-	triangleTerm = getSelfOrSynonym(input.value);
+	_termA = getSelfOrSynonym(input.value);
 	_type = selectBar.value;
-	
+	_stack = new ThornStack();
+
 	//console.log(term); console.log(type);	
 	
-	_subterms = subtermsCheckbox.checked;
-	if(_subterms){
-		queryNeo4j(getSubtermsPayload(triangleTerm),findTriangleSubTerms);
+	_withSubterms = subtermsCheckbox.checked;
+	if(_withSubterms){
+		queryNeo4j(getSubtermsPayload(_termA),findTriangleSubTerms);
 	}else{
-		queryNeo4j(getMentionsByTypePayload(triangleTerm, _type),triangleSearchOnSuccess);
+		queryNeo4j(getMentionsByTypePayload(_termA, _type),triangleSearchOnSuccess);
 	}	
 }
-var stack, newStack;
+
+/* Without subterms */
 
 function triangleSearchOnSuccess(data){
 	console.log("Finished Search");
 	
-	stack = new ThornStack();
-		
-	addTermOrSubterm(stack, data);
+	addTermOrSubterm(_stack, data);
 
 	showSubresults();
 }	
+
+
+/* Including subterms */
+
+function findTriangleSubTerms(data){
+	var results = data["results"][0]["data"];
 	
-var checkedTerms;
+	_subterms = [];
+	_subtermMax = results.length + 1;
+	_finishedSubterms = 0;
+	
+	queryNeo4j(getMentionsByTypePayload(_termA, _type), addTriangleSubTerm);
+	
+	for (var i=0; i< results.length ; i++){
+		var name = results[i]["row"][0]["name"];	
+		_subterms.push(name);
+		queryNeo4j(getMentionsByTypePayload(name, _type), addTriangleSubTerm);
+	}	
+}
+
+function addTriangleSubTerm(data){	
+	addTermOrSubterm(_stack, data);
+	_finishedSubterms++;
+	
+	if(_finishedSubterms ==_subtermMax){
+		showSubresults();
+	}
+}
+
+/* General */
+function showSubresults(){
+
+	if(_stack.length==0){
+		$(displayText).text("No Results");
+		$("#loader").hide();
+		return;
+	}
+	
+	SEARCH_TYPE = "path-subresults";
+	makeTables(_stack,tableLimit,0);
+	//setFilterHandler(stack, "");
+
+	$(loader).hide();
+	$("#results").show();
+	$("#path-subresults").show();
+	$("#downloadform").hide();
+	//$("#filterSection").hide();
+	$("#selections").text("Choose the Intermediary Terms you want to search with");
+
+	_stack = new ThornStack();	//reset stack for stage 2
+	setFinishSearchHandler();	
+}
+
 function setFinishSearchHandler(){
 	var selectBar2 = document.getElementById("triType");
 	
@@ -66,13 +127,13 @@ function setFinishSearchHandler(){
 		showLoader()
 		$("#results").hide();
 	
-		checkedTerms = [];
+		_checkedTerms = [];
 		var checkedString = "Your Intermediary Terms: ";
 		var csvName = "";
 		
 		$("td input:checked").parent().next().each(function(i,el){
 			var term = $(this).text();
-			checkedTerms.push(term);
+			_checkedTerms.push(term);
 			checkedString += term + ", ";
 			csvName += "_" + term;			
 		});
@@ -80,108 +141,35 @@ function setFinishSearchHandler(){
 		checkedString += " Your Final Term Type: " + selectBar2.value;
 		$("#selections").text(checkedString);
 		
-		countER = checkedTerms.length;
-		//console.log(countER);
-		for(var j=0;j<checkedTerms.length;j++){
+		_checkedTermsLeft = _checkedTerms.length;
+		for(var j=0;j<_checkedTerms.length;j++){
 			console.log("Post Request");
-			term = checkedTerms[j];
-			postRequest(term, selectBar2.value, newStack,csvName)
+			postRequest(_checkedTerms[j], selectBar2.value, csvName)
 		}
-		$(displayText).text("Intermediary Terms Done: 0 out of "+checkedTerms.length);
+		$(displayText).text("Intermediary Terms Done: 0 out of "+_checkedTerms.length);
 	};
 }
-	
-	
-function showSubresults(){
-	SEARCH_TYPE = "path-subresults";
-	//setFilterHandler(stack, "");
-	makeTables(stack,tableLimit,0, SEARCH_TYPE);
-
-	if(stack.length==0){
-		$(displayText).text("No Results");
-		$("#loader").hide();
-		return;
-	}
-	$(loader).hide();
-	$("#results").show();
-	$("#path-subresults").show();
-	$("#downloadform").hide();
-	//$("#filterSection").hide();
-	$("#selections").text("Choose the Intermediary Terms you want to search with");
-
-	newStack = new ThornStack();
-	setFinishSearchHandler();	
-}
 
 
-function findTriangleSubTerms(data){
-	//console.log(data);
-	subTerms = [];
-	subTermCount = 0;
-	var data2=data["results"][0]["data"];
-	subTermMax = data2.length + 1;
-	
-	stack = new ThornStack();
-
-
-	queryNeo4j(getMentionsByTypePayload(triangleTerm, _type), addTriangleSubTerm);
-	
-	for (var i=0; i< data2.length ; i++){
-		var name = data2[i]["row"][0]["name"];	
-		subTerms.push(name);
-		queryNeo4j(getMentionsByTypePayload(name, _type), addTriangleSubTerm);
-	}	
-}
-
-
-function getMentionsByTypePayload(name, type){
-	var statement;
-	if(type == "Disease" || type == "Other" || type == "Chemical"){
-		statement = "match (n:Term{name:{name}})-[:MENTIONS]-(a)-[:MENTIONS]-(m:Term{type:{type}}) return m, a";			
-	}else if (type=="Drug"){
-		statement = "match (n:Term{name:{name}})-[:MENTIONS]-(a)-[:MENTIONS]-(m:Term{isDrug:{type}}) return m, a";
-		type="true";
-	}else{
-		statement = "match (n:Term{name:{name}})-[:MENTIONS]-(a)-[:MENTIONS]-(m:Term{stype:{type}}) return m, a";
-	}	
-	
-	return JSON.stringify({
-		"statements" : [{
-			"statement" : statement,
-			"parameters" : {"name": name, "type":type}
-		}]			
-	});
-}
-
-function addTriangleSubTerm(data){	
-	addTermOrSubterm(stack, data);
-	console.log("FINISHED SUBTERM or TERM");
-	subTermCount++;
-	
-	if(subTermCount==subTermMax){
-		showSubresults();
-	}
-}
-
-function postRequest(term,type,stack,csvName){
-	var input = document.getElementById("inputbar");
+function postRequest(term, type, csvName){
 	var downloadform = document.getElementById("downloadform");
 	
 	var payload = getMentionsByTypePayload(term, type);
 		
 	queryNeo4j(payload, function(data,xhr,status){
 		console.log("Finished Search");
-		addTermOrSubterm(stack, data);
+		addTermOrSubterm(_stack, data);
 		
-		countER--;
+		_checkedTermsLeft--;
 		$(displayText).text("Intermediary Terms Done: "+(
-			checkedTerms.length-countER)+" out of "+checkedTerms.length); 
-		//console.log("Count: "+countER);
-		if(countER==0){
-			console.log("FINISHED: "+stack.length)
+			_checkedTerms.length-_checkedTermsLeft)+" out of "+_checkedTerms.length); 
+			
+		if(_checkedTermsLeft==0){
+			console.log("FINISHED: "+_stack.length)
+			
 			SEARCH_TYPE = "path-final-results";
 			$("#results").hide();
-			showResult(stack, input.value+"_Path"+csvName, _subterms, SEARCH_TYPE);
+			showResult(_stack, input.value+"_Path"+csvName, _withSubterms);
 			$("#path-subresults").hide();
 			$("#downloadform").show();
 			$("#show-subterms").hide();
@@ -272,4 +260,26 @@ function makePathFinalResultsTable(stack, index, indexLimit){
 		node = node.right;
 	}
 }
+
+
+
+function getMentionsByTypePayload(name, type){
+	var statement;
+	if(type == "Disease" || type == "Other" || type == "Chemical"){
+		statement = "match (n:Term{name:{name}})-[:MENTIONS]-(a)-[:MENTIONS]-(m:Term{type:{type}}) return m, a";			
+	}else if (type=="Drug"){
+		statement = "match (n:Term{name:{name}})-[:MENTIONS]-(a)-[:MENTIONS]-(m:Term{isDrug:{type}}) return m, a";
+		type="true";
+	}else{
+		statement = "match (n:Term{name:{name}})-[:MENTIONS]-(a)-[:MENTIONS]-(m:Term{stype:{type}}) return m, a";
+	}	
+	
+	return JSON.stringify({
+		"statements" : [{
+			"statement" : statement,
+			"parameters" : {"name": name, "type":type}
+		}]			
+	});
+}
+
 

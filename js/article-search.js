@@ -19,23 +19,6 @@ $(document).ready(function(){
 });
 
 
-
-function addToArticleArray(){	
-	var term = getSelfOrSynonym(articleBar.value);
-	$(termsList).append('<li><span>'+term+'</span><button type="button" onclick="deleteFromArticleArray(this)">X</button></li>');
-	
-	articleBar.value = "";
-}
-
-
-function deleteFromArticleArray(button){
-	$(button).parent().remove();
-	if ($(termsList).children().length == 0){
-			searchbutton.disabled = true;		
-	}
-	//console.log("Delete");
-}
-
 function articleSearch(){
 	$(displayText).text("");
 	$("#results").hide();
@@ -51,7 +34,6 @@ function articleSearch(){
 	for(var i =1;i<articleArray.length;i++){
 		var name = "name"+i;
 		params[name] = articleArray[i];
-		//matchStr += " match (n"+articleArray[i]+":Term {name:{"+name+"}})-[:MENTIONS]-(a)";
 		matchStr += " match (n"+i+":Term {name:{"+name+"}})-[:MENTIONS]-(a)";
 	}
 	
@@ -61,20 +43,14 @@ function articleSearch(){
 				"parameters" : params
 			}]
      });
-	 
-	 console.log(payload);
-	 
+	 	 
 	 queryNeo4j(payload, function(data,xhr,status){
 		console.log("Finished Search");
-		//console.log(data);
-		var data = data["results"][0];
-		if (typeof myVar != 'undefined'){
-			$("#loader").hide();
-			$(displayText).text("No Results");
-			return;
-		}
-		data = data["data"];
+
+		var data = data["results"][0]["data"];
+
 		var stack = new ThornStack(false);
+		
 		for(var i=0;i<data.length;i++){
 			var date = data[i]["row"][0]["date"];
 			var pmid = data[i]["row"][0]["pmid"];
@@ -84,13 +60,8 @@ function articleSearch(){
 			stack.add(pmid,art);
 		}
 		
-		showResult(stack, "", false, SEARCH_TYPE);
-		//console.log(stack.length);
-		//makeTables(stack,tableLimit);
-		//setFilterHandler(stack,"articles");
+		showResult(stack, "", false);
 	 });
-	 
-	
 }
 
 
@@ -113,6 +84,21 @@ function makeArticleSearchTable(stack, index, indexLimit){
 	}
 }
 	
+
+	
+function addToArticleArray(){	
+	var term = getSelfOrSynonym(articleBar.value);
+	$(termsList).append('<li><span>'+term+'</span><button type="button" onclick="deleteFromArticleArray(this)">X</button></li>');
+	
+	articleBar.value = "";
+}
+
+function deleteFromArticleArray(button){
+	$(button).parent().remove();
+	if ($(termsList).children().length == 0){
+		searchbutton.disabled = true;		
+	}
+}
 
 
 	

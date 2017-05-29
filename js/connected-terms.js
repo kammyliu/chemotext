@@ -9,7 +9,12 @@ $(document).ready(function(){
 });
 
 // fields specific to each search execution
-var _term, _stack, _subterms;
+var _term, _stack;
+
+var _withSubterms = false;
+var _subtermMax;
+var _finishedSubterms=0;
+//var _subterms declared in chemotext.js
 
 function simpleSearch(){
 	if (input.value == "") return;
@@ -20,10 +25,12 @@ function simpleSearch(){
 	showLoader();
 
 	_term = getSelfOrSynonym(input.value);
-	console.log("Term: "+_term);
+	_stack = new ThornStack();
 	
-	_subterms = subtermsCheckbox.checked;
-	if(_subterms){
+	//console.log("Term: "+_term);
+
+	_withSubterms = subtermsCheckbox.checked;
+	if(_withSubterms){
 		queryNeo4j(getSubtermsPayload(_term), findSimpleSubterms);	// fetch subterms
 	}else{
 		queryNeo4j(getMentionsPayload(_term), simpleSearchOnSuccess);	// fetch search term occurrences
@@ -33,53 +40,42 @@ function simpleSearch(){
 /* Not including subterms */
 
 function simpleSearchOnSuccess(data){
-	_stack = new ThornStack();
-	//console.log(data);
 	addTermOrSubterm(_stack,data);
-	showResult(_stack, input.value, _subterms, SEARCH_TYPE);
+	showResult(_stack, input.value, _withSubterms);
 }
-
 
 
 /* Including subterms */
 
 function findSimpleSubterms(data){
-	console.log(data);
-	_stack = new ThornStack();
+	var results = data["results"][0]["data"];
 	
-	subTerms = [];
-	subTermCount = 0;
-	subTermMax = data["results"][0]["data"].length + 1;
-	//console.log(subTermMax);
+	_subterms = [];
+	_subtermMax = results.length + 1;
+	_finishedSubterms = 0;
 	
 	// fetch input term
-	queryNeo4j(getMentionsPayload(_term),addSimpleSubtermData);
+	queryNeo4j(getMentionsPayload(_term), addSimpleSubtermData);
 			
-	var results = data["results"][0];
-	var data2 = results["data"];
-	
 	// fetch each subterm 
-	for (var i=0; i< data2.length ; i++){
-		var name = data2[i]["row"][0]["name"];	
-		subTerms.push(name);
-		queryNeo4j(getMentionsPayload(name),addSimpleSubtermData);			
+	for (var i=0; i< results.length ; i++){
+		var name = results[i]["row"][0]["name"];	
+		_subterms.push(name);
+		queryNeo4j(getMentionsPayload(name), addSimpleSubtermData);			
 	}
 }
-
 
 function addSimpleSubtermData(data){
 	addTermOrSubterm(_stack,data);
-	//console.log("FINISHED SUBTERM or TERM");
 	
-	subTermCount++;
-	if(subTermCount==subTermMax){
-		showResult(_stack, input.value, _subterms, SEARCH_TYPE);
+	_finishedSubterms++;
+	if(_finishedSubterms == _subtermMax){
+		showResult(_stack, input.value, _withSubterms);
 	}
 }
 
 
-/* GENERAL */
-
+/* Show results table */
 function makeConnectedTermsTable(stack, index, indexLimit){
 	
 	//skip up to 'index'

@@ -1,7 +1,6 @@
 SEARCH_TYPE = "shared";
 
 var input, input2;
-
 $(document).ready(function(){	
 	makePageSections();
 
@@ -12,35 +11,35 @@ $(document).ready(function(){
 	input2 = document.getElementById("inputbar2");
 });
 
-var sharedTerm1;
-var sharedTerm2;
-var payload2;
-var _stack;	
-var _subterms; //flag for if subterms are included
+
+// fields specific to each search execution
+var _term1, _term2, _stack;
+var _withSubterms = false;
+var _subtermMax;
+var _finishedSubterms=0;
+//var _subterms declared in chemotext.js
 
 function sharedSearch(){
-	if (input.value == "" || input2.value == ""){
-		return;
-	}
+	if (input.value == "" || input2.value == "") return;
+	
 	$(displayText).text("");
 	$("#results").hide();
 	$("#show-subterms").hide();
 	showLoader();
 	
+	// labels in table header
 	$("#term1-label").text(input.value);
 	$("#term2-label").text(input2.value);
 	
-	var term1 = getSelfOrSynonym(input.value);
-	var term2 = getSelfOrSynonym(input2.value);
+	_term1 = getSelfOrSynonym(input.value);
+	_term2 = getSelfOrSynonym(input2.value);
+	_stack = new ThornStack();
 		
-	_subterms = subtermsCheckbox.checked;
-	if(_subterms){
-		sharedTerm1 = term1;
-		sharedTerm2 = term2;
-		queryNeo4j(getSubtermsPayload(term1), findSharedSubTermsOne);
+	_withSubterms = subtermsCheckbox.checked;
+	if(_withSubterms){
+		queryNeo4j(getSubtermsPayload(_term1), findSharedSubTermsOne);
 	}else{
-		payload2 = getMentionsPayload(term2);
-		queryNeo4j(getMentionsPayload(term1), sharedSearchOne);
+		queryNeo4j(getMentionsPayload(_term1), sharedSearchOne);
 	}	
 }
 
@@ -48,89 +47,114 @@ function sharedSearch(){
 /* Not including subterms */
 
 function sharedSearchOne(data){
-	console.log("Finished Query 1");
-	_stack = new ThornStack();
+	console.log("Finished query term 1");
 	addTermOrSubterm(_stack, data);
-	//console.log(_stack);
-	queryNeo4j(payload2,sharedSearchTwo);
+	queryNeo4j(getMentionsPayload(_term2),sharedSearchTwo);
 }	
 
 function sharedSearchTwo(data){
-	console.log("Finished Query 2");
-
-	var newstack = new ThornStack();
-	addSharedTermOrSubterm(_stack, newstack, data);
+	console.log("Finished query term 2");
 	
-	_stack = newstack;
+	var newStack = new ThornStack();
+	addSharedTermOrSubterm(_stack, newStack, data);
+	_stack = newStack;
 	
 	//console.log(_stack);
-	showResult(_stack, input.value+"_"+input2.value, _subterms, SEARCH_TYPE);
+	showResult(_stack, input.value+"_"+input2.value, _withSubterms);
 }
 
 
 /* Including subterms */
 
-/* almost identical to findSimpleSubterms in connected-terms.js */
-function findSharedSubTermsOne(data){
-	_stack = new ThornStack();
+function findSharedSubTermsOne(data){	
+	var results = data["results"][0]["data"];
+
+	_subterms = [];	
+	_subtermMax = results.length + 1;	//all subterms plus the original term
+	_finishedSubterms = 0;
 	
-	subTerms = [];	
-	subTermCount = 0;
-	subTermMax = data["results"][0]["data"].length + 1;
-	//console.log(subTermMax);
+	queryNeo4j(getMentionsPayload(_term1), addSharedSubTermsOne);
 	
-	queryNeo4j(getMentionsPayload(sharedTerm1),addSharedSubTermsOne);
-	
-	var results = data["results"][0];
-	var data2 = results["data"];
-	
-	for (var i=0; i< data2.length ; i++){
-		var name = data2[i]["row"][0]["name"];	
-		subTerms.push(name);
-		queryNeo4j(getMentionsPayload(name),addSharedSubTermsOne);			
+	for (var i=0; i< results.length ; i++){
+		var name = results[i]["row"][0]["name"];	
+		_subterms.push(name);
+		queryNeo4j(getMentionsPayload(name), addSharedSubTermsOne);			
 	}
 }
 
 function addSharedSubTermsOne(data){		
 	addTermOrSubterm(_stack, data);
-	//console.log("FINISHED SUBTERM or TERM");
 	
-	subTermCount++;
-	if(subTermCount==subTermMax){
-		queryNeo4j(getSubtermsPayload(sharedTerm2), findSharedSubTermsTwo);
+	_finishedSubterms++;
+	if(	_finishedSubterms == _subtermMax){
+		console.log("Finished query term 1");
+		queryNeo4j(getSubtermsPayload(_term2), findSharedSubTermsTwo);
 	}
 }
 
 function findSharedSubTermsTwo(data){
-	var results = data["results"][0];
-	var data2 = results["data"];
-		
-	subTermCount = 0;
-	subTermMax = data2.length + 1;
-	//console.log(subTermMax);
+	var results = data["results"][0]["data"];
+
+	_finishedSubterms = 0;
+	_subtermMax = results.length + 1;
 	
-	queryNeo4j(getMentionsPayload(sharedTerm2),addSharedSubTermsTwo);
+	queryNeo4j(getMentionsPayload(_term2), addSharedSubTermsTwo);
 	
-	for (var i=0; i< data2.length ; i++){
-		var name = data2[i]["row"][0]["name"];	
-		subTerms.push(name);	
+	for (var i=0; i< results.length ; i++){
+		var name = results[i]["row"][0]["name"];	
+		_subterms.push(name);	
 		queryNeo4j(getMentionsPayload(name),addSharedSubTermsTwo);			
 	}
 }
 
-function addSharedSubTermsTwo(data){
-	var stack = _stack;
-	var newstack = new ThornStack();
 
-	addSharedTermOrSubterm(stack, newstack, data);
+function addSharedSubTermsTwo(data){
+	var newStack = new ThornStack();
+	//	console.log(_stack);
+
+	addSharedTermOrSubterm(_stack, newStack, data);
+	//_stack = newStack; 
 	
-	console.log("FINISHED SUBTERM or TERM2");
-	subTermCount++;
-	if(subTermCount==subTermMax){
-		stack = newstack;
-		showResult(stack, input.value+"_"+input2.value, _subterms, SEARCH_TYPE);
+	//console.log(_stack);
+	
+	_finishedSubterms++;
+	if(_finishedSubterms == _subtermMax){
+		_stack = newStack;
+		console.log("Finished query term 2");
+		showResult(_stack, input.value+"_"+input2.value, _withSubterms);
 	}
 }
+
+
+/* helper that adds a term to the stack */
+function addSharedTermOrSubterm(stack, newstack, data){
+	//console.log(stack);
+	var data2 = data["results"][0]["data"];
+	
+	for (var i=0; i< data2.length ; i++){
+		var name = data2[i]["row"][0]["name"];
+		var type = data2[i]["row"][0]["type"];
+		var stype = data2[i]["row"][0]["stype"];
+		var date = data2[i]["row"][1]["date"];
+		var pmid = data2[i]["row"][1]["pmid"];
+		var title = data2[i]["row"][1]["title"];
+
+		var check = stack.get(name);	
+		if(check){
+			var check2 = newstack.get(name);
+			if(!check2){
+				check = check.sharedCopy();
+				newstack.add(name,check);
+				check.addArtShared(pmid,date,newstack,title);
+			}else{
+				check2.addArtShared(pmid,date,newstack,title);
+			}
+		}	
+	}	
+	//console
+}
+
+
 
 
 
@@ -174,33 +198,6 @@ function makeSharedTermsTable(stack, index, indexLimit){
 }
 
 
-
-/* helper that adds an article to the stack */
-function addSharedTermOrSubterm(stack, newstack, data){
-	var results = data["results"][0];
-	var data2 = results["data"];
-	
-	for (var i=0; i< data2.length ; i++){
-		var name = data2[i]["row"][0]["name"];
-		var type = data2[i]["row"][0]["type"];
-		var stype = data2[i]["row"][0]["stype"];
-		var date = data2[i]["row"][1]["date"];
-		var pmid = data2[i]["row"][1]["pmid"];
-		var title = data2[i]["row"][1]["title"];
-
-		var check = stack.get(name);	
-		if(check){
-			var check2 = newstack.get(name);
-			if(!check2){
-				check = check.sharedCopy();
-				newstack.add(name,check);
-				check.addArtShared(pmid,date,newstack,title);
-			}else{
-				check2.addArtShared(pmid,date,newstack,title);
-			}
-		}	
-	}	
-}
 
 	
 /* before: true = remove those before the date, false = remove those after the date */

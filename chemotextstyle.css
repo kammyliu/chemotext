@@ -21,6 +21,11 @@ main {
 	text-align: center;
 }
 
+#subterm-wrapper{
+	text-align: center;
+    margin-bottom: 20px;
+}
+
 #space{
 	height: 100px;
 }
