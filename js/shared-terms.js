@@ -14,6 +14,8 @@ $(document).ready(function(){
 
 // fields specific to each search execution
 var _term1, _term2, _stack;
+var _newStack;	//only used with subterms. stack for building Term 2 + subterms results
+
 var _withSubterms = false;
 var _subtermMax;
 var _finishedSubterms=0;
@@ -88,6 +90,8 @@ function addSharedSubTermsOne(data){
 	_finishedSubterms++;
 	if(	_finishedSubterms == _subtermMax){
 		console.log("Finished query term 1");
+		
+		_newStack = new ThornStack();
 		queryNeo4j(getSubtermsPayload(_term2), findSharedSubTermsTwo);
 	}
 }
@@ -109,17 +113,13 @@ function findSharedSubTermsTwo(data){
 
 
 function addSharedSubTermsTwo(data){
-	var newStack = new ThornStack();
-	//	console.log(_stack);
-
-	addSharedTermOrSubterm(_stack, newStack, data);
-	//_stack = newStack; 
+	addSharedTermOrSubterm(_stack, _newStack, data);
 	
 	//console.log(_stack);
 	
 	_finishedSubterms++;
 	if(_finishedSubterms == _subtermMax){
-		_stack = newStack;
+		_stack = _newStack;
 		console.log("Finished query term 2");
 		showResult(_stack, input.value+"_"+input2.value, _withSubterms);
 	}
@@ -142,6 +142,7 @@ function addSharedTermOrSubterm(stack, newstack, data){
 		var check = stack.get(name);	
 		if(check){
 			var check2 = newstack.get(name);
+			//console.log(check2);
 			if(!check2){
 				check = check.sharedCopy();
 				newstack.add(name,check);
