@@ -137,7 +137,6 @@ class NumStack {
 			}
 			if(i==length){
 				array[0] = object;
-				//console.log(array);
 				this.stack.push(object);
 				break;
 			}
@@ -192,10 +191,6 @@ class ThornStack {
 		this.withCountCode = withCountCode;
 	}
 	add(tag,object){
-		if(tag==null){
-			console.log("null tag, object: "+object);
-			return;
-		}
 		var chars = tag.toString().split('');
 		var length = chars.length;
 		var array = this.thornstack;
@@ -245,7 +240,6 @@ class ThornStack {
 	get(tag){
 		var chars = tag.split('');
 		var length = chars.length;
-		
 		var array = this.thornstack;
 		
 		for(var i=0;i<=length;i++){		
@@ -316,18 +310,19 @@ class ThornStack {
 			}
 		}
 	}
+	
 	search(tag){
 		var chars = tag.split('');
 		var length = chars.length;
 		var array = this.thornstack;
+		
 		for(var i=0;i<=length;i++){
 			if(array.length==0){
 				return false;
 			}
 			
 			if(i==length){
-				var check = [];
-				return this.searchFind(array,check);
+				return this.searchFind(array,[]);
 			}
 			
 			var pos = this.chartonum(chars[i]);
@@ -342,6 +337,7 @@ class ThornStack {
 			}
 		}
 	}
+	
 	searchFind(array,check){
 		if(check.length==5){
 			return check;
@@ -351,7 +347,6 @@ class ThornStack {
 				var notIn = false;
 				for(var j=0;j<check.length;j++){
 					if(check[j]==array[0][1]){
-						//console.log("THE SAME?");
 						notIn = true;
 					}
 				}
@@ -361,13 +356,11 @@ class ThornStack {
 				if(check.length==5){
 					return check;
 				}
-				//return [array[0][1]];// 
 			}else{
 				this.searchFind(array[i][1],check);
 			}
 		}
 		return check;
-	
 	}
 	
 	chartonum(cha){
