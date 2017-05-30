@@ -8,12 +8,7 @@ $(document).ready(function(){
 	input = document.getElementById("inputbar");
 });
 
-// fields specific to each search execution
-var _term, _stack;
-
 var _withSubterms = false;
-var _subtermMax;
-var _finishedSubterms=0;
 //var _subterms declared in chemotext.js
 
 function simpleSearch(){
@@ -24,65 +19,65 @@ function simpleSearch(){
 	$("#show-subterms").hide();
 	showLoader();
 
-	_term = termBank.getSynonym(input.value);
-	_stack = new ThornStack();
-	
-	//console.log("Term: "+_term);
+	var term = termBank.getSynonym(input.value);
+	//console.log("Term: "+term);
 
 	_withSubterms = subtermsCheckbox.checked;
 	if(_withSubterms){
-		queryNeo4j(getSubtermsPayload(_term), findSimpleSubterms);	// fetch subterms
+		queryNeo4j(getMentionsWithSubtermsPayload(term), simpleSearchOnSuccess);	// search term and subterm co-occurrences
 	}else{
-		queryNeo4j(getMentionsPayload(_term), simpleSearchOnSuccess);	// fetch search term occurrences
+		queryNeo4j(getMentionsPayload(term), simpleSearchOnSuccess);	// fetch search term co-occurrences
 	}
 }
 
 /* Not including subterms */
 
 function simpleSearchOnSuccess(data){
-	addTermOrSubterm(_stack,data);
-	showResult(_stack, input.value, _withSubterms);
+	//console.log(data);
+
+	var results = readResults(data, _withSubterms);
+
+	showResult(results, input.value, _withSubterms);
 }
 
-
-/* Including subterms */
-
-function findSimpleSubterms(data){
-	var results = data["results"][0]["data"];
+function readResults(data, withSubterms){
+	var results = [];
 	
-	_subterms = [];
-	_subtermMax = results.length + 1;
-	_finishedSubterms = 0;
-	
-	// fetch input term
-	queryNeo4j(getMentionsPayload(_term), addSimpleSubtermData);
-			
-	// fetch each subterm 
-	for (var i=0; i< results.length ; i++){
-		var name = results[i]["row"][0]["name"];	
-		_subterms.push(name);
-		queryNeo4j(getMentionsPayload(name), addSimpleSubtermData);			
+	if (withSubterms){
+		_subterms = data["results"][1]["data"][0].row[0];
 	}
-}
+		
+	data = data["results"][0]["data"];
 
-function addSimpleSubtermData(data){
-	addTermOrSubterm(_stack,data);
+	for (var i=0; i< data.length ; i++){
+		//console.log(i+" out of "+data2.length);
+		var row = data[i].row;
+		
+		var name = row[0]["name"];
+		var type = row[0]["type"];
+		var stype = row[0]["stype"];
+		var isDrug = row[0]["isDrug"];
+		
+		var newTerm = new Term(name,type,stype);
+		if(isDrug=="true"){newTerm.isDrug=true;}
 	
-	_finishedSubterms++;
-	if(_finishedSubterms == _subtermMax){
-		showResult(_stack, input.value, _withSubterms);
+		var articles = row[1];
+		for (var j=0; j<articles.length; j++){
+			var a = articles[j];
+			var date = a["date"];
+			var pmid = a["pmid"];
+			var title = a["title"];
+			newTerm.addArticle(pmid,date,title);
+		}
+		
+		results.push(newTerm);
 	}
+	return results;
 }
-
 
 /* Show results table */
 function makeConnectedTermsTable(stack, index, indexLimit){
-	
-	//skip up to 'index'
-	var node = stack.first;
-	for(var i=0;i<index;i++){
-		node = node.right;	
-	}
+	var $tbody = $(tableform).find("tbody");
 
 	/*append TR: 
 		<tr>
@@ -92,22 +87,19 @@ function makeConnectedTermsTable(stack, index, indexLimit){
 			</td>
 		</tr>
 	*/
-	var $tbody = $(tableform).find("tbody");
-	for(var j=index;j<indexLimit;j++){
-		if (node == null) break;
-		
+	for(var i=index;i<indexLimit;i++){
+		var term = stack[i];
 		$tr = $("<tr/>");
-		$tr.append('<td>'+node.name+'</td>');
+		$tr.append('<td>'+term.name+'</td>');
 		$buttonTd = $("<td/>").append( $("<button/>", {
 			type: "button", 
 			"class": "articleButton", 
-			text: node.count, 
-			click: function(node){ return function(){openArticleList(node);} }(node)
+			text: term.articles.length, 
+			click: function(term){ return function(){openArticleList(term);} }(term)
 		}));
-		$tbody.append($tr.append($buttonTd));
-
-		node = node.right;
-	}
+		$tbody.append($tr.append($buttonTd));		
+	}	
+	return;
 }
 
 

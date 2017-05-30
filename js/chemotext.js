@@ -168,7 +168,7 @@ function makeSTypes(id, withNone){
 		"Nervous System Diseases",
 		"Eye Diseases",
 		"Male Urogenital Diseases",
-		"Female Urogenital Diseases and Pregnancy Complications",
+		"Female Urogentital Diseases and Pregnancy Complications",
 		"Hemic and Lymphatic Diseases",
 		"Congenital, Hereditary, and Neonatal Diseases and Abnormalities",
 		"Skin and Connective Tissue Diseases",
@@ -344,16 +344,28 @@ function showSubterms(){
 
 /* Open a new page listing article names or ids */
 function openArticleList(node){		
+	
 	var html = "<html><head><title>" + node.name + "</title></head><body>";
-	for(var i= 0;i<node.stack.length;i++){
-		if(node.stack[i]!=null){						
-			var name = node.stack[i].pmid;
-			if(node.stack[i].title!=null){
-				name = node.stack[i].title;
-			}
-			html = html + "<p><a href=http://www.ncbi.nlm.nih.gov/pubmed/"+node.stack[i].pmid+">"+name+"</a></p>";
+	// for(var i= 0;i<node.stack.length;i++){
+		// if(node.stack[i]!=null){						
+			// var name = node.stack[i].pmid;
+			// if(node.stack[i].title!=null){
+				// name = node.stack[i].title;
+			// }
+			// html = html + "<p><a href=http://www.ncbi.nlm.nih.gov/pubmed/"+node.stack[i].pmid+">"+name+"</a></p>";
+		// }
+	// }
+	
+	var articles = node.articles;
+	for (var i=0; i<articles.length; i++){
+		//if (articles[i]==null) continue;	//spots may be made null by filtering
+		var name = articles[i].pmid;
+		if(articles[i].title!=null){
+			name = articles[i].title;
 		}
+		html = html + "<p><a href=http://www.ncbi.nlm.nih.gov/pubmed/"+articles[i].pmid+">"+name+"</a></p>";
 	}
+	
 	html = html + "</body></html>"
 	var newpage = window.open("");
 	newpage.document.write(html)
@@ -391,8 +403,7 @@ function onInitFs(fs, name, stack, withPmids){
 			}
 			
 			fileWriter.addEventListener("writeend", function() {
-				//window.open("filesystem:http://chemotext.mml.unc.edu/temporary/"+fileName);
-				window.open("filesystem:https://kammyliu.github.io/temporary/"+fileName);	//GITHUB PAGES
+				window.open("filesystem:http://chemotext.mml.unc.edu/temporary/"+fileName);
 			}, false);
 			var blob = new Blob([data],{type: 'text/plain'});
 			fileWriter.write(blob);
@@ -440,7 +451,7 @@ function filterStack(dropbox,stack,name){
 	
 /* Filters the input stack by type and returns a new stack */
 function filterType(stack, type){
-	var newStack = new ThornStack();
+	var newStack = [];
 
 	var condition;
 	if(type == "Disease" || type == "Chemical" || type == "Other"){
@@ -451,13 +462,20 @@ function filterType(stack, type){
 		condition = function(term){return term.stype==type;};
 	}
 	
-	var term = stack.first;
-	while(term != null){
-		if(condition(term)){
-			newStack.add(term.name, term.copy());
+	for (var i=0; i<stack.length; i++){
+	var term = stack[i];
+		if (condition(term)){
+			newStack.push(term);
 		}
-		term = term.right;
-	}	
+	}
+	
+	// var term = stack.first;
+	// while(term != null){
+		// if(condition(term)){
+			// newStack.add(term.name, term.copy());
+		// }
+		// term = term.right;
+	// }	
 	return newStack;
 }
 
@@ -471,32 +489,54 @@ function filterDate(stack, removeBefore, dateValue){
 
 	var toFilter = removeBefore ? nodeDateBefore : nodeDateAfter;
 		
-	var newStack = new ThornStack();
-
-	var term = stack.first;
-	while(term != null){
-		var termCopy = term.copy();
-		for(var i =0;i<term.stack.length;i++){	
-			if (toFilter(benchmark, term.stack[i])){
-				termCopy.count--;
-				termCopy.stack[i] = null;			
-			}
-		}
+	//var newStack = new ThornStack();
+	var newStack = [];
 	
-		if(termCopy.count > 0){
-			newStack.add(term.name,termCopy);
-		}
+	for (var i=0; i<stack.length; i++){
+		var term = stack[i];
+		var termCopy = term.copy();	//also deep copies the articles array
+		var articles = termCopy.articles;
 		
-		var newArray = [];
-		for(var j=0;j<termCopy.stack.length;j++){
-			if(termCopy.stack[j]!=null){
-				newArray.push(termCopy.stack[j]);
+		for(var j = articles.length -1; j >= 0 ; j--){
+			if (toFilter(benchmark, articles[j])){
+				articles.splice(j, 1);
 			}
 		}
-		termCopy.stack = newArray;
-		
-		term = term.right;
+		if (articles.length>0){
+			newStack.push(termCopy);
+		}
 	}
+	
+	//resort the terms by new article count
+	newStack.sort(function(term1, term2){
+		return term2.articles.length - term1.articles.length;
+	});
+
+	
+	// var term = stack.first;
+	// while(term != null){
+		// var termCopy = term.copy();
+		// for(var i =0;i<term.stack.length;i++){	
+			// if (toFilter(benchmark, term.stack[i])){
+				// termCopy.count--;
+				// termCopy.stack[i] = null;			
+			// }
+		// }
+	
+		// if(termCopy.count > 0){
+			// newStack.add(term.name,termCopy);
+		// }
+		
+		// var newArray = [];
+		// for(var j=0;j<termCopy.stack.length;j++){
+			// if(termCopy.stack[j]!=null){
+				// newArray.push(termCopy.stack[j]);
+			// }
+		// }
+		// termCopy.stack = newArray;
+		
+		// term = term.right;
+	// }
 	
 	if(SEARCH_TYPE=="shared"){
 		filterDateShared(newStack,year,month,day,removeBefore);
@@ -511,18 +551,51 @@ function filterDate(stack, removeBefore, dateValue){
 function getMentionsPayload(name){
 	return JSON.stringify({
 		"statements" : [{
-			"statement" : "match (n:Term{name:{name}})-[:MENTIONS]-(a)-[:MENTIONS]-(m) return m, a " , 
+			// match Terms with the name 'name' that are mentioned by an 'article' that mentions a 'term'
+			"statement": "MATCH (:Term{name:{name}})-[:MENTIONS]-(article)-[:MENTIONS]-(term) " +
+				"WITH article, term MATCH (term)-[:MENTIONS]-(article) " + 	//group the articles that correspond to each term
+				"RETURN term, collect(article) as articleList " +	//return each term and its list of articles
+				"ORDER BY length(articleList) DESC", 	//sorted by number of articles
 			"parameters" : {"name": name}
 		}]
 	});
 }
 
+function getMentionsWithSubtermsPayload(name){
+	return JSON.stringify({
+		"statements" : [
+			{
+				"statement": "MATCH (:Term{name:{name}})-[:MAPPED]->(subterm) " +	// get subterms
+					"WITH collect(subterm.name) as subtermNames " + 	// collect the list of subterm names
+					
+					"MATCH (n:Term)-[:MENTIONS]-(article)-[:MENTIONS]-(term) " +		// input term is mentioned by articles that mention other terms
+					"WHERE n.name in subtermNames OR n.name = {name} " +	// where the initial terms are subterms or the input term
+					
+					"WITH article, term "+ 		// using the articles and final terms
+					"MATCH (term)-[:MENTIONS]-(article) " + 	//get the articles that correspond to each term
+					"RETURN term, collect(article) as articleList " +	//return each term and its list of articles
+					"ORDER BY length(articleList) DESC",	//sorted by number of articles
+				"parameters" : {"name": name}
+			},
+			{
+				"statement": "match (:Term{name:{name}})-[:MAPPED]->(subterm) " +	// get subterms
+					"RETURN collect(subterm.name)" ,	// return as one list
+				"parameters" : {"name": name}
+			}		
+		]
+	});
+}
+
+
+
 /* Return the query string for getting a term's subterms*/
 function getSubtermsPayload(name){
 	return JSON.stringify({
 		"statements" : [{
-			"statement" : "match (n:Term{name:{name}})-[:MAPPED]->(a) return a " ,
-			"parameters" : {"name": name}
+			// match Terms with the name 'name' that map to a 'subterm'
+			// return subterm
+			"statement" : "match (:Term{name:{name}})-[:MAPPED]->(subterm) return subterm " ,
+			"parameters" : {"name": name }
 		}]
 	});
 }

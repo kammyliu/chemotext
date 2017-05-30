@@ -35,6 +35,8 @@ class Term {
 		var sharedStack = null;
 		this.sharedCount2 = 0;
 		this.sharedCountBoth = 0;
+		
+		this.articles = [];
 	}
 	copy(){
 		var copy = new Term(this.name,this.type,this.stype);
@@ -45,6 +47,9 @@ class Term {
 		copy.stack1 = this.stack1;
 		copy.stack2 = this.stack2;
 		copy.sharedCount2 = this.sharedCount2;
+		
+		copy.articles = this.articles.slice()
+
 		return copy;
 	}
 	sharedCopy(){
@@ -114,6 +119,10 @@ class Term {
 			this.count++;
 			this.checkPosition(stack);
 		}
+	}
+	
+	addArticle(pmid, date, title){
+		this.articles.push(new Art(pmid, date, title));
 	}
 }
 	
@@ -260,56 +269,6 @@ class ThornStack {
 			return false;
 		}
 	}
-
-	/* Used to return top 5 results for autocompletion */
-	search(tag){
-		var chars = tag.split('');
-		var array = this.thornstack;
-		
-		for(var i=0;i<chars.length;i++){
-			if(array.length==0){
-				return false;
-			}
-			
-			var pos = this.chartonum(chars[i]);
-						
-			for(var j=0;j<array.length;j++){
-				if(array[j][0]==pos){
-					array = array[j][1];
-					break;
-				}else if(array[j][0]>pos){
-					return false;
-				}
-			}
-		}
-		
-		return this.searchFind(array,[]);
-	}
-	
-	searchFind(array,check){
-		if(check.length==5){
-			return check;
-		}
-		for(var i=0;i<array.length;i++){
-			if(array[0][0]==0){
-				var notIn = false;
-				for(var j=0;j<check.length;j++){
-					if(check[j]==array[0][1]){
-						notIn = true;
-					}
-				}
-				if(!notIn){
-					check.push(array[0][1]);
-				}
-				if(check.length==5){
-					return check;
-				}
-			}else{
-				this.searchFind(array[i][1],check);
-			}
-		}
-		return check;
-	}
 	
 	/* Used only to compare the order of characters. Unnecessary */
 	chartonum(cha){
@@ -340,7 +299,7 @@ class TermBank {
 	// takes a sorted (case-insensitive) array of strings, with synonyms demarcated by |. Terms have only 0 or 1 synonyms
 	constructor(list){
 		this.list = list;
-		this.suggestCount = 5;
+		this.suggestCount = 5;	//the max number of suggestions complete() will return
 	}
 	
 	// return synonym, or self if no synonym
@@ -357,10 +316,9 @@ class TermBank {
 	complete(prefix){		
 		var options = [];
 		var index = this.getIndex(prefix, false);
-		prefix = prefix.toUpperCase();	
 		
 		if (index > -1){
-			for (var i=0; i<this.suggestCount && this.isPrefix(prefix, this.list[index].toUpperCase()); i++){
+			for (var i=0; i<this.suggestCount && this.isPrefix(prefix, this.list[index]); i++){
 				var entry = this.list[index++];
 				if (entry.includes('|')){
 					entry = entry.split('|')[0];
@@ -377,6 +335,7 @@ class TermBank {
 	getIndex(target, exact) {
 		target = target.toUpperCase();
 		
+		//binary search
 		var low = 0, high = this.list.length - 1, i, comp;
 		while (low <= high) {
 			i = Math.floor((low + high) / 2);
@@ -388,7 +347,7 @@ class TermBank {
 		}
 
 		if (!exact && this.isPrefix(target, this.list[low])){
-				return low;
+			return low;
 		} 
 		
 		//split off the term without its synonym
