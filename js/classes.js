@@ -12,6 +12,15 @@ class Art{
 			this.day = parseInt(this.date.substring(6,8));
 		}
 	}
+	
+	// Return title if there is one. Otherwise, return pmid
+	getTitleOrId(){
+		if (this.title != null){
+			return this.title;
+		} else {
+			return this.pmid;
+		}
+	}
 }
 
 class Term {
@@ -305,6 +314,7 @@ class TermBank {
 	// return synonym, or self if no synonym
 	getSynonym(term){
 		var index = this.getIndex(term, true);
+		//console.log(index);
 		var entry = this.list[index];
 		if (entry.includes('|')){
 			entry = entry.split('|')[1];

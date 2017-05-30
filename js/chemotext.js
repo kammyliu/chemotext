@@ -346,23 +346,10 @@ function showSubterms(){
 function openArticleList(node){		
 	
 	var html = "<html><head><title>" + node.name + "</title></head><body>";
-	// for(var i= 0;i<node.stack.length;i++){
-		// if(node.stack[i]!=null){						
-			// var name = node.stack[i].pmid;
-			// if(node.stack[i].title!=null){
-				// name = node.stack[i].title;
-			// }
-			// html = html + "<p><a href=http://www.ncbi.nlm.nih.gov/pubmed/"+node.stack[i].pmid+">"+name+"</a></p>";
-		// }
-	// }
 	
 	var articles = node.articles;
 	for (var i=0; i<articles.length; i++){
-		//if (articles[i]==null) continue;	//spots may be made null by filtering
-		var name = articles[i].pmid;
-		if(articles[i].title!=null){
-			name = articles[i].title;
-		}
+		var name = articles[i].getTitleOrId();
 		html = html + "<p><a href=http://www.ncbi.nlm.nih.gov/pubmed/"+articles[i].pmid+">"+name+"</a></p>";
 	}
 	

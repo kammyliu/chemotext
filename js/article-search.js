@@ -29,7 +29,11 @@ function articleSearch(){
 		articleArray.push($(this).text());
 	});
 	
-	var matchStr = "match (n:Term {name:{name0}})-[]-(a)";
+	
+	// match (n:Term {name:{name0}})-[]-(a) 
+	// match (n1:Term {name:{name1}})-[:MENTIONS]-(a) return a
+	
+	var matchStr = "match (n:Term {name:{name0}})-[:MENTIONS]-(a)";
 	var params = { "name0" : articleArray[0] };
 	for(var i =1;i<articleArray.length;i++){
 		var name = "name"+i;
@@ -39,25 +43,24 @@ function articleSearch(){
 	
 	var payload = JSON.stringify({
 			"statements" : [{
-				"statement" : matchStr+" return a;", 
+				"statement" : matchStr+" return a", 
 				"parameters" : params
 			}]
      });
 	 	 
 	 queryNeo4j(payload, function(data,xhr,status){
-		console.log("Finished Search");
+		//console.log("Finished Search");
 
 		var data = data["results"][0]["data"];
 
-		var stack = new ThornStack(false);
+		var stack = [];
 		
 		for(var i=0;i<data.length;i++){
 			var date = data[i]["row"][0]["date"];
 			var pmid = data[i]["row"][0]["pmid"];
 			var title = data[i]["row"][0]["title"];
 
-			var art = new Art(pmid,date,title);
-			stack.add(pmid,art);
+			stack.push(new Art(pmid,date,title));
 		}
 		
 		showResult(stack, "", false);
@@ -68,8 +71,7 @@ function articleSearch(){
 function makeArticleSearchTable(stack, index, indexLimit){
 
 	var $tbody = $(tableform).find("tbody");
-
-
+	
 	/*append TR: 
 		<tr>
 			<td>
@@ -78,7 +80,7 @@ function makeArticleSearchTable(stack, index, indexLimit){
 		</tr>
 	*/
 	for(var j=index;j<indexLimit;j++){
-		var pmid = stack.list[j];
+		var pmid = stack[j].pmid;
 		$tbody.append('<tr><td><a target="_blank" href="http://www.ncbi.nlm.nih.gov/pubmed/'+pmid+'">'
 			+pmid+'</a></td></tr>');
 	}
