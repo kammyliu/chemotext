@@ -56,6 +56,44 @@ function queryNeo4j(payload,successFunc){
 	});
 }
 	
+	
+	
+function readResults(data, withSubterms){
+	var results = [];
+	
+	if (withSubterms){
+		_subterms = data["results"][1]["data"][0].row[0];
+	}
+		
+	data = data["results"][0]["data"];
+
+	for (var i=0; i< data.length ; i++){
+		//console.log(i+" out of "+data2.length);
+		var row = data[i].row;
+		
+		var name = row[0]["name"];
+		var type = row[0]["type"];
+		var stype = row[0]["stype"];
+		var isDrug = row[0]["isDrug"];
+		
+		var newTerm = new Term(name,type,stype);
+		if(isDrug=="true"){newTerm.isDrug=true;}
+	
+		var articles = row[1];
+		for (var j=0; j<articles.length; j++){
+			var a = articles[j];
+			var date = a["date"];
+			var pmid = a["pmid"];
+			var title = a["title"];
+			newTerm.addArticle(pmid,date,title);
+		}
+		
+		results.push(newTerm);
+	}
+	return results;
+}
+
+	
 /* Add the results of querying a term to the results stack */
 function addTermOrSubterm(stack, data){
 	var results = data["results"][0];
@@ -450,19 +488,11 @@ function filterType(stack, type){
 	}
 	
 	for (var i=0; i<stack.length; i++){
-	var term = stack[i];
+		var term = stack[i];
 		if (condition(term)){
 			newStack.push(term);
 		}
 	}
-	
-	// var term = stack.first;
-	// while(term != null){
-		// if(condition(term)){
-			// newStack.add(term.name, term.copy());
-		// }
-		// term = term.right;
-	// }	
 	return newStack;
 }
 
@@ -476,7 +506,6 @@ function filterDate(stack, removeBefore, dateValue){
 
 	var toFilter = removeBefore ? nodeDateBefore : nodeDateAfter;
 		
-	//var newStack = new ThornStack();
 	var newStack = [];
 	
 	for (var i=0; i<stack.length; i++){
@@ -498,32 +527,6 @@ function filterDate(stack, removeBefore, dateValue){
 	newStack.sort(function(term1, term2){
 		return term2.articles.length - term1.articles.length;
 	});
-
-	
-	// var term = stack.first;
-	// while(term != null){
-		// var termCopy = term.copy();
-		// for(var i =0;i<term.stack.length;i++){	
-			// if (toFilter(benchmark, term.stack[i])){
-				// termCopy.count--;
-				// termCopy.stack[i] = null;			
-			// }
-		// }
-	
-		// if(termCopy.count > 0){
-			// newStack.add(term.name,termCopy);
-		// }
-		
-		// var newArray = [];
-		// for(var j=0;j<termCopy.stack.length;j++){
-			// if(termCopy.stack[j]!=null){
-				// newArray.push(termCopy.stack[j]);
-			// }
-		// }
-		// termCopy.stack = newArray;
-		
-		// term = term.right;
-	// }
 	
 	if(SEARCH_TYPE=="shared"){
 		filterDateShared(newStack,year,month,day,removeBefore);
@@ -532,60 +535,88 @@ function filterDate(stack, removeBefore, dateValue){
 }
 
 
-/** Helpers **/
+/** Database query string builders **/
 	
-/* Return the query string for getting co-occuring terms*/
-function getMentionsPayload(name){
+/* Return the query string for getting terms that co-occur with the input term*/
+function getMentionsPayload(name, type){
+	var typeFilter = getQueryTypeFilter(type);
+	if (type=="Drug") type="true";
+
 	return JSON.stringify({
 		"statements" : [{
 			// match Terms with the name 'name' that are mentioned by an 'article' that mentions a 'term'
-			"statement": "MATCH (:Term{name:{name}})-[:MENTIONS]-(article)-[:MENTIONS]-(term) " +
+			"statement": "MATCH (:Term{name:{name}})-[:MENTIONS]-(article)-[:MENTIONS]-(term"+typeFilter+") " +
 				"WITH article, term MATCH (term)-[:MENTIONS]-(article) " + 	//group the articles that correspond to each term
 				"RETURN term, collect(article) as articleList " +	//return each term and its list of articles
 				"ORDER BY length(articleList) DESC", 	//sorted by number of articles
-			"parameters" : {"name": name}
+			"parameters" : {"name": name, "type": type}
 		}]
 	});
 }
 
-function getMentionsWithSubtermsPayload(name){
+/* Return the query string for getting terms that co-occur with the input term or its subterms*/
+function getMentionsWithSubtermsPayload(name, type){
+	var typeFilter = getQueryTypeFilter(type);
+	if (type=="Drug") type="true";
+
 	return JSON.stringify({
 		"statements" : [
 			{
 				"statement": "MATCH (:Term{name:{name}})-[:MAPPED]->(subterm) " +	// get subterms
 					"WITH collect(subterm.name) as subtermNames " + 	// collect the list of subterm names
 					
-					"MATCH (n:Term)-[:MENTIONS]-(article)-[:MENTIONS]-(term) " +		// input term is mentioned by articles that mention other terms
+					"MATCH (n:Term)-[:MENTIONS]-(article)-[:MENTIONS]-(term"+typeFilter+") " +		// input term is mentioned by articles that mention other terms
 					"WHERE n.name in subtermNames OR n.name = {name} " +	// where the initial terms are subterms or the input term
 					
 					"WITH article, term "+ 		// using the articles and final terms
 					"MATCH (term)-[:MENTIONS]-(article) " + 	//get the articles that correspond to each term
 					"RETURN term, collect(article) as articleList " +	//return each term and its list of articles
 					"ORDER BY length(articleList) DESC",	//sorted by number of articles
-				"parameters" : {"name": name}
+				"parameters" : {"name": name, "type": type}
 			},
 			{
 				"statement": "match (:Term{name:{name}})-[:MAPPED]->(subterm) " +	// get subterms
 					"RETURN collect(subterm.name)" ,	// return as one list
-				"parameters" : {"name": name}
+				"parameters" : {"name": name, "type": type}
 			}		
 		]
 	});
 }
 
+/* Return the query string for getting terms that co-occur with at least one of the input terms*/
+function getMentionsFromListPayload(terms, type){
+	var typeFilter = getQueryTypeFilter(type);
+	if (type=="Drug") type="true";
 
-
-/* Return the query string for getting a term's subterms*/
-function getSubtermsPayload(name){
 	return JSON.stringify({
 		"statements" : [{
-			// match Terms with the name 'name' that map to a 'subterm'
-			// return subterm
-			"statement" : "match (:Term{name:{name}})-[:MAPPED]->(subterm) return subterm " ,
-			"parameters" : {"name": name }
+			"statement": "MATCH (n:Term)-[:MENTIONS]-(article)-[:MENTIONS]-(term"+typeFilter+") " +
+				"WHERE n.name in {selectedTerms} " +
+				"WITH article, term MATCH (term)-[:MENTIONS]-(article) " + 	//group the articles that correspond to each term
+				"RETURN term, collect(article) as articleList " +	//return each term and its list of articles
+				"ORDER BY length(articleList) DESC", 	//sorted by number of articles
+			"parameters" : {"selectedTerms": terms, "type": type}
 		}]
 	});
 }
+
+/* Return the type modifier for a query */
+function getQueryTypeFilter(type){
+	var typeFilter="";	//no type filter
+	if (type){
+		if(type == "Disease" || type == "Other" || type == "Chemical"){
+			typeFilter = ":Term{type:{type}}";	
+		}else if (type=="Drug"){
+			typeFilter = ":Term{isDrug:{type}}"; 	
+		}else{
+			typeFilter = ":Term{stype:{type}}"; 	
+		}	
+	} 
+	return typeFilter;
+}
+
+
+/** Helpers **/
 
 /* Compare a Date and the date of a node */
 function compareNodeDate(benchmark, node){

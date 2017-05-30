@@ -40,41 +40,6 @@ function simpleSearchOnSuccess(data){
 	showResult(results, input.value, _withSubterms);
 }
 
-function readResults(data, withSubterms){
-	var results = [];
-	
-	if (withSubterms){
-		_subterms = data["results"][1]["data"][0].row[0];
-	}
-		
-	data = data["results"][0]["data"];
-
-	for (var i=0; i< data.length ; i++){
-		//console.log(i+" out of "+data2.length);
-		var row = data[i].row;
-		
-		var name = row[0]["name"];
-		var type = row[0]["type"];
-		var stype = row[0]["stype"];
-		var isDrug = row[0]["isDrug"];
-		
-		var newTerm = new Term(name,type,stype);
-		if(isDrug=="true"){newTerm.isDrug=true;}
-	
-		var articles = row[1];
-		for (var j=0; j<articles.length; j++){
-			var a = articles[j];
-			var date = a["date"];
-			var pmid = a["pmid"];
-			var title = a["title"];
-			newTerm.addArticle(pmid,date,title);
-		}
-		
-		results.push(newTerm);
-	}
-	return results;
-}
-
 /* Show results table */
 function makeConnectedTermsTable(stack, index, indexLimit){
 	var $tbody = $(tableform).find("tbody");

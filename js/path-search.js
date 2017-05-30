@@ -10,25 +10,13 @@ $(document).ready(function(){
 	makeSTypes("selectBar", false);
 	makeSTypes("triType", false);
 
-input = document.getElementById("inputbar");
+	input = document.getElementById("inputbar");
 	selectBar = document.getElementById("selectBar");	
 });
 
-// fields specific to each search execution
-var _type; //type of B terms
-var _termA;
-var _stack;
-
 var _withSubterms = false;
-var _subtermMax;
-var _finishedSubterms=0;
+var _checkedTerms = [];	
 //var _subterms declared in chemotext.js
-
-// for second stage
-var _checkedTermsLeft;
-var _checkedTerms = [];
-
-
 
 function triangleSearch(){
 	if (input.value == "") return;
@@ -40,79 +28,47 @@ function triangleSearch(){
 	showLoader();
 	$("#path-subresults").hide();
 
-	_termA = termBank.getSynonym(input.value);
-	_type = selectBar.value;
-	_stack = new ThornStack();
-
+	var termA = termBank.getSynonym(input.value);
+	var type = selectBar.value;
 	//console.log(term); console.log(type);	
 	
 	_withSubterms = subtermsCheckbox.checked;
 	if(_withSubterms){
-		queryNeo4j(getSubtermsPayload(_termA),findTriangleSubTerms);
+		queryNeo4j(getMentionsWithSubtermsPayload(termA, type), triangleSearchOnSuccess);
 	}else{
-		queryNeo4j(getMentionsByTypePayload(_termA, _type),triangleSearchOnSuccess);
+		queryNeo4j(getMentionsPayload(termA, type), triangleSearchOnSuccess);
 	}	
 }
 
-/* Without subterms */
-
-function triangleSearchOnSuccess(data){
-	console.log("Finished Search");
-	
-	addTermOrSubterm(_stack, data);
-
-	showSubresults();
+function triangleSearchOnSuccess(data){	
+	//console.log(data);
+	var results = readResults(data, _withSubterms);
+	showSubresults(results);
 }	
 
 
-/* Including subterms */
+function showSubresults(results){
+	_checkedTerms = [];
 
-function findTriangleSubTerms(data){
-	var results = data["results"][0]["data"];
-	
-	_subterms = [];
-	_subtermMax = results.length + 1;
-	_finishedSubterms = 0;
-	
-	queryNeo4j(getMentionsByTypePayload(_termA, _type), addTriangleSubTerm);
-	
-	for (var i=0; i< results.length ; i++){
-		var name = results[i]["row"][0]["name"];	
-		_subterms.push(name);
-		queryNeo4j(getMentionsByTypePayload(name, _type), addTriangleSubTerm);
-	}	
-}
-
-function addTriangleSubTerm(data){	
-	addTermOrSubterm(_stack, data);
-	_finishedSubterms++;
-	
-	if(_finishedSubterms ==_subtermMax){
-		showSubresults();
-	}
-}
-
-/* General */
-function showSubresults(){
-
-	if(_stack.length==0){
+	if(results.length==0){
 		$(displayText).text("No Results");
 		$("#loader").hide();
 		return;
 	}
 	
+	if (_withSubterms){
+		$("#show-subterms").show();
+	}
+	
 	SEARCH_TYPE = "path-subresults";
-	makeTables(_stack,tableLimit,0);
-	//setFilterHandler(stack, "");
+	makeTables(results,tableLimit,0);
 
 	$(loader).hide();
 	$("#results").show();
 	$("#path-subresults").show();
 	$("#downloadform").hide();
-	//$("#filterSection").hide();
 	$("#selections").text("Choose the Intermediary Terms you want to search with");
-
-	_stack = new ThornStack();	//reset stack for stage 2
+	
 	setFinishSearchHandler();	
 }
 
@@ -121,72 +77,48 @@ function setFinishSearchHandler(){
 	
 	var button = document.getElementById("finish-search");
 	button.onclick = function(){
-		if ($(tableform).find(":checked").length ==0){
+		if (_checkedTerms.length == 0){
 			return;
 		}
 		showLoader()
 		$("#results").hide();
 	
-		_checkedTerms = [];
 		var checkedString = "Your Intermediary Terms: ";
 		var csvName = "";
 		
-		$("td input:checked").parent().next().each(function(i,el){
-			var term = $(this).text();
-			_checkedTerms.push(term);
-			checkedString += term + ", ";
-			csvName += "_" + term;			
-		});
-		
-		checkedString += " Your Final Term Type: " + selectBar2.value;
-		$("#selections").text(checkedString);
-		
-		_checkedTermsLeft = _checkedTerms.length;
-		for(var j=0;j<_checkedTerms.length;j++){
-			console.log("Post Request");
-			postRequest(_checkedTerms[j], selectBar2.value, csvName)
+		for (var i=0; i< _checkedTerms.length; i++){
+			checkedString += _checkedTerms[i] + ", ";
+			csvName += "_" + _checkedTerms[i];
 		}
-		$(displayText).text("Intermediary Terms Done: 0 out of "+_checkedTerms.length);
+		checkedString += "<br>Your Final Term Type: " + selectBar2.value;
+		$("#selections").html(checkedString);
+		
+		getFinalTerms(_checkedTerms, selectBar2.value, csvName);
 	};
 }
 
-
-function postRequest(term, type, csvName){
-	var downloadform = document.getElementById("downloadform");
+/* Request the final terms from the list of selected terms and the filter type */
+function getFinalTerms(terms, type, csvName){		
+	var payload = getMentionsFromListPayload(terms, type);
 	
-	var payload = getMentionsByTypePayload(term, type);
-		
 	queryNeo4j(payload, function(data,xhr,status){
-		console.log("Finished Search");
-		addTermOrSubterm(_stack, data);
+		//console.log(data);
 		
-		_checkedTermsLeft--;
-		$(displayText).text("Intermediary Terms Done: "+(
-			_checkedTerms.length-_checkedTermsLeft)+" out of "+_checkedTerms.length); 
+		var results = readResults(data, false);
 			
-		if(_checkedTermsLeft==0){
-			console.log("FINISHED: "+_stack.length)
-			
-			SEARCH_TYPE = "path-final-results";
-			$("#results").hide();
-			showResult(_stack, input.value+"_Path"+csvName, _withSubterms);
-			$("#path-subresults").hide();
-			$("#downloadform").show();
-			$("#show-subterms").hide();
-		}	
+		SEARCH_TYPE = "path-final-results";
+		$("#results").hide();
+		showResult(results, input.value+"_Path"+csvName, _withSubterms);
+		$("#path-subresults").hide();
+		$("#downloadform").show();
+		$("#show-subterms").hide();
 	 });
 }
 
 function makePathSubresultsTable(stack, index, indexLimit){
-	//skip up to 'index'
-	var node = stack.first;
-	for(var i=0;i<index;i++){
-		node = node.right;	
-	}
-	
 	var $tbody = $(tableform).find("tbody");
-	$(tableform).find("tr").remove();	
 	
+	$(tableform).find("tr").remove();	
 	$tbody.append('<tr><th></th><th>Terms</th><th>Count</th></tr>');
 	
 	/*append TR: 
@@ -201,39 +133,36 @@ function makePathSubresultsTable(stack, index, indexLimit){
 		</tr>
 	*/
 
-	for(var j=index;j<indexLimit;j++){
-		if (node == null) break;
+	for(var i=index;i<indexLimit;i++){
+		var term = stack[i];
 		
 		$tr = $("<tr/>");
 		$tr.append('<td><input '+
-			(node.isSelected?'checked ':'') +
-			'type="checkbox" name="'+node.name+'"></td>');
-		$tr.append('<td>'+node.name+'</td>');
-		$tr.append('<td>'+node.count+'</td>');
+			(_checkedTerms.indexOf(term.name) >-1 ?'checked ':'') +
+			'type="checkbox" name="'+term.name+'"></td>');
+		$tr.append('<td>'+term.name+'</td>');
+		$tr.append('<td>'+term.articles.length+'</td>');
 		$tbody.append($tr);
-		
-		node = node.right;
 	}
 	
 	// used to make checks persistent when the table is rebuilt (from paging)
 	$("td input[type='checkbox']").click(function(){
-		var term = stack.get(this.name);
-		term.isSelected = this.checked;
+		if (this.checked){
+			_checkedTerms.push(this.name);
+		} else {
+			var index = _checkedTerms.indexOf(this.name);
+			if (index>-1){
+				_checkedTerms.splice(index, 1);
+			}
+		}
 	});
 }	
 
 
 function makePathFinalResultsTable(stack, index, indexLimit){
-	
-	//skip up to 'index'
-	var node = stack.first;
-	for(var i=0;i<index;i++){
-		node = node.right;	
-	}
-	
 	$(tableform).find("tr").remove();	
-	var $tbody = $(tableform).find("tbody");
 	
+	var $tbody = $(tableform).find("tbody");
 	$tbody.append('<tr><th>Terms</th><th>Count</th></tr>');
 	
 	/*append TR: 
@@ -245,41 +174,17 @@ function makePathFinalResultsTable(stack, index, indexLimit){
 		</tr>
 	*/
 	for(var j=index;j<indexLimit;j++){
-		if (node == null) break;
-		
+		var node = stack[j];
+	
 		$tr = $("<tr/>");
 		$tr.append('<td>'+node.name+'</td>');
 		$buttonTd = $("<td/>").append( $("<button/>", {
 			type: "button", 
 			"class": "articleButton", 
-			text: node.count, 
+			text: node.articles.length, 
 			click: function(node){ return function(){openArticleList(node);} }(node)
 		}));
 		$tbody.append($tr.append($buttonTd));
-
-		node = node.right;
 	}
 }
-
-
-
-function getMentionsByTypePayload(name, type){
-	var statement;
-	if(type == "Disease" || type == "Other" || type == "Chemical"){
-		statement = "match (:Term{name:{name}})-[:MENTIONS]-(article)-[:MENTIONS]-(term:Term{type:{type}}) return term, article";			
-	}else if (type=="Drug"){
-		statement = "match (:Term{name:{name}})-[:MENTIONS]-(article)-[:MENTIONS]-(term:Term{isDrug:{type}}) return term, article";
-		type="true";
-	}else{
-		statement = "match (:Term{name:{name}})-[:MENTIONS]-(article)-[:MENTIONS]-(term:Term{stype:{type}}) return term, article";
-	}	
-	
-	return JSON.stringify({
-		"statements" : [{
-			"statement" : statement,
-			"parameters" : {"name": name, "type":type}
-		}]			
-	});
-}
-
 
