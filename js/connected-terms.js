@@ -24,7 +24,7 @@ function simpleSearch(){
 	$("#show-subterms").hide();
 	showLoader();
 
-	_term = getSelfOrSynonym(input.value);
+	_term = termBank.getSynonym(input.value);
 	_stack = new ThornStack();
 	
 	//console.log("Term: "+_term);

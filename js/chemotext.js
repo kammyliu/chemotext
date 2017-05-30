@@ -1,15 +1,14 @@
 var SEARCH_TYPE;
 
 var tableLimit = 10;
-var synStack = new ThornStack(withCountCode=false);
-synStack.extra = false;
+
+var termBank = new TermBank(termList);
 
 // fields specific to each search execution and used by this file
 var _subterms = [];
 
 var CORS = "https://cors-anywhere.herokuapp.com/"; //GITHUB PAGES
 
-makeSynStack();	//start requesting the synstack file ASAP
 
 // elements accessed by all search types
 var tableform, displayText, subtermsCheckbox;
@@ -18,22 +17,6 @@ $(document).ready(function(){
 	displayText = document.getElementById("displayText");
 	subtermsCheckbox = document.getElementById("include-subterms");
 });
-
-/* Fetch the stack */
-function makeSynStack(){
-	readTextFile(CORS+"http://chemotext.mml.unc.edu/synstack.json",reconstructSynStack,"\r\n"); //GITHUB PAGES
-}
-
-/* Parse the received stack */
-function reconstructSynStack(jsonObj){
-	console.log("Retreived synstack");
-	try {
-		synStack.thornstack = JSON.parse(jsonObj);
-	} catch (e){
-		console.log(jsonObj);
-	}
-	console.log("Parsed synstack");
-}	
 
 /* Request a file */
 function readTextFile(file,success,terminator){
@@ -78,7 +61,9 @@ function addTermOrSubterm(stack, data){
 	var results = data["results"][0];
 	var data2 = results["data"];
 	
+	
 	for (var i=0; i< data2.length ; i++){
+	//console.log(i+" out of "+data2.length);
 		var name = data2[i]["row"][0]["name"];
 		var type = data2[i]["row"][0]["type"];
 		var stype = data2[i]["row"][0]["stype"];
@@ -152,23 +137,16 @@ function inputSuggestion($inputSection, inputId){
 	
 	$("#"+inputId).keyup(function(keyEvent){
 		var inputTerm = $(this).val();
-		var check = synStack.search(inputTerm);
-		var keyC = keyEvent.keyCode;
+		var newDataList = document.getElementById("datalist-"+inputId);
+		newDataList.innerHTML = "";
+		if (!inputTerm) return;
 		
-		//console.log(keyC);
-		//console.log(check);
-
-		if(check && check!=[] && keyC!=37 && keyC!=38 && keyC!=39 && keyC!=40){
-			var newDataList = document.getElementById("datalist-"+inputId);
-			newDataList.innerHTML = "";
-			for(var i=0;i<check.length;i++){
-				var option = document.createElement("option");
-				if (check[i].includes("|")){
-					check[i] = check[i].split('|')[0];
-				}
-				option.value = check[i];
-				newDataList.appendChild(option);	
-			}
+		var options = termBank.complete(inputTerm);
+		
+		for(var i=0;i<options.length;i++){
+			var option = document.createElement("option");
+			option.value = options[i];
+			newDataList.appendChild(option);	
 		}
 	});
 }
@@ -528,16 +506,6 @@ function filterDate(stack, removeBefore, dateValue){
 
 
 /** Helpers **/
-
-/* Look up a string in the stack */ 
-function getSelfOrSynonym(string){
-	var term = synStack.get(string);
-	if(term && term.includes('|')){
-		return term.split('|')[1]; //term.mainTerm.name;
-	} else {
-		return string;
-	}
-}
 	
 /* Return the query string for getting co-occuring terms*/
 function getMentionsPayload(name){

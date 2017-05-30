@@ -33,8 +33,8 @@ function sharedSearch(){
 	$("#term1-label").text(input.value);
 	$("#term2-label").text(input2.value);
 	
-	_term1 = getSelfOrSynonym(input.value);
-	_term2 = getSelfOrSynonym(input2.value);
+	_term1 = termBank.getSynonym(input.value);
+	_term2 = termBank.getSynonym(input2.value);
 	_stack = new ThornStack();
 		
 	_withSubterms = subtermsCheckbox.checked;

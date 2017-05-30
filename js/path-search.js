@@ -40,7 +40,7 @@ function triangleSearch(){
 	showLoader();
 	$("#path-subresults").hide();
 
-	_termA = getSelfOrSynonym(input.value);
+	_termA = termBank.getSynonym(input.value);
 	_type = selectBar.value;
 	_stack = new ThornStack();
 

@@ -335,4 +335,76 @@ class ThornStack {
 	}
 }
 
+class TermBank {
+	
+	// takes a sorted (case-insensitive) array of strings, with synonyms demarcated by |. Terms have only 0 or 1 synonyms
+	constructor(list){
+		this.list = list;
+		this.suggestCount = 5;
+	}
+	
+	// return synonym, or self if no synonym
+	getSynonym(term){
+		var index = this.getIndex(term, true);
+		var entry = this.list[index];
+		if (entry.includes('|')){
+			entry = entry.split('|')[1];
+		} 
+		return entry; 
+	}
+	
+	// returns an array of autocomplete options, with length up to this.suggestCount
+	complete(prefix){		
+		var options = [];
+		var index = this.getIndex(prefix, false);
+		prefix = prefix.toUpperCase();	
+		
+		if (index > -1){
+			for (var i=0; i<this.suggestCount && this.isPrefix(prefix, this.list[index].toUpperCase()); i++){
+				var entry = this.list[index++];
+				if (entry.includes('|')){
+					entry = entry.split('|')[0];
+				} 
+				options.push(entry);
+			}
+		} 
+		
+		return options;
+	}	
+	
+	// If 'exact', get the index of the first item that is equal to the target (case-insensitive)
+	// If not 'exact', it can also just begin with the target
+	getIndex(target, exact) {
+		target = target.toUpperCase();
+		
+		var low = 0, high = this.list.length - 1, i, comp;
+		while (low <= high) {
+			i = Math.floor((low + high) / 2);
+			comp = this.list[i].toUpperCase();
+	
+			if (comp < target){ low = i + 1; continue; }
+			if (comp > target) { high = i - 1; continue; }
+			return i;
+		}
+
+		if (!exact && this.isPrefix(target, this.list[low])){
+				return low;
+		} 
+		
+		//split off the term without its synonym
+		comp = this.list[low].toUpperCase();
+		if (comp.includes('|')){
+			comp = comp.split('|')[0];
+		}
+		if (comp === target){
+			return low;
+		}
+		return -1;
+	}
+	
+	// return whether the first argument is a prefix of the second. Case-insensitive
+	isPrefix(prefix, string){
+		return string.toUpperCase().substring(0, prefix.length) === prefix.toUpperCase();
+	}
+}
 
