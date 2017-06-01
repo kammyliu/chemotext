@@ -47,6 +47,7 @@ class Term {
 		
 		this.articles = [];
 	}
+
 	copy(){
 		var copy = new Term(this.name,this.type,this.stype);
 		copy.count = this.count;
@@ -60,74 +61,6 @@ class Term {
 		copy.articles = this.articles.slice()
 
 		return copy;
-	}
-	sharedCopy(){
-		var copy = this.copy();
-		copy.sharedCount1 = this.count;
-		copy.count = 0;
-		copy.sharedStack = new NumStack();
-		for(var i=0;i<this.stack.length;i++){
-			copy.sharedStack.add(this.stack[i].pmid,this.stack[i]);
-		}
-		copy.stack1 = this.stack;
-		copy.stack = [];
-		return copy;
-	}
-	
-	checkPosition(stack){
-		var ccc = 0;
-		while(true){
-			ccc++;
-			if(this.left==null){
-				stack.first = this;
-				return;
-			}
-			if(ccc>stack.length+1){ //problem
-				return;
-			}
-			
-			if(this.left.count<this.count){
-				if(this.right==null){
-					stack.end = this.left;
-					this.left.right = null;
-					this.right = this.left;
-					this.left = this.left.left;
-					this.right.left = this;
-					if(this.left!=null){
-						this.left.right = this;
-					}
-				}else{
-					this.right.left = this.left;
-					this.left.right = this.right;
-					this.right = this.left;
-					this.left = this.left.left;
-					this.right.left = this;
-					if(this.left!=null){
-						this.left.right = this;
-					}
-				}
-			}else{	
-				return;
-			}
-		}
-	}
-	
-	addArt(pmid,date,stack,title){
-		this.count++;
-		var art = new Art(pmid,date,title);
-		this.stack.push(art);
-		this.checkPosition(stack);
-	}
-	
-	addArtShared(pmid,date,stack,title){
-		this.sharedCount2++;
-		var art = new Art(pmid,date,title);
-		this.stack2.push(art)
-		if(this.sharedStack.get(pmid)!=false){
-			this.stack.push(art);
-			this.count++;
-			this.checkPosition(stack);
-		}
 	}
 	
 	addArticle(pmid, date, title){

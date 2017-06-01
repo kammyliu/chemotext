@@ -54,7 +54,7 @@ function queryNeo4j(payload,successFunc){
 }
 	
 	
-	
+/* Process the results of query into a list of Term objects */	
 function readResults(data, withSubterms, withSharedCounts){
 	var results = [];
 	
@@ -94,36 +94,6 @@ function readResults(data, withSubterms, withSharedCounts){
 		results.push(newTerm);
 	}
 	return results;
-}
-
-	
-/* Add the results of querying a term to the results stack */
-function addTermOrSubterm(stack, data){
-	var results = data["results"][0];
-	var data2 = results["data"];
-	
-	
-	for (var i=0; i< data2.length ; i++){
-	//console.log(i+" out of "+data2.length);
-		var name = data2[i]["row"][0]["name"];
-		var type = data2[i]["row"][0]["type"];
-		var stype = data2[i]["row"][0]["stype"];
-		var date = data2[i]["row"][1]["date"];
-		var pmid = data2[i]["row"][1]["pmid"];
-		var title = data2[i]["row"][1]["title"];
-		
-		var check = stack.get(name);
-
-		if(!check){
-			var newTerm = new Term(name,type,stype);
-			var isDrug = data2[i]["row"][0]["isDrug"];
-			if(isDrug=="true"){newTerm.isDrug=true;}
-			stack.add(name,newTerm);
-			newTerm.addArt(pmid,date,stack,title);
-		}else{			
-			check.addArt(pmid,date,stack,title);
-		}	
-	}
 }
 
 

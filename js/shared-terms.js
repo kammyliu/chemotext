@@ -11,14 +11,7 @@ $(document).ready(function(){
 	input2 = document.getElementById("inputbar2");
 });
 
-
-// fields specific to each search execution
-var _term1, _term2, _stack;
-var _newStack;	//only used with subterms. stack for building Term 2 + subterms results
-
 var _withSubterms = false;
-var _subtermMax;
-var _finishedSubterms=0;
 //var _subterms declared in chemotext.js
 
 function sharedSearch(){
@@ -33,17 +26,14 @@ function sharedSearch(){
 	$("#term1-label").text(input.value);
 	$("#term2-label").text(input2.value);
 	
-	_term1 = termBank.getSynonym(input.value);
-	_term2 = termBank.getSynonym(input2.value);
-	_stack = new ThornStack();
+	var term1 = termBank.getSynonym(input.value);
+	var term2 = termBank.getSynonym(input2.value);
 		
 	_withSubterms = subtermsCheckbox.checked;
 	if(_withSubterms){
-		//queryNeo4j(getSubtermsPayload(_term1), findSharedSubTermsOne);
-		queryNeo4j(getSubtermsPayload(_term1), findSharedSubTermsOne);
+		queryNeo4j(getSharedMentionsWithSubtermsPayload(term1, term2), sharedSearchOne);
 	}else{
-		queryNeo4j(getSharedMentionsPayload(_term1, _term2), sharedSearchOne);
-		//queryNeo4j(getSubtermsPayload(_term1), findSharedSubTermsOne);
+		queryNeo4j(getSharedMentionsPayload(term1, term2), sharedSearchOne);
 	}	
 }
 
@@ -52,152 +42,56 @@ function getSharedMentionsPayload(term1, term2){
 		"statements" : [
 			{
 				"statement":
-"MATCH (:Term{name:{name1}})-[:MENTIONS]-(article1)-[:MENTIONS]-(term) "+
-"MATCH (term)-[:MENTIONS]-(article2)-[:MENTIONS]-(:Term{name:{name2}}) "+
-"WITH term, collect(distinct article1) as a1, collect(distinct article2) as a2 "+
-"RETURN term, filter(x in a1 where x in a2) as shared, size(a1), size(a2) "+
-"ORDER BY size(shared) DESC",
-/*
-				"MATCH (:Term{name:{name1}})-[:MENTIONS]-(article1)-[:MENTIONS]-(term) "+
-				"MATCH (:Term{name:{name2}})-[:MENTIONS]-(article2)-[:MENTIONS]-(term) "+
-				"RETURN term, collect(article1) as a1, collect(article2) as a2 ",	
-/*
-				"MATCH (:Term{name:{name1}})-[:MENTIONS]-(article1)-[:MENTIONS]-(term1) "+
-				"MATCH (:Term{name:{name2}})-[:MENTIONS]-(article2)-[:MENTIONS]-(term2) "+
-				"WITH collect(term1) + collect(term2) as terms, collect(article1) as a1, collect(article2) as a2 "+
-				"UNWIND terms as allTerms "+
-				
-				"WITH distinct allTerms as terms, filter(a in a1 where a in a2) as allArticles, a1, a2 "+
-				"UNWIND a1 as article1 "+
-				"UNWIND a2 as article2 "+
-				"UNWIND a2 as articles "+
-				
-				"MATCH (terms)-[:MENTIONS]-(articles) "+
-				"MATCH (terms)-[:MENTIONS]-(article1) "+
-				"MATCH (terms)-[:MENTIONS]-(article2) "+
-				"RETURN terms, collect(allArticles) as articleList, count(article1)as count1, count(article2) as count2 "+
-				"ORDER BY length(articleList) DESC",
-*/				
+					"MATCH (:Term{name:{name1}})-[:MENTIONS]-(article1)-[:MENTIONS]-(term) "+
+					"MATCH (term)-[:MENTIONS]-(article2)-[:MENTIONS]-(:Term{name:{name2}}) "+
+					"WITH term, collect(distinct article1) as a1, collect(distinct article2) as a2 "+
+					"RETURN term, filter(x in a1 where x in a2) as shared, size(a1), size(a2) "+
+					"ORDER BY size(shared) DESC",
 				"parameters" : {"name1": term1, "name2": term2}
 			}
 		]
 	});
 }
 
-/* Not including subterms */
+function getSharedMentionsWithSubtermsPayload(term1, term2){
+	return JSON.stringify({
+		"statements" : [
+			{
+				"statement":
+					// get subterms for term1 and term2
+					"MATCH (term1:Term{name:{name1}}) " +
+					"MATCH (term2:Term{name:{name2}}) " +
+					"OPTIONAL MATCH (term1)-[:MAPPED]->(subterm1) " +
+					"OPTIONAL MATCH (term2)-[:MAPPED]->(subterm2) " +
+					"WITH collect(distinct subterm1.name)+{name1} as subtermList1, collect(distinct subterm2.name)+{name2} as subtermList2 " + 
+
+					// match input term or a subterm
+					"MATCH (n1:Term)-[:MENTIONS]-(article1)-[:MENTIONS]-(term) "+
+					"WHERE n1.name in subtermList1 " +
+					"MATCH (term)-[:MENTIONS]-(article2)-[:MENTIONS]-(n2:Term) "+
+					"WHERE n2.name in subtermList2 " +
+
+					"WITH term, collect(distinct article1) as a1, collect(distinct article2) as a2 "+
+					"RETURN term, filter(x in a1 where x in a2) as shared, size(a1), size(a2) "+
+					"ORDER BY size(shared) DESC",
+				"parameters" : {"name1": term1, "name2": term2}
+			},
+			{
+				"statement": 
+					"OPTIONAL MATCH (:Term{name:{name1}})-[:MAPPED]->(subterm1) "+
+					"OPTIONAL MATCH (:Term{name:{name2}})-[:MAPPED]->(subterm2) "+
+					"RETURN collect(distinct subterm1.name)+collect(distinct subterm2.name)",
+				"parameters" : {"name1": term1, "name2": term2}
+			}	
+		]
+	});
+}
 
 function sharedSearchOne(data){
-	console.log(data);
+	//console.log(data);
 	var results = readResults(data, _withSubterms, true);
 	showResult(results, input.value+"_"+input2.value, _withSubterms);
-
-	//addTermOrSubterm(_stack, data);
-	//queryNeo4j(getMentionsPayload(_term2),sharedSearchTwo);
 }	
-
-function sharedSearchTwo(data){
-	console.log("Finished query term 2");
-	
-	var newStack = new ThornStack();
-	addSharedTermOrSubterm(_stack, newStack, data);
-	_stack = newStack;
-	
-	//console.log(_stack);
-	showResult(_stack, input.value+"_"+input2.value, _withSubterms);
-}
-
-
-/* Including subterms */
-
-function findSharedSubTermsOne(data){	
-	var results = data["results"][0]["data"];
-
-	_subterms = [];	
-	_subtermMax = results.length + 1;	//all subterms plus the original term
-	_finishedSubterms = 0;
-	
-	queryNeo4j(getMentionsPayload(_term1), addSharedSubTermsOne);
-	
-	for (var i=0; i< results.length ; i++){
-		var name = results[i]["row"][0]["name"];	
-		_subterms.push(name);
-		queryNeo4j(getMentionsPayload(name), addSharedSubTermsOne);			
-	}
-}
-
-function addSharedSubTermsOne(data){		
-	addTermOrSubterm(_stack, data);
-	
-	_finishedSubterms++;
-	if(	_finishedSubterms == _subtermMax){
-		console.log("Finished query term 1");
-		
-		_newStack = new ThornStack();
-		queryNeo4j(getSubtermsPayload(_term2), findSharedSubTermsTwo);
-	}
-}
-
-function findSharedSubTermsTwo(data){
-	var results = data["results"][0]["data"];
-
-	_finishedSubterms = 0;
-	_subtermMax = results.length + 1;
-	
-	queryNeo4j(getMentionsPayload(_term2), addSharedSubTermsTwo);
-	
-	for (var i=0; i< results.length ; i++){
-		var name = results[i]["row"][0]["name"];	
-		_subterms.push(name);	
-		queryNeo4j(getMentionsPayload(name),addSharedSubTermsTwo);			
-	}
-}
-
-
-function addSharedSubTermsTwo(data){
-	addSharedTermOrSubterm(_stack, _newStack, data);
-	
-	//console.log(_stack);
-	
-	_finishedSubterms++;
-	if(_finishedSubterms == _subtermMax){
-		_stack = _newStack;
-		console.log("Finished query term 2");
-		showResult(_stack, input.value+"_"+input2.value, _withSubterms);
-	}
-}
-
-
-/* helper that adds a term to the stack */
-function addSharedTermOrSubterm(stack, newstack, data){
-	//console.log(stack);
-	var data2 = data["results"][0]["data"];
-	
-	for (var i=0; i< data2.length ; i++){
-		var name = data2[i]["row"][0]["name"];
-		var type = data2[i]["row"][0]["type"];
-		var stype = data2[i]["row"][0]["stype"];
-		var date = data2[i]["row"][1]["date"];
-		var pmid = data2[i]["row"][1]["pmid"];
-		var title = data2[i]["row"][1]["title"];
-
-		var check = stack.get(name);	
-		if(check){
-			var check2 = newstack.get(name);
-			//console.log(check2);
-			if(!check2){
-				check = check.sharedCopy();
-				newstack.add(name,check);
-				check.addArtShared(pmid,date,newstack,title);
-			}else{
-				check2.addArtShared(pmid,date,newstack,title);
-			}
-		}	
-	}	
-}
-
-
-
-
 
 function makeSharedTermsTable(stack, index, indexLimit){
 	var $tbody = $(tableform).find("tbody");
