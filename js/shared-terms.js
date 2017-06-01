@@ -52,7 +52,16 @@ function getSharedMentionsPayload(term1, term2){
 		"statements" : [
 			{
 				"statement":
-
+"MATCH (:Term{name:{name1}})-[:MENTIONS]-(article1)-[:MENTIONS]-(term) "+
+"MATCH (term)-[:MENTIONS]-(article2)-[:MENTIONS]-(:Term{name:{name2}}) "+
+"WITH term, collect(distinct article1) as a1, collect(distinct article2) as a2 "+
+"RETURN term, filter(x in a1 where x in a2) as shared, size(a1), size(a2) "+
+"ORDER BY size(shared) DESC",
+/*
+				"MATCH (:Term{name:{name1}})-[:MENTIONS]-(article1)-[:MENTIONS]-(term) "+
+				"MATCH (:Term{name:{name2}})-[:MENTIONS]-(article2)-[:MENTIONS]-(term) "+
+				"RETURN term, collect(article1) as a1, collect(article2) as a2 ",	
+/*
 				"MATCH (:Term{name:{name1}})-[:MENTIONS]-(article1)-[:MENTIONS]-(term1) "+
 				"MATCH (:Term{name:{name2}})-[:MENTIONS]-(article2)-[:MENTIONS]-(term2) "+
 				"WITH collect(term1) + collect(term2) as terms, collect(article1) as a1, collect(article2) as a2 "+
@@ -68,7 +77,7 @@ function getSharedMentionsPayload(term1, term2){
 				"MATCH (terms)-[:MENTIONS]-(article2) "+
 				"RETURN terms, collect(allArticles) as articleList, count(article1)as count1, count(article2) as count2 "+
 				"ORDER BY length(articleList) DESC",
-				
+*/				
 				"parameters" : {"name1": term1, "name2": term2}
 			}
 		]
@@ -79,6 +88,9 @@ function getSharedMentionsPayload(term1, term2){
 
 function sharedSearchOne(data){
 	console.log(data);
+	var results = readResults(data, _withSubterms, true);
+	showResult(results, input.value+"_"+input2.value, _withSubterms);
+
 	//addTermOrSubterm(_stack, data);
 	//queryNeo4j(getMentionsPayload(_term2),sharedSearchTwo);
 }	
@@ -188,13 +200,8 @@ function addSharedTermOrSubterm(stack, newstack, data){
 
 
 function makeSharedTermsTable(stack, index, indexLimit){
-	
-	//skip up to 'index'
-	var node = stack.first;
-	for(var i=0;i<index;i++){
-		node = node.right;	
-	}
-	
+	var $tbody = $(tableform).find("tbody");
+
 	/*append TR: 
 		<tr>
 			<td>name</td>
@@ -205,16 +212,15 @@ function makeSharedTermsTable(stack, index, indexLimit){
 			<td>term2 count</td>
 		</tr>
 	*/
-	var $tbody = $(tableform).find("tbody");
 	for(var j=index;j<indexLimit;j++){
-		if (node == null) break;
-		
+		var node = stack[j];
+
 		$tr = $("<tr/>");
 		$tr.append('<td>'+node.name+'</td>');
 		$buttonTd = $("<td/>").append( $("<button/>", {
 			type: "button", 
 			"class": "articleButton", 
-			text: node.count, 
+			text: node.articles.length, 
 			click: function(node){ return function(){openArticleList(node);} }(node)
 		}));
 		$tr.append($buttonTd);
@@ -222,7 +228,6 @@ function makeSharedTermsTable(stack, index, indexLimit){
 		$tr.append('<td>'+node.sharedCount2+'</td>');
 		$tbody.append($tr);
 		
-		node = node.right;
 	}
 }
 

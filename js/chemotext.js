@@ -55,7 +55,7 @@ function queryNeo4j(payload,successFunc){
 	
 	
 	
-function readResults(data, withSubterms){
+function readResults(data, withSubterms, withSharedCounts){
 	var results = [];
 	
 	if (withSubterms){
@@ -85,6 +85,12 @@ function readResults(data, withSubterms){
 			newTerm.addArticle(pmid,date,title);
 		}
 		
+
+		if (withSharedCounts){
+			newTerm.sharedCount1 = row[2];
+			newTerm.sharedCount2 = row[3];
+		}
+
 		results.push(newTerm);
 	}
 	return results;
