@@ -7,9 +7,6 @@ var termBank = new TermBank(termList);
 // fields specific to each search execution and used by this file
 var _subterms = [];
 
-var CORS = "https://cors-anywhere.herokuapp.com/"; //GITHUB PAGES
-
-
 // elements accessed by all search types
 var tableform, displayText, subtermsCheckbox;
 $(document).ready(function(){
@@ -40,7 +37,7 @@ function readTextFile(file,success,terminator){
 function queryNeo4j(payload,successFunc){
 	console.log(payload);
 	$.ajax({ //443 works.
-		url: CORS+"http://chemotext.mml.unc.edu:7474/db/data/transaction/commit", //GITHUB PAGES
+		url: "http://chemotext.mml.unc.edu:7474/db/data/transaction/commit",
 		accepts: "application/json; charset=UTF-8",	
 		dataType:"json",
 		contentType:"application/json",
@@ -56,33 +53,47 @@ function queryNeo4j(payload,successFunc){
 	});
 }
 	
-/* Add the results of querying a term to the results stack */
-function addTermOrSubterm(stack, data){
-	var results = data["results"][0];
-	var data2 = results["data"];
 	
+/* Process the results of query into a list of Term objects */	
+function readResults(data, withSubterms, withSharedCounts){
+	var results = [];
 	
-	for (var i=0; i< data2.length ; i++){
-	//console.log(i+" out of "+data2.length);
-		var name = data2[i]["row"][0]["name"];
-		var type = data2[i]["row"][0]["type"];
-		var stype = data2[i]["row"][0]["stype"];
-		var date = data2[i]["row"][1]["date"];
-		var pmid = data2[i]["row"][1]["pmid"];
-		var title = data2[i]["row"][1]["title"];
-		
-		var check = stack.get(name);
-
-		if(!check){
-			var newTerm = new Term(name,type,stype);
-			var isDrug = data2[i]["row"][0]["isDrug"];
-			if(isDrug=="true"){newTerm.isDrug=true;}
-			stack.add(name,newTerm);
-			newTerm.addArt(pmid,date,stack,title);
-		}else{			
-			check.addArt(pmid,date,stack,title);
-		}	
+	if (withSubterms){
+		_subterms = data["results"][1]["data"][0].row[0];
 	}
+		
+	data = data["results"][0]["data"];
+
+	for (var i=0; i< data.length ; i++){
+		//console.log(i+" out of "+data2.length);
+		var row = data[i].row;
+		
+		var name = row[0]["name"];
+		var type = row[0]["type"];
+		var stype = row[0]["stype"];
+		var isDrug = row[0]["isDrug"];
+		
+		var newTerm = new Term(name,type,stype);
+		if(isDrug=="true"){newTerm.isDrug=true;}
+	
+		var articles = row[1];
+		for (var j=0; j<articles.length; j++){
+			var a = articles[j];
+			var date = a["date"];
+			var pmid = a["pmid"];
+			var title = a["title"];
+			newTerm.addArticle(pmid,date,title);
+		}
+		
+
+		if (withSharedCounts){
+			newTerm.sharedCount1 = row[2];
+			newTerm.sharedCount2 = row[3];
+		}
+
+		results.push(newTerm);
+	}
+	return results;
 }
 
 
@@ -168,7 +179,7 @@ function makeSTypes(id, withNone){
 		"Nervous System Diseases",
 		"Eye Diseases",
 		"Male Urogenital Diseases",
-		"Female Urogenital Diseases and Pregnancy Complications",
+		"Female Urogentital Diseases and Pregnancy Complications",
 		"Hemic and Lymphatic Diseases",
 		"Congenital, Hereditary, and Neonatal Diseases and Abnormalities",
 		"Skin and Connective Tissue Diseases",
@@ -344,16 +355,15 @@ function showSubterms(){
 
 /* Open a new page listing article names or ids */
 function openArticleList(node){		
+	
 	var html = "<html><head><title>" + node.name + "</title></head><body>";
-	for(var i= 0;i<node.stack.length;i++){
-		if(node.stack[i]!=null){						
-			var name = node.stack[i].pmid;
-			if(node.stack[i].title!=null){
-				name = node.stack[i].title;
-			}
-			html = html + "<p><a href=http://www.ncbi.nlm.nih.gov/pubmed/"+node.stack[i].pmid+">"+name+"</a></p>";
-		}
+	
+	var articles = node.articles;
+	for (var i=0; i<articles.length; i++){
+		var name = articles[i].getTitleOrId();
+		html = html + "<p><a href=http://www.ncbi.nlm.nih.gov/pubmed/"+articles[i].pmid+">"+name+"</a></p>";
 	}
+	
 	html = html + "</body></html>"
 	var newpage = window.open("");
 	newpage.document.write(html)
@@ -370,29 +380,25 @@ function onInitFs(fs, name, stack, withPmids){
 				var split = name.split("_");
 				data = "Term \t Both \t" + split[0] + "\t" + split[1] + "\n";
 			}
-			var node = stack.first;
 			for(var j=0;j<stack.length;j++){
+				var node = stack[j];				
+
 				var arts = "";
 				if (withPmids){
-					for(var k=0;k<node.stack.length;k++){
-						arts = arts+"\t"+node.stack[k].pmid;
+					for(var k=0;k<node.articles.length;k++){
+						arts = arts+"\t"+node.articles[k].pmid;
 					}	
 				}
 				
-				data = data + node.name + ";" + node.count + arts;
+				data = data + node.name + ";" + node.articles.length + arts;
 				if(SEARCH_TYPE == "shared" && !withPmids){ 
 					data = data + "\t" + node.sharedCount1 + "\t" + node.sharedCount2; 
 				}
 				data += "\n";
-				if(node.right==null){
-					break;
-				}
-				node = node.right;
 			}
 			
 			fileWriter.addEventListener("writeend", function() {
-				//window.open("filesystem:http://chemotext.mml.unc.edu/temporary/"+fileName);
-				window.open("filesystem:https://kammyliu.github.io/temporary/"+fileName);	//GITHUB PAGES
+				window.open("filesystem:http://chemotext.mml.unc.edu/temporary/"+fileName);
 			}, false);
 			var blob = new Blob([data],{type: 'text/plain'});
 			fileWriter.write(blob);
@@ -440,7 +446,7 @@ function filterStack(dropbox,stack,name){
 	
 /* Filters the input stack by type and returns a new stack */
 function filterType(stack, type){
-	var newStack = new ThornStack();
+	var newStack = [];
 
 	var condition;
 	if(type == "Disease" || type == "Chemical" || type == "Other"){
@@ -451,13 +457,12 @@ function filterType(stack, type){
 		condition = function(term){return term.stype==type;};
 	}
 	
-	var term = stack.first;
-	while(term != null){
-		if(condition(term)){
-			newStack.add(term.name, term.copy());
+	for (var i=0; i<stack.length; i++){
+		var term = stack[i];
+		if (condition(term)){
+			newStack.push(term);
 		}
-		term = term.right;
-	}	
+	}
 	return newStack;
 }
 
@@ -471,32 +476,27 @@ function filterDate(stack, removeBefore, dateValue){
 
 	var toFilter = removeBefore ? nodeDateBefore : nodeDateAfter;
 		
-	var newStack = new ThornStack();
-
-	var term = stack.first;
-	while(term != null){
-		var termCopy = term.copy();
-		for(var i =0;i<term.stack.length;i++){	
-			if (toFilter(benchmark, term.stack[i])){
-				termCopy.count--;
-				termCopy.stack[i] = null;			
-			}
-		}
+	var newStack = [];
 	
-		if(termCopy.count > 0){
-			newStack.add(term.name,termCopy);
-		}
+	for (var i=0; i<stack.length; i++){
+		var term = stack[i];
+		var termCopy = term.copy();	//also deep copies the articles array
+		var articles = termCopy.articles;
 		
-		var newArray = [];
-		for(var j=0;j<termCopy.stack.length;j++){
-			if(termCopy.stack[j]!=null){
-				newArray.push(termCopy.stack[j]);
+		for(var j = articles.length -1; j >= 0 ; j--){
+			if (toFilter(benchmark, articles[j])){
+				articles.splice(j, 1);
 			}
 		}
-		termCopy.stack = newArray;
-		
-		term = term.right;
+		if (articles.length>0){
+			newStack.push(termCopy);
+		}
 	}
+	
+	//resort the terms by new article count
+	newStack.sort(function(term1, term2){
+		return term2.articles.length - term1.articles.length;
+	});
 	
 	if(SEARCH_TYPE=="shared"){
 		filterDateShared(newStack,year,month,day,removeBefore);
@@ -505,27 +505,84 @@ function filterDate(stack, removeBefore, dateValue){
 }
 
 
-/** Helpers **/
+/** Database query string builders **/
 	
-/* Return the query string for getting co-occuring terms*/
-function getMentionsPayload(name){
+/* Return the query string for getting terms that co-occur with the input term*/
+function getMentionsPayload(name, type){
+	var typeFilter = getQueryTypeFilter(type);
+	if (type=="Drug") type="true";
+
 	return JSON.stringify({
 		"statements" : [{
-			"statement" : "match (n:Term{name:{name}})-[:MENTIONS]-(a)-[:MENTIONS]-(m) return m, a " , 
-			"parameters" : {"name": name}
+			// match Terms with the name 'name' that are mentioned by an 'article' that mentions a 'term'
+			"statement": "MATCH (:Term{name:{name}})-[:MENTIONS]-(article)-[:MENTIONS]-(term"+typeFilter+") " +
+				"RETURN term, collect(article) as articleList " +	//return each term and its list of articles
+				"ORDER BY size(articleList) DESC", 	//sorted by number of articles
+			"parameters" : {"name": name, "type": type}
 		}]
 	});
 }
 
-/* Return the query string for getting a term's subterms*/
-function getSubtermsPayload(name){
+/* Return the query string for getting terms that co-occur with the input term or its subterms*/
+function getMentionsWithSubtermsPayload(name, type){
+	var typeFilter = getQueryTypeFilter(type);
+	if (type=="Drug") type="true";
+
+	return JSON.stringify({
+		"statements" : [
+			{
+				"statement": "MATCH (:Term{name:{name}})-[:MAPPED]->(subterm) " +	// get subterms
+					"WITH collect(subterm.name) as subtermNames " + 	// collect the list of subterm names
+					
+					"MATCH (n:Term)-[:MENTIONS]-(article)-[:MENTIONS]-(term"+typeFilter+") " +		// input term is mentioned by articles that mention other terms
+					"WHERE n.name in subtermNames OR n.name = {name} " +	// where the initial terms are subterms or the input term
+					
+					"RETURN term, collect(article) as articleList " +	//return each term and its list of articles
+					"ORDER BY size(articleList) DESC",	//sorted by number of articles
+				"parameters" : {"name": name, "type": type}
+			},
+			{
+				"statement": "match (:Term{name:{name}})-[:MAPPED]->(subterm) " +	// get subterms
+					"RETURN collect(subterm.name)" ,	// return as one list
+				"parameters" : {"name": name, "type": type}
+			}		
+		]
+	});
+}
+
+/* Return the query string for getting terms that co-occur with at least one of the input terms*/
+function getMentionsFromListPayload(terms, type){
+	var typeFilter = getQueryTypeFilter(type);
+	if (type=="Drug") type="true";
+
 	return JSON.stringify({
 		"statements" : [{
-			"statement" : "match (n:Term{name:{name}})-[:MAPPED]->(a) return a " ,
-			"parameters" : {"name": name}
+			"statement": "MATCH (n:Term)-[:MENTIONS]-(article)-[:MENTIONS]-(term"+typeFilter+") " +
+				"WHERE n.name in {selectedTerms} " +
+				"RETURN term, collect(article) as articleList " +	//return each term and its list of articles
+				"ORDER BY size(articleList) DESC", 	//sorted by number of articles
+			"parameters" : {"selectedTerms": terms, "type": type}
 		}]
 	});
 }
+
+/* Return the type modifier for a query */
+function getQueryTypeFilter(type){
+	var typeFilter="";	//no type filter
+	if (type){
+		if(type == "Disease" || type == "Other" || type == "Chemical"){
+			typeFilter = ":Term{type:{type}}";	
+		}else if (type=="Drug"){
+			typeFilter = ":Term{isDrug:{type}}"; 	
+		}else{
+			typeFilter = ":Term{stype:{type}}"; 	
+		}	
+	} 
+	return typeFilter;
+}
+
+
+/** Helpers **/
 
 /* Compare a Date and the date of a node */
 function compareNodeDate(benchmark, node){
