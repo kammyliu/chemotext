@@ -380,24 +380,21 @@ function onInitFs(fs, name, stack, withPmids){
 				var split = name.split("_");
 				data = "Term \t Both \t" + split[0] + "\t" + split[1] + "\n";
 			}
-			var node = stack.first;
 			for(var j=0;j<stack.length;j++){
+				var node = stack[j];				
+
 				var arts = "";
 				if (withPmids){
-					for(var k=0;k<node.stack.length;k++){
-						arts = arts+"\t"+node.stack[k].pmid;
+					for(var k=0;k<node.articles.length;k++){
+						arts = arts+"\t"+node.articles[k].pmid;
 					}	
 				}
 				
-				data = data + node.name + ";" + node.count + arts;
+				data = data + node.name + ";" + node.articles.length + arts;
 				if(SEARCH_TYPE == "shared" && !withPmids){ 
 					data = data + "\t" + node.sharedCount1 + "\t" + node.sharedCount2; 
 				}
 				data += "\n";
-				if(node.right==null){
-					break;
-				}
-				node = node.right;
 			}
 			
 			fileWriter.addEventListener("writeend", function() {
@@ -519,9 +516,8 @@ function getMentionsPayload(name, type){
 		"statements" : [{
 			// match Terms with the name 'name' that are mentioned by an 'article' that mentions a 'term'
 			"statement": "MATCH (:Term{name:{name}})-[:MENTIONS]-(article)-[:MENTIONS]-(term"+typeFilter+") " +
-				"WITH article, term MATCH (term)-[:MENTIONS]-(article) " + 	//group the articles that correspond to each term
 				"RETURN term, collect(article) as articleList " +	//return each term and its list of articles
-				"ORDER BY length(articleList) DESC", 	//sorted by number of articles
+				"ORDER BY size(articleList) DESC", 	//sorted by number of articles
 			"parameters" : {"name": name, "type": type}
 		}]
 	});
@@ -541,10 +537,8 @@ function getMentionsWithSubtermsPayload(name, type){
 					"MATCH (n:Term)-[:MENTIONS]-(article)-[:MENTIONS]-(term"+typeFilter+") " +		// input term is mentioned by articles that mention other terms
 					"WHERE n.name in subtermNames OR n.name = {name} " +	// where the initial terms are subterms or the input term
 					
-					"WITH article, term "+ 		// using the articles and final terms
-					"MATCH (term)-[:MENTIONS]-(article) " + 	//get the articles that correspond to each term
 					"RETURN term, collect(article) as articleList " +	//return each term and its list of articles
-					"ORDER BY length(articleList) DESC",	//sorted by number of articles
+					"ORDER BY size(articleList) DESC",	//sorted by number of articles
 				"parameters" : {"name": name, "type": type}
 			},
 			{
@@ -565,9 +559,8 @@ function getMentionsFromListPayload(terms, type){
 		"statements" : [{
 			"statement": "MATCH (n:Term)-[:MENTIONS]-(article)-[:MENTIONS]-(term"+typeFilter+") " +
 				"WHERE n.name in {selectedTerms} " +
-				"WITH article, term MATCH (term)-[:MENTIONS]-(article) " + 	//group the articles that correspond to each term
 				"RETURN term, collect(article) as articleList " +	//return each term and its list of articles
-				"ORDER BY length(articleList) DESC", 	//sorted by number of articles
+				"ORDER BY size(articleList) DESC", 	//sorted by number of articles
 			"parameters" : {"selectedTerms": terms, "type": type}
 		}]
 	});

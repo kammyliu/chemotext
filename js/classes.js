@@ -28,22 +28,14 @@ class Term {
 		this.name = name;
 		this.type = type;
 		this.stype = stype;
-		this.count = 0;
-		var left = null;
-		var right = null; 
-		this.stack = [];
 		this.isDrug = false;
 		
-		var isSelected = false;
-		var isSynonym = false;
-		var mainTerm = null;
+		//var isSelected = false;
+		//var isSynonym = false;
+		//var mainTerm = null;
 		
 		this.sharedCount1 = 0;
-		this.stack1 = [];
-		this.stack2 = [];
-		var sharedStack = null;
 		this.sharedCount2 = 0;
-		this.sharedCountBoth = 0;
 		
 		this.articles = [];
 	}
@@ -67,175 +59,8 @@ class Term {
 		this.articles.push(new Art(pmid, date, title));
 	}
 }
-	
-class NumStack {
-	constructor(){
-		this.stack = [];
-		this.thornstack = [];
-	}
-	add(tag,object){
-		var chars = tag.toString().split('');
-		var array = this.thornstack;
-		for(var i=0;i<chars.length;i++){
-			if (array.length==0){
-				for(var j=0;j<11;j++){
-					array.push([]);
-				}
-			}
-			var pos = this.chartonum(chars[i]);
-			array = array[pos];
-		}		
-		array[0] = object;
-		this.stack.push(object);
-	}
-	
-	get(tag){
-		var chars = tag.toString().split('');
-		var array = this.thornstack;
-		for(var i=0;i<chars.length;i++){
-			if(array.length==0){
-				return false;
-			}
-			var pos = this.chartonum(chars[i]);
-			array = array[pos];
-		}
-		if(array[0]==[]){
-			return false;
-		}else{
-			return array[0];
-		}
-	}
-	
-	chartonum(cha){
-		if (cha == '0'){ return 1; }
-		if (cha == '1'){ return 2; }
-		if (cha == '2'){ return 3; }
-		if (cha == '3'){ return 4; }
-		if (cha == '4'){ return 5; }
-		if (cha == '5'){ return 6; }
-		if (cha == '6'){ return 7; }
-		if (cha == '7'){ return 8; }
-		if (cha == '8'){ return 9; }
-		if (cha == '9'){ return 10; }
-		else{ return 11; }
-	}
-	
-}
 
-
-class ThornStack {
-	constructor(withCountCode=true){
-		this.first = null;
-		this.end = null;
-		this.thornstack = [];
-		this.list = [];
-		this.length = 0;
-		this.extra = true;
-		this.withCountCode = withCountCode;
-	}
 	
-	add(tag,object){
-		var chars = tag.toString().split('');
-		var length = chars.length;
-		var array = this.thornstack;
-		
-		for(var i=0;i<length;i++){
-			var arrayMissing = true;
-			var pos = this.chartonum(chars[i]);
-			for(var j=0;j<array.length;j++){
-				if(array[j][0]==pos){
-					array = array[j][1];
-					arrayMissing = false;
-					break;
-				}else if(array[j][0]>pos){
-					var newArray = [];
-					array.splice(j,0,[pos,newArray]);
-					array = newArray;
-					arrayMissing = false;
-					break;
-				}
-			}
-			if(arrayMissing){
-				var newArray = [];
-				array.push([pos,newArray]);
-				array = newArray;
-			}	
-		}	
-		array.splice(0,0,[0,object]);
-		this.length++;
-		//EXTRA STUFF
-		if(this.withCountCode){
-			if(this.extra){
-				if(this.first==null){						
-					this.first = object;
-					this.end = object;	
-				}else{
-					this.end.right = object;
-					object.left = this.end;
-					this.end = object;
-				}
-				object.checkPosition(this); 
-			}
-		}else{
-			this.list.push(tag);
-		}
-	}
-	
-	get(tag){
-		var chars = tag.split('');
-		var array = this.thornstack;
-		
-		for(var i=0;i<chars.length;i++){		
-			if(array.length==0){
-				return false;
-			}
-			var isMissing = true;
-			var pos = this.chartonum(chars[i]);
-			for(var j=0;j<array.length;j++){
-				if(array[j][0]==pos){
-					array = array[j][1];
-					isMissing = false;
-					break;
-				}else if(array[j][0]>pos){
-					return false;
-				}
-			}
-			if(isMissing){
-				return false;
-			}
-		}
-		
-		if(array[0][0]==0){
-			return array[0][1];
-		}else{
-			return false;
-		}
-	}
-	
-	/* Used only to compare the order of characters. Unnecessary */
-	chartonum(cha){
-		var upper = cha.toUpperCase();
-		var code = upper.charCodeAt(0);
-		
-		// is a letter
-		if (code >= 65 && code <= 90){
-			return code-64;	//1 - 26
-		}
-		
-		//is a number
-		if (code >= 48 && code <= 57){
-			return code-21;	//27 - 36
-		}
-		
-		if (cha == ','){ return 37; }
-		if (cha == ';'){ return 38; }
-		if (cha == '-'){ return 39; }
-		if (cha == ' '){ return 40; }
-
-		return 41; 
-	}
-}
-
 class TermBank {
 	
 	// takes a sorted (case-insensitive) array of strings, with synonyms demarcated by |. Terms have only 0 or 1 synonyms
