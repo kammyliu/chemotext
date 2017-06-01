@@ -39,19 +39,48 @@ function sharedSearch(){
 		
 	_withSubterms = subtermsCheckbox.checked;
 	if(_withSubterms){
+		//queryNeo4j(getSubtermsPayload(_term1), findSharedSubTermsOne);
 		queryNeo4j(getSubtermsPayload(_term1), findSharedSubTermsOne);
 	}else{
-		queryNeo4j(getMentionsPayload(_term1), sharedSearchOne);
+		queryNeo4j(getSharedMentionsPayload(_term1, _term2), sharedSearchOne);
+		//queryNeo4j(getSubtermsPayload(_term1), findSharedSubTermsOne);
 	}	
 }
 
+function getSharedMentionsPayload(term1, term2){
+	return JSON.stringify({
+		"statements" : [
+			{
+				"statement":
+
+				"MATCH (:Term{name:{name1}})-[:MENTIONS]-(article1)-[:MENTIONS]-(term1) "+
+				"MATCH (:Term{name:{name2}})-[:MENTIONS]-(article2)-[:MENTIONS]-(term2) "+
+				"WITH collect(term1) + collect(term2) as terms, collect(article1) as a1, collect(article2) as a2 "+
+				"UNWIND terms as allTerms "+
+				
+				"WITH distinct allTerms as terms, filter(a in a1 where a in a2) as allArticles, a1, a2 "+
+				"UNWIND a1 as article1 "+
+				"UNWIND a2 as article2 "+
+				"UNWIND a2 as articles "+
+				
+				"MATCH (terms)-[:MENTIONS]-(articles) "+
+				"MATCH (terms)-[:MENTIONS]-(article1) "+
+				"MATCH (terms)-[:MENTIONS]-(article2) "+
+				"RETURN terms, collect(allArticles) as articleList, count(article1)as count1, count(article2) as count2 "+
+				"ORDER BY length(articleList) DESC",
+				
+				"parameters" : {"name1": term1, "name2": term2}
+			}
+		]
+	});
+}
 
 /* Not including subterms */
 
 function sharedSearchOne(data){
-	console.log("Finished query term 1");
-	addTermOrSubterm(_stack, data);
-	queryNeo4j(getMentionsPayload(_term2),sharedSearchTwo);
+	console.log(data);
+	//addTermOrSubterm(_stack, data);
+	//queryNeo4j(getMentionsPayload(_term2),sharedSearchTwo);
 }	
 
 function sharedSearchTwo(data){
@@ -152,7 +181,6 @@ function addSharedTermOrSubterm(stack, newstack, data){
 			}
 		}	
 	}	
-	//console
 }
 
 

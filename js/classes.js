@@ -328,7 +328,7 @@ class TermBank {
 		var index = this.getIndex(prefix, false);
 		
 		if (index > -1){
-			for (var i=0; i<this.suggestCount && this.isPrefix(prefix, this.list[index]); i++){
+			for (var i=0; i<this.suggestCount && index<this.list.length && this.isPrefix(prefix, this.list[index]); i++){
 				var entry = this.list[index++];
 				if (entry.includes('|')){
 					entry = entry.split('|')[0];

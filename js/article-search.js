@@ -30,7 +30,7 @@ function articleSearch(){
 	});
 	
 	
-	// match (n:Term {name:{name0}})-[]-(a) 
+	// match (n:Term {name:{name0}})-[:MENTIONS]-(a) 
 	// match (n1:Term {name:{name1}})-[:MENTIONS]-(a) return a
 	
 	var matchStr = "match (n:Term {name:{name0}})-[:MENTIONS]-(a)";
