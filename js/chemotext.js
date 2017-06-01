@@ -7,9 +7,6 @@ var termBank = new TermBank(termList);
 // fields specific to each search execution and used by this file
 var _subterms = [];
 
-var CORS = "https://cors-anywhere.herokuapp.com/"; //GITHUB PAGES
-
-
 // elements accessed by all search types
 var tableform, displayText, subtermsCheckbox;
 $(document).ready(function(){
@@ -40,7 +37,7 @@ function readTextFile(file,success,terminator){
 function queryNeo4j(payload,successFunc){
 	console.log(payload);
 	$.ajax({ //443 works.
-		url: CORS+"http://chemotext.mml.unc.edu:7474/db/data/transaction/commit", //GITHUB PAGES
+		url: "http://chemotext.mml.unc.edu:7474/db/data/transaction/commit",
 		accepts: "application/json; charset=UTF-8",	
 		dataType:"json",
 		contentType:"application/json",
