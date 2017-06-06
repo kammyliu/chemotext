@@ -26,8 +26,8 @@ function sharedSearch(){
 	$("#term1-label").text(input.value);
 	$("#term2-label").text(input2.value);
 	
-	var term1 = termBank.getSynonym(input.value);
-	var term2 = termBank.getSynonym(input2.value);
+	var term1 = termBank.getSynonym(getDataIndex(input));
+	var term2 = termBank.getSynonym(getDataIndex(input2));
 		
 	_withSubterms = subtermsCheckbox.checked;
 	if(_withSubterms){

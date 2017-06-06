@@ -157,6 +157,7 @@ function inputSuggestion($inputSection, inputId){
 		for(var i=0;i<options.length;i++){
 			var option = document.createElement("option");
 			option.value = options[i];
+			option.setAttribute("data-index", options.startIndex+i); 	//see getDataIndex() for explanation 
 			newDataList.appendChild(option);	
 		}
 	});
@@ -603,4 +604,14 @@ function nodeDateAfter(benchmark, node){
 /* Generic error handler */
 function errorHandler(e) {
 	console.log(e);
+}
+
+/* Used for inputs with autocomplete from TermBank. 
+Gets the data-index attribute of the selected <option> element.
+data-index is the index of the term in the TermBank. 
+This is used to ensure that any option that can selected can be found again, 
+such as when looking up its synonym. */
+function getDataIndex(input){
+	//assumes the <datalist> is just before the <input>
+	return $(input).prev().find("option[value='"+input.value+"']").data("index");
 }

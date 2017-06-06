@@ -28,7 +28,7 @@ function triangleSearch(){
 	showLoader();
 	$("#path-subresults").hide();
 
-	var termA = termBank.getSynonym(input.value);
+	var termA = termBank.getSynonym(getDataIndex(input));
 	var type = selectBar.value;
 	//console.log(term); console.log(type);	
 	

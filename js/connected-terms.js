@@ -19,7 +19,8 @@ function simpleSearch(){
 	$("#show-subterms").hide();
 	showLoader();
 
-	var term = termBank.getSynonym(input.value);
+	var term = termBank.getSynonym(getDataIndex(input));
+	
 	//console.log("Term: "+term);
 
 	_withSubterms = subtermsCheckbox.checked;
