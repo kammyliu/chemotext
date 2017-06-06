@@ -34,8 +34,8 @@ class Term {
 		//var isSynonym = false;
 		//var mainTerm = null;
 		
-		this.sharedCount1 = 0;
-		this.sharedCount2 = 0;
+		this.sharedCount1 = 0;	// used for the "TermA only" part of Shared Terms search
+		this.sharedCount2 = 0;	// used for the "TermB only" part of Shared Terms search
 		
 		this.articles = [];
 	}

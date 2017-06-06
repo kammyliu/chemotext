@@ -45,7 +45,8 @@ function getSharedMentionsPayload(term1, term2){
 					"MATCH (:Term{name:{name1}})-[:MENTIONS]-(article1)-[:MENTIONS]-(term) "+
 					"MATCH (term)-[:MENTIONS]-(article2)-[:MENTIONS]-(:Term{name:{name2}}) "+
 					"WITH term, collect(distinct article1) as a1, collect(distinct article2) as a2 "+
-					"RETURN term, filter(x in a1 where x in a2) as shared, size(a1), size(a2) "+
+					"WITH term, filter(x in a1 where x in a2) as shared, a1, a2 " +
+					"RETURN term, shared, size(a1)-size(shared), size(a2)-size(shared) "+
 					"ORDER BY size(shared) DESC",
 				"parameters" : {"name1": term1, "name2": term2}
 			}
@@ -72,7 +73,8 @@ function getSharedMentionsWithSubtermsPayload(term1, term2){
 					"WHERE n2.name in subtermList2 " +
 
 					"WITH term, collect(distinct article1) as a1, collect(distinct article2) as a2 "+
-					"RETURN term, filter(x in a1 where x in a2) as shared, size(a1), size(a2) "+
+					"WITH term, filter(x in a1 where x in a2) as shared, a1, a2 " +
+					"RETURN term, shared, size(a1)-size(shared), size(a2)-size(shared) "+
 					"ORDER BY size(shared) DESC",
 				"parameters" : {"name1": term1, "name2": term2}
 			},
