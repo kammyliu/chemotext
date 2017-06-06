@@ -25,9 +25,17 @@
 	<main id="content" autocomplete="off">
 		<div id="introSection">
 			<img src="img/Shared_Terms_Image.png">
-			<p id="introText">This search inputs two terms and gives you three results -- 
-				all terms that co-exist with either term or both terms in an article. 
-				The counts respresent the number of articles where they co-occur or articles that they are present in. </p>
+			<div id="introText">
+			<p>In this module, two query terms are input, and co-occurring terms 
+			and the article counts that are shared between the queries are returned. </p>
+			
+			This type of search outputs the associated counts of co-occurrence for three instances: 
+			<ol>
+				<li>when all three terms (query 1, query 2, and co-occurring term) are present in the same article,</li>
+				<li>when the term co-occurs only in articles with query 1, and </li>
+				<li>when the term co-occurs only in articles with query 2.</li>
+			</ol>
+			</div>
 		</div>
 
 		<form autocomplete="off" id="inputSection">

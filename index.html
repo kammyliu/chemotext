@@ -26,25 +26,47 @@
 <main>
 	<div id="introSection">
 		<img src="img/ChemotextPicture.png">
-		<p id="introText">Chemotext is a search engine of 
-		<a href="https://meshb.nlm.nih.gov/search" target="_blank">MeSH Terms</a>
-		 and articles. Relationships were created between every MeSH Term
-	and every article the term is referenced in. This allows to make complex connections between MeSH Terms through various 
-	articles allowing for the search of new relationships between MeSH Terms. 
+		<div id="introText">
+		<p>
+			Chemotext is a publicly-available Webserver that mines the published literature
+			in PubMed in the form of 
+			<a href="https://meshb.nlm.nih.gov/search" target="_blank">
+				Medical Subject Headings (MeSH) terms
+			</a>.
 		</p>
-		<p><a href="ChemotextAppNote_Tutorial_v2.docx" download="Chemotext Tutorial">
-			Click here to download the tutorial.
-		</a></p>
+		
+		<p>The goal of Chemotext is to enable text-based drug-target-disease relationships 
+		in order to identify novel drug repurposing candidates and discovery discovery targets.</p>
+		
+		<p>Text-based relationships have been created between every MeSH term and every article 
+		in which the term is referenced.</p>
+		
+		<p>Through text-mining the published literature, 
+		complex connections between MeSH terms in various articles can be made.</p>
+		
+		<p>
+			<a href="ChemotextAppNote_Tutorial_v2.docx" download="Chemotext Tutorial">
+				Click here to download the tutorial.
+			</a>
+		</p>
+		
+			<p>There are over 20,000 MeSHTerms, 18 Million Articles, and 70 Million Relationships 
+	in the Chemotext Neo4j Database. <p>
+	<p>Send any feedback to pozefsky@cs.unc.edu. Chemotext is currently public but still in Beta.</p>
+		</div>
 	</div>
 
-	<p>There are over 20,000 MeSHTerms, 18 Million Articles, and 70 Million Relationships in the Chemotext Neo4j Database. 
-	Send any feedback to thethorn@live.unc.edu. Chemotext is currently public but still in Beta.</p>
+
 </main>
 
+<div style="margin-top: 50px">
 <p>
-Chemotext was thought of by Nancy Baker in her paper: <a target="_blank" href="http://www.ncbi.nlm.nih.gov/pubmed/20348023">
+Chemotext was originally conceived by Nancy Baker: <a target="_blank" href="http://www.ncbi.nlm.nih.gov/pubmed/20348023">
 Mining connections between chemicals, proteins, and diseases extracted from Medline annotations.</a>
 </p>
+<p>
+Chemotext is supported by NIH grant 1U01CA207160.</p>
+</div>
 
 </body>
 </html>
