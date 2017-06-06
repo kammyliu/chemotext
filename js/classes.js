@@ -72,6 +72,9 @@ class TermBank {
 	// return synonym, or self if no synonym
 	getSynonym(term){
 		var index = this.getIndex(term, true);
+		if (index == -1){
+			return term;
+		}
 		//console.log(index);
 		var entry = this.list[index];
 		
