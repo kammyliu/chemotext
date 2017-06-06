@@ -89,7 +89,7 @@ function makeArticleSearchTable(stack, index, indexLimit){
 
 	
 function addToArticleArray(){	
-	var term = termBank.getSynonym(getDataIndex(articleBar));
+	var term = termBank.getSynonym(articleBar.value);
 	$(termsList).append('<li><span>'+term+'</span><button type="button" onclick="deleteFromArticleArray(this)">X</button></li>');
 	
 	articleBar.value = "";

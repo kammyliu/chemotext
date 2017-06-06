@@ -70,7 +70,8 @@ class TermBank {
 	}
 	
 	// return synonym, or self if no synonym
-	getSynonym(index){
+	getSynonym(term){
+		var index = this.getIndex(term, true);
 		//console.log(index);
 		var entry = this.list[index];
 		
@@ -84,7 +85,6 @@ class TermBank {
 	complete(prefix){		
 		var options = [];
 		var index = this.getIndex(prefix, false);
-		options.startIndex = index;		//see getDataIndex() in chemotext.js for explanation of extra field
 		
 		if (index > -1){
 			for (var i=0; i<this.suggestCount && index<this.list.length && this.isPrefix(prefix, this.list[index]); i++){

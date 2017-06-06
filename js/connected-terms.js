@@ -20,7 +20,7 @@ function simpleSearch(){
 	$("#show-subterms").hide();
 	showLoader();
 
-	var term = termBank.getSynonym(getDataIndex(input));
+	var term = termBank.getSynonym(input.value);
 	
 	//console.log("Term: "+term);
 
