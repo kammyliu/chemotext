@@ -7,6 +7,48 @@ $(document).ready(function(){
 	inputSuggestion($("#inputSection"), "inputbar");
 	input = document.getElementById("inputbar");
 	
+		window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
+		window.requestFileSystem(window.TEMPORARY, 5*1024*1024, function(fs){
+			var fileName = "sorted.js";
+	fs.root.getFile(fileName,{create:true}, function(fileEntry){
+		fileEntry.createWriter(function(fileWriter){
+			var data = termBank.sort(function(a,b){
+				if (a.includes('|')){
+					a = a.split('|')[0];
+				} 
+								if (b.includes('|')){
+					b = b.split('|')[0];
+				} 
+			a = a.toUpperCase();
+b = b.toUpperCase();
+				if (a < b) {
+    return -1;
+  }
+  if (a > b) {
+    return 1;
+  }
+
+  // names must be equal
+  return 0;
+				});
+			
+			
+			
+			fileWriter.addEventListener("writeend", function() {
+				window.open("filesystem:http://chemotext.mml.unc.edu/temporary/"+fileName);
+			}, false);
+			var blob = new Blob([data],{type: 'text/plain'});
+			fileWriter.write(blob);
+			console.log("WRITTEN");
+		},errorHandler);
+	},errorHandler);
+	
+			}, errorHandler);
+		
+	
+	
+});
+
 });
 
 var _withSubterms = false;
