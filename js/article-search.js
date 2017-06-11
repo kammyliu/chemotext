@@ -5,7 +5,7 @@ var articleBar, termsList, searchbutton;
 $(document).ready(function(){	
 	makePageSections();
 
-	inputSuggestion($("#inputSection"), "articleBar");
+	makeAutocomplete($("#inputSection"), "articleBar");
 	articleBar = document.getElementById("articleBar");
 	termsList = document.getElementById("terms-list");
 	searchbutton = document.getElementById("search-button");

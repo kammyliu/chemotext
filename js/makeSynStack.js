@@ -1,3 +1,23 @@
+
+/* Request a file */
+function readTextFile(file,success,terminator){
+	var rawFile = new XMLHttpRequest();
+	rawFile.open("GET",file,true);
+	rawFile.onreadystatechange = function (){
+		if(rawFile.readyState == 4){
+			if(rawFile.status == 200 || rawFile.status == 0){
+				var allText = rawFile.responseText;
+				var split = allText.split(terminator);
+				success(split);
+			}
+		}
+	}
+	rawFile.send(null);
+	
+	console.log("Fetching synstack");
+}
+
+
 readTextFile("http://chemotext.mml.unc.edu/AllMainTerms.txt", makeSynStack2, "\r\n");
 	
 function makeSynStack2(allTerms){

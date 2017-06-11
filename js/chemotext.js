@@ -15,24 +15,6 @@ $(document).ready(function(){
 	subtermsCheckbox = document.getElementById("include-subterms");
 });
 
-/* Request a file */
-function readTextFile(file,success,terminator){
-	var rawFile = new XMLHttpRequest();
-	rawFile.open("GET",file,true);
-	rawFile.onreadystatechange = function (){
-		if(rawFile.readyState == 4){
-			if(rawFile.status == 200 || rawFile.status == 0){
-				var allText = rawFile.responseText;
-				var split = allText.split(terminator);
-				success(split);
-			}
-		}
-	}
-	rawFile.send(null);
-	
-	console.log("Fetching synstack");
-}
-
 /* Query the database */
 function queryNeo4j(payload,successFunc){
 	console.log(payload);
@@ -52,7 +34,6 @@ function queryNeo4j(payload,successFunc){
 		}
 	});
 }
-	
 	
 /* Process the results of query into a list of Term objects */	
 function readResults(data, withSubterms, withSharedCounts){
@@ -124,7 +105,7 @@ function makePageSections(){
 	var filterSection = document.getElementById("filterSection");
 	if (filterSection != null){
 		$(filterSection).append('<select id="typeSelect"></select>');
-		makeSTypes("typeSelect", true);	
+		makeTypeDropdown("typeSelect", true);	
 		$(filterSection).append('<div>Date After:<input id="dateAfterInput" type="date">'+ 
 			'Date Before:<input id="dateBeforeInput" type="date"></div>');
 		$(filterSection).append('<button type="submit" id="filter-button">Filter</button>');
@@ -141,7 +122,7 @@ function makePageSections(){
 }
 
 /* Build the autocompleting search term field */
-function inputSuggestion($inputSection, inputId){
+function makeAutocomplete($inputSection, inputId){
 	$inputSection.prepend('<datalist id="datalist-'+inputId+
 		'"></datalist><input class="suggestion-bar" id="'+inputId+
 		'" list="datalist-'+inputId+'">');
@@ -163,50 +144,55 @@ function inputSuggestion($inputSection, inputId){
 }
 	
 /* Build the <select> with type options. 'withNone': true for the table results filter, false for Path Search subresults */
-function makeSTypes(id, withNone){
+function makeTypeDropdown(id, withNone){
 	var select = document.getElementById(id);
 	
 	if(withNone){
 		$(select).append('<option value="None">No Filter</option>');
 	}
 	
+	// comments specify tree nodes in the 2017 MeSH trees
+	// top-level types "Disease", "Chemical", and "Other" don't align with the MeSH trees
+	// https://meshb.nlm.nih.gov/treeView
 	var stypes = [
 		"Disease",
-		"Bacteria",
-		"Viruses",
-		"Bacterial Infections and Mycoses",
-		"Neoplasms",
-		"Nervous System Diseases",
-		"Eye Diseases",
-		"Male Urogenital Diseases",
-		"Female Urogentital Diseases and Pregnancy Complications",
-		"Hemic and Lymphatic Diseases",
-		"Congenital, Hereditary, and Neonatal Diseases and Abnormalities",
-		"Skin and Connective Tissue Diseases",
-		"Nutritional and Metabolic Diseases",
-		"Endocrine System Diseases",
-		"Immune System Diseases",
-		"Pathological Conditions, Signs and Symptoms",
-		"Wounds and Injuries", 
+		"Bacteria",	//B03
+		"Viruses",	//B04
+		"Bacterial Infections and Mycoses",	//C01
+		"Neoplasms",	//C04
+		"Nervous System Diseases",	//C10
+		"Eye Diseases",	//C11
+		"Male Urogenital Diseases",	//C12
+		"Female Urogentital Diseases and Pregnancy Complications",	//C13
+		"Hemic and Lymphatic Diseases",	//C15
+		"Congenital, Hereditary, and Neonatal Diseases and Abnormalities",	//C16
+		"Skin and Connective Tissue Diseases",	//C17
+		"Nutritional and Metabolic Diseases",	//C18
+		"Endocrine System Diseases",	//C19
+		"Immune System Diseases",	//C20
+		"Pathological Conditions, Signs and Symptoms",	//C23
+		"Wounds and Injuries", 	//C26
+		
 		"Chemical",  
 		"Drug",
-		"Inorganic Chemicals",
-		"Organic Chemicals",
-		"Heterocyclic Compounds",
-		"Polycyclic Compounds",
-		"Macromolecular Substances",
-		"Complex Mixtures",
-		"Biomedical and Dental Materials",
-		"Pharmaceutical Preparations",
-		"Chemical Actions and Uses",
+		"Inorganic Chemicals",	//D01
+		"Organic Chemicals",	//D02
+		"Heterocyclic Compounds",	//D03
+		"Polycyclic Compounds",	//D04
+		"Macromolecular Substances",	//D05
+		"Complex Mixtures",	//D20
+		"Biomedical and Dental Materials",	//D25
+		"Pharmaceutical Preparations",	//D26
+		"Chemical Actions and Uses",	//D27
+		
 		"Other",
-		"Hormones, Hormone Substitutes, and Hormone Antagonists",
-		"Enzymes and Coenzymes",
-		"Carbohydrates",
-		"Lipids",
-		"Amino Acids, Peptides, and Proteins",
-		"Nucleic Acids, Nucleotides, and Nucleosides",
-		"Biological Factors"
+		"Hormones, Hormone Substitutes, and Hormone Antagonists",	//D06
+		"Enzymes and Coenzymes",	//D08
+		"Carbohydrates",	//D09
+		"Lipids",	//D10
+		"Amino Acids, Peptides, and Proteins",	//D12
+		"Nucleic Acids, Nucleotides, and Nucleosides",	//D13
+		"Biological Factors"	//D23
 		];
 	
 	
@@ -573,7 +559,7 @@ function getQueryTypeFilter(type){
 		if(type == "Disease" || type == "Other" || type == "Chemical"){
 			typeFilter = ":Term{type:{type}}";	
 		}else if (type=="Drug"){
-			typeFilter = ":Term{isDrug:{type}}"; 	
+			typeFilter = ":Term{isDrug:{type}}"; //will be corrected to isDrug:"true"	
 		}else{
 			typeFilter = ":Term{stype:{type}}"; 	
 		}	

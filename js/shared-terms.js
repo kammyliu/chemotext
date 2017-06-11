@@ -4,8 +4,8 @@ var input, input2;
 $(document).ready(function(){	
 	makePageSections();
 
-	inputSuggestion($("#inputSection"), "inputbar2");	//2 first because it prepends
-	inputSuggestion($("#inputSection"), "inputbar");
+	makeAutocomplete($("#inputSection"), "inputbar2");	//2 first because it prepends
+	makeAutocomplete($("#inputSection"), "inputbar");
 	
 	input = document.getElementById("inputbar");
 	input2 = document.getElementById("inputbar2");

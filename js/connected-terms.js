@@ -4,7 +4,7 @@ var input;
 $(document).ready(function(){	
 	makePageSections();
 	
-	inputSuggestion($("#inputSection"), "inputbar");
+	makeAutocomplete($("#inputSection"), "inputbar");
 	input = document.getElementById("inputbar");
 
 });

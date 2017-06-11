@@ -5,10 +5,10 @@ var input, selectBar;
 $(document).ready(function(){	
 	makePageSections();
 
-	inputSuggestion($("#inputSection"), "inputbar");
+	makeAutocomplete($("#inputSection"), "inputbar");
 	
-	makeSTypes("selectBar", false);
-	makeSTypes("triType", false);
+	makeTypeDropdown("selectBar", false);
+	makeTypeDropdown("triType", false);
 
 	input = document.getElementById("inputbar");
 	selectBar = document.getElementById("selectBar");	
