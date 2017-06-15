@@ -1,5 +1,5 @@
 
-class Art{
+class Article{
 	constructor(pmid,date,title){
 		this.pmid = pmid;
 		this.title = title;
@@ -24,15 +24,11 @@ class Art{
 }
 
 class Term {
-	constructor(name,type,stype){
+	constructor(name,type,subtype,isDrug){
 		this.name = name;
 		this.type = type;
-		this.stype = stype;
-		this.isDrug = false;
-		
-		//var isSelected = false;
-		//var isSynonym = false;
-		//var mainTerm = null;
+		this.subtype = subtype;
+		this.isDrug = isDrug;
 		
 		this.sharedCount1 = 0;	// used for the "TermA only" part of Shared Terms search
 		this.sharedCount2 = 0;	// used for the "TermB only" part of Shared Terms search
@@ -41,7 +37,7 @@ class Term {
 	}
 
 	copy(){
-		var copy = new Term(this.name,this.type,this.stype);
+		var copy = new Term(this.name,this.type,this.subtype);
 		copy.count = this.count;
 		copy.isDrug = this.isDrug;
 		copy.stack = this.stack.slice();
@@ -56,7 +52,7 @@ class Term {
 	}
 	
 	addArticle(pmid, date, title){
-		this.articles.push(new Art(pmid, date, title));
+		this.articles.push(new Article(pmid, date, title));
 	}
 }
 

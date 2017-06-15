@@ -60,7 +60,7 @@ function articleSearch(){
 			var pmid = data[i]["row"][0]["pmid"];
 			var title = data[i]["row"][0]["title"];
 
-			stack.push(new Art(pmid,date,title));
+			stack.push(new Article(pmid,date,title));
 		}
 		
 		showResult(stack, "", false);

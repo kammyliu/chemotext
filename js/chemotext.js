@@ -51,11 +51,10 @@ function readResults(data, withSubterms, withSharedCounts){
 		
 		var name = row[0]["name"];
 		var type = row[0]["type"];
-		var stype = row[0]["stype"];
+		var subtype = row[0]["subtype"];
 		var isDrug = row[0]["isDrug"];
 		
-		var newTerm = new Term(name,type,stype);
-		if(isDrug=="true"){newTerm.isDrug=true;}
+		var newTerm = new Term(name,type,subtype,isDrug);
 	
 		var articles = row[1];
 		for (var j=0; j<articles.length; j++){
@@ -154,27 +153,41 @@ function makeTypeDropdown(id, withNone){
 	// comments specify tree nodes in the 2017 MeSH trees
 	// top-level types "Disease", "Chemical", and "Other" don't align with the MeSH trees
 	// https://meshb.nlm.nih.gov/treeView
-	var stypes = [
+	
+	var subtypes = [
 		"Disease",
 		"Bacteria",	//B03
 		"Viruses",	//B04
-		"Bacterial Infections and Mycoses",	//C01
-		"Neoplasms",	//C04
-		"Nervous System Diseases",	//C10
-		"Eye Diseases",	//C11
-		"Male Urogenital Diseases",	//C12
-		"Female Urogentital Diseases and Pregnancy Complications",	//C13
-		"Hemic and Lymphatic Diseases",	//C15
-		"Congenital, Hereditary, and Neonatal Diseases and Abnormalities",	//C16
-		"Skin and Connective Tissue Diseases",	//C17
-		"Nutritional and Metabolic Diseases",	//C18
-		"Endocrine System Diseases",	//C19
-		"Immune System Diseases",	//C20
-		"Pathological Conditions, Signs and Symptoms",	//C23
-		"Wounds and Injuries", 	//C26
+		"Organism Forms",	//B05
+		"Bacterial Infections and Mycoses",	//C01 (sequential from here to C26)
+		"Virus Diseases",
+		"Parasitic Diseases",
+		"Neoplasms",
+		"Musculoskeletal Diseases",
+		"Digestive System Diseases",
+		"Stomatognathic Diseases",
+		"Respiratory Tract Diseases",
+		"Otorhinolaryngologic Diseases",
+		"Nervous System Diseases",
+		"Eye Diseases",
+		"Male Urogenital Diseases",
+		"Female Urogenital Diseases and Pregnancy Complications",
+		"Cardiovascular Diseases",
+		"Hemic and Lymphatic Diseases",
+		"Congenital, Hereditary, and Neonatal Diseases and Abnormalities",
+		"Skin and Connective Tissue Diseases",
+		"Nutritional and Metabolic Diseases",
+		"Endocrine System Diseases",
+		"Immune System Diseases",
+		"Disorders of Environmental Origin",
+		"Animal Diseases",
+		"Pathological Conditions, Signs and Symptoms",
+		"Occupational Diseases",
+		"Chemically-Induced Disorders",
+		"Wounds and Injuries",	//C26
 		
 		"Chemical",  
-		"Drug",
+		"Drug",	//special sub-category
 		"Inorganic Chemicals",	//D01
 		"Organic Chemicals",	//D02
 		"Heterocyclic Compounds",	//D03
@@ -196,23 +209,23 @@ function makeTypeDropdown(id, withNone){
 		];
 	
 	
-	for(var i =0; i<stypes.length;i++){
+	for(var i =0; i<subtypes.length;i++){
 		var option= document.createElement("option");
-		option.value = stypes[i];
-		if(stypes[i]== "Disease"){
+		option.value = subtypes[i];
+		if(subtypes[i]== "Disease"){
 			option.innerHTML = "Diseases and Indications";
 			option.style.fontWeight = 'bold';
-		}else if(stypes[i] == "Other"){
+		}else if(subtypes[i] == "Other"){
 			option.innerHTML = "Proteins-Pathways-Intermediaries-Other";
 			option.style.fontWeight = 'bold';
-		}else if(stypes[i]=="Chemical"){
+		}else if(subtypes[i]=="Chemical"){
 			option.innerHTML = "Chemicals";
 			option.style.fontWeight = 'bold';
-		}else if(stypes[i]=="Drug"){
-			option.innerHTML = '- - ' + stypes[i];
+		}else if(subtypes[i]=="Drug"){
+			option.innerHTML = '- - ' + subtypes[i];
 			option.style.fontWeight = 'bold';
 		}else{
-			option.innerHTML = '- - ' + stypes[i];
+			option.innerHTML = '- - ' + subtypes[i];
 		}
 		select.appendChild(option);
 	}	
@@ -440,7 +453,7 @@ function filterType(stack, type){
 	} else if(type=="Drug"){
 		condition = function(term){return term.isDrug;};
 	} else {
-		condition = function(term){return term.stype==type;};
+		condition = function(term){return term.subtype==type;};
 	}
 	
 	for (var i=0; i<stack.length; i++){
@@ -496,7 +509,7 @@ function filterDate(stack, removeBefore, dateValue){
 /* Return the query string for getting terms that co-occur with the input term*/
 function getMentionsPayload(name, type){
 	var typeFilter = getQueryTypeFilter(type);
-	if (type=="Drug") type="true";
+	if (type=="Drug") type=true;
 
 	return JSON.stringify({
 		"statements" : [{
@@ -512,7 +525,7 @@ function getMentionsPayload(name, type){
 /* Return the query string for getting terms that co-occur with the input term or its subterms*/
 function getMentionsWithSubtermsPayload(name, type){
 	var typeFilter = getQueryTypeFilter(type);
-	if (type=="Drug") type="true";
+	if (type=="Drug") type=true;
 
 	return JSON.stringify({
 		"statements" : [
@@ -539,7 +552,7 @@ function getMentionsWithSubtermsPayload(name, type){
 /* Return the query string for getting terms that co-occur with at least one of the input terms*/
 function getMentionsFromListPayload(terms, type){
 	var typeFilter = getQueryTypeFilter(type);
-	if (type=="Drug") type="true";
+	if (type=="Drug") type=true;
 
 	return JSON.stringify({
 		"statements" : [{
@@ -559,9 +572,9 @@ function getQueryTypeFilter(type){
 		if(type == "Disease" || type == "Other" || type == "Chemical"){
 			typeFilter = ":Term{type:{type}}";	
 		}else if (type=="Drug"){
-			typeFilter = ":Term{isDrug:{type}}"; //will be corrected to isDrug:"true"	
+			typeFilter = ":Term{isDrug:{type}}"; //will be corrected to isDrug:true	
 		}else{
-			typeFilter = ":Term{stype:{type}}"; 	
+			typeFilter = ":Term{subtype:{type}}"; 	
 		}	
 	} 
 	return typeFilter;
