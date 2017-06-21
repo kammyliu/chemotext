@@ -1,6 +1,6 @@
 var SEARCH_TYPE;
 
-var tableLimit = 10;
+var tableLimit = 10;	//default number of results in one page of the table
 
 var termBank = new TermBank(termList);
 
@@ -85,6 +85,9 @@ function makePageSections(){
 	content.addEventListener('submit', function(e) {
 		e.preventDefault();
 	}, false);
+	
+	//remove the text since the termbank is loaded
+	$("#preload-text").remove();	
 	
 	// table pagination and labels
 	$(tableform).append('<img src="img/previous.png" class="table-arrow" id="prev-arrow">');
