@@ -12,6 +12,7 @@ $(document).ready(function(){
 var _withSubterms = false;
 //var _subterms declared in chemotext.js
 
+/* Executes the search */
 function simpleSearch(){
 	if (input.value == "") return;
 
@@ -32,8 +33,7 @@ function simpleSearch(){
 	}
 }
 
-/* Not including subterms */
-
+/* Callback for receiving the search results */
 function simpleSearchOnSuccess(data){
 	//console.log(data);
 

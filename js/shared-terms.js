@@ -14,6 +14,7 @@ $(document).ready(function(){
 var _withSubterms = false;
 //var _subterms declared in chemotext.js
 
+/* Executes the search */
 function sharedSearch(){
 	if (input.value == "" || input2.value == "") return;
 	
@@ -31,12 +32,13 @@ function sharedSearch(){
 		
 	_withSubterms = subtermsCheckbox.checked;
 	if(_withSubterms){
-		queryNeo4j(getSharedMentionsWithSubtermsPayload(term1, term2), sharedSearchOne);
+		queryNeo4j(getSharedMentionsWithSubtermsPayload(term1, term2), sharedSearchOnSuccess);
 	}else{
-		queryNeo4j(getSharedMentionsPayload(term1, term2), sharedSearchOne);
+		queryNeo4j(getSharedMentionsPayload(term1, term2), sharedSearchOnSuccess);
 	}	
 }
 
+/* Return the Cypher query for this search */
 function getSharedMentionsPayload(term1, term2){
 	return JSON.stringify({
 		"statements" : [
@@ -54,6 +56,7 @@ function getSharedMentionsPayload(term1, term2){
 	});
 }
 
+/* Return the Cypher query for this search, with subterms */
 function getSharedMentionsWithSubtermsPayload(term1, term2){
 	return JSON.stringify({
 		"statements" : [
@@ -89,12 +92,14 @@ function getSharedMentionsWithSubtermsPayload(term1, term2){
 	});
 }
 
-function sharedSearchOne(data){
+/* Callback for receiving search results */
+function sharedSearchOnSuccess(data){
 	//console.log(data);
 	var results = readResults(data, _withSubterms, true);
 	showResult(results, input.value+"_"+input2.value, _withSubterms);
 }	
 
+/* Build the results table */
 function makeSharedTermsTable(stack, index, indexLimit){
 	var $tbody = $(tableform).find("tbody");
 
