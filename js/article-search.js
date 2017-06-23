@@ -29,24 +29,7 @@ function articleSearch(){
 		articleArray.push($(this).text());
 	});
 	
-	
-	// match (n:Term {name:{name0}})-[:MENTIONS]-(a) 
-	// match (n1:Term {name:{name1}})-[:MENTIONS]-(a) return a
-	
-	var matchStr = "match (n:Term {name:{name0}})-[:MENTIONS]-(a)";
-	var params = { "name0" : articleArray[0] };
-	for(var i =1;i<articleArray.length;i++){
-		var name = "name"+i;
-		params[name] = articleArray[i];
-		matchStr += " match (n"+i+":Term {name:{"+name+"}})-[:MENTIONS]-(a)";
-	}
-	
-	var payload = JSON.stringify({
-			"statements" : [{
-				"statement" : matchStr+" return a", 
-				"parameters" : params
-			}]
-     });
+	var payload = getArticleSearchPayload(articleArray);
 	 	 
 	 queryNeo4j(payload, function(data,xhr,status){
 		//console.log("Finished Search");
@@ -66,6 +49,29 @@ function articleSearch(){
 	 });
 }
 
+function getArticleSearchPayload(articleArray){
+	// For two terms, looks like:
+	// match (n:Term {name:{name0}})-[:MENTIONS]-(a) 
+	// match (n1:Term {name:{name1}})-[:MENTIONS]-(a) return a
+	
+	var matchStr = "match (n:Term {name:{name0}})-[:MENTIONS]-(a)";
+	var params = { "name0" : articleArray[0] };
+	
+	for(var i =1;i<articleArray.length;i++){
+		var name = "name"+i;
+		params[name] = articleArray[i];
+		matchStr += " match (n"+i+":Term {name:{"+name+"}})-[:MENTIONS]-(a)";
+	}
+	
+	var payload = JSON.stringify({
+			"statements" : [{
+				"statement" : matchStr+" return a", 
+				"parameters" : params
+			}]
+     });
+	 return payload;
+}
+
 /* Build the results table */
 function makeArticleSearchTable(stack, index, indexLimit){
 
@@ -80,8 +86,9 @@ function makeArticleSearchTable(stack, index, indexLimit){
 	*/
 	for(var j=index;j<indexLimit;j++){
 		var pmid = stack[j].pmid;
+		var label = stack[j].getTitleOrId();
 		$tbody.append('<tr><td><a target="_blank" href="http://www.ncbi.nlm.nih.gov/pubmed/'+pmid+'">'
-			+pmid+'</a></td></tr>');
+			+label+'</a></td></tr>');
 	}
 }
 	
