@@ -1,4 +1,4 @@
-SEARCH_TYPE = "path-subresults";	//second step is "path-final-results"
+SEARCH_TYPE = "path-subresults";	//second step is type "path-final-results"
 
 var input, selectBar;
 
@@ -18,6 +18,7 @@ var _withSubterms = false;
 var _checkedTerms = [];	
 //var _subterms declared in chemotext.js
 
+/* Executes the first part of the search */
 function triangleSearch(){
 	if (input.value == "") return;
 		
@@ -40,13 +41,14 @@ function triangleSearch(){
 	}	
 }
 
+/* Callback for receiving the query results (of the first part of the search) */
 function triangleSearchOnSuccess(data){	
 	//console.log(data);
 	var results = readResults(data, _withSubterms);
 	showSubresults(results);
 }	
 
-
+/* Show the results for the first part of the search */
 function showSubresults(results){
 	_checkedTerms = [];
 
@@ -72,6 +74,7 @@ function showSubresults(results){
 	setFinishSearchHandler();	
 }
 
+/* Executes the final part of the search */
 function setFinishSearchHandler(){
 	var selectBar2 = document.getElementById("triType");
 	
@@ -97,7 +100,7 @@ function setFinishSearchHandler(){
 	};
 }
 
-/* Request the final terms from the list of selected terms and the filter type */
+/* Request the final result terms, using the list of selected terms and the filter type */
 function getFinalTerms(terms, type, csvName){		
 	var payload = getMentionsFromListPayload(terms, type);
 	
@@ -115,6 +118,7 @@ function getFinalTerms(terms, type, csvName){
 	 });
 }
 
+/* Build the table for showing results of the first step */
 function makePathSubresultsTable(stack, index, indexLimit){
 	var $tbody = $(tableform).find("tbody");
 	
@@ -158,7 +162,7 @@ function makePathSubresultsTable(stack, index, indexLimit){
 	});
 }	
 
-
+/* Build the table for showing final results */
 function makePathFinalResultsTable(stack, index, indexLimit){
 	$(tableform).find("tr").remove();	
 	

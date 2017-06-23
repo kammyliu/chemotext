@@ -18,7 +18,7 @@ $(document).ready(function(){
 	});
 });
 
-
+/* Execute the search */
 function articleSearch(){
 	$(displayText).text("");
 	$("#results").hide();
@@ -53,8 +53,7 @@ function articleSearch(){
 
 		var data = data["results"][0]["data"];
 
-		var stack = [];
-		
+		var stack = [];		
 		for(var i=0;i<data.length;i++){
 			var date = data[i]["row"][0]["date"];
 			var pmid = data[i]["row"][0]["pmid"];
@@ -67,7 +66,7 @@ function articleSearch(){
 	 });
 }
 
-
+/* Build the results table */
 function makeArticleSearchTable(stack, index, indexLimit){
 
 	var $tbody = $(tableform).find("tbody");
@@ -87,7 +86,7 @@ function makeArticleSearchTable(stack, index, indexLimit){
 }
 	
 
-	
+/* Add a checked term to the list */
 function addToArticleArray(){	
 	var term = termBank.getSynonym(articleBar.value);
 	$(termsList).append('<li><span>'+term+'</span><button type="button" onclick="deleteFromArticleArray(this)">X</button></li>');
@@ -95,6 +94,7 @@ function addToArticleArray(){
 	articleBar.value = "";
 }
 
+/* Remove a deleted term from the list */
 function deleteFromArticleArray(button){
 	$(button).parent().remove();
 	if ($(termsList).children().length == 0){

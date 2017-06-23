@@ -1,11 +1,11 @@
-var SEARCH_TYPE;
+var SEARCH_TYPE;	//works like an enum for which type of search is being executed
 
 var tableLimit = 10;	//default number of results in one page of the table
 
-var termBank = new TermBank(termList);
+var termBank = new TermBank(termList);	//the autocompletion list
 
 // fields specific to each search execution and used by this file
-var _subterms = [];
+var _subterms = [];	//the list of subterms mapped to the input term
 
 // elements accessed by all search types
 var tableform, displayText, subtermsCheckbox;
