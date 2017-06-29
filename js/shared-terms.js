@@ -49,7 +49,7 @@ function getSharedMentionsPayload(term1, term2){
 					"WITH term, collect(distinct article1) as a1, collect(distinct article2) as a2 "+
 					"WITH term, filter(x in a1 where x in a2) as shared, a1, a2 " +
 					"RETURN term, shared, size(a1)-size(shared) as count1, size(a2)-size(shared) as count2 "+
-					"ORDER BY size(shared), count1+count2 DESC",
+					"ORDER BY size(shared) DESC, count1+count2 DESC",
 				"parameters" : {"name1": term1, "name2": term2}
 			}
 		]
@@ -78,7 +78,7 @@ function getSharedMentionsWithSubtermsPayload(term1, term2){
 					"WITH term, collect(distinct article1) as a1, collect(distinct article2) as a2 "+
 					"WITH term, filter(x in a1 where x in a2) as shared, a1, a2 " +
 					"RETURN term, shared, size(a1)-size(shared) as count1, size(a2)-size(shared) as count2 "+
-					"ORDER BY size(shared), count1+count2 DESC",
+					"ORDER BY size(shared) DESC, count1+count2 DESC",
 				"parameters" : {"name1": term1, "name2": term2}
 			},
 			{
