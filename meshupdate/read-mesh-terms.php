@@ -110,8 +110,9 @@ if ($handle) {
 						case "D":
 							if (in_array($prefix, $other)){
 								$type = "Other";
+							} else {
+								$type = "Chemical";
 							}
-							$type = "Chemical";
 							break;
 					}
 					$term["type"] = $type;
