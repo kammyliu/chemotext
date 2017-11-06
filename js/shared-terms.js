@@ -4,11 +4,13 @@ var input, input2;
 $(document).ready(function(){	
 	makePageSections();
 
-	makeAutocomplete($("#inputSection"), "inputbar2");	//2 first because it prepends
-	makeAutocomplete($("#inputSection"), "inputbar");
+	makeAutocomplete($("#inputSection"), "inputbar2", "gefitinib");	//2 first because it prepends
+	makeAutocomplete($("#inputSection"), "inputbar", "GAK protein, human");
 	
 	input = document.getElementById("inputbar");
 	input2 = document.getElementById("inputbar2");
+	
+	addExampleLink();
 });
 
 var _withSubterms = false;

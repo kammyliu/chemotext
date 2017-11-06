@@ -124,9 +124,9 @@ function makePageSections(){
 }
 
 /* Build the autocompleting search term field */
-function makeAutocomplete($inputSection, inputId){
+function makeAutocomplete($inputSection, inputId, example=''){
 	$inputSection.prepend('<datalist id="datalist-'+inputId+
-		'"></datalist><input class="suggestion-bar" id="'+inputId+
+		'"></datalist><input class="suggestion-bar" data-example="'+example+'" id="'+inputId+
 		'" list="datalist-'+inputId+'">');
 	
 	$("#"+inputId).keyup(function(keyEvent){
@@ -144,6 +144,20 @@ function makeAutocomplete($inputSection, inputId){
 		}
 	});
 }
+
+/* Build automatic example input feature. */
+function addExampleLink(){
+	$("#introText").append("<p style='text-align:center'><a id='example-link'>See an example.</a></p>");
+	$("#example-link").click(function(e){
+		e.preventDefault();
+		$("#inputSection input").each(function(i, el){
+			if ($(el).attr("data-example")){
+				$(el).val($(el).attr("data-example"));
+			}
+		});
+	});
+} 
+
 	
 /* Build the <select> with type options. 'withNone': true for the table results filter, false for Path Search subresults */
 function makeTypeDropdown(id, withNone){
@@ -416,6 +430,9 @@ function filterStack(dropbox,stack,name){
 	var dateAfter = document.getElementById("dateAfterInput");
 	var dateBefore = document.getElementById("dateBeforeInput");
 	
+// console.log(dateAfter.value);
+// console.log(dateBefore.value);	
+
 	var newStack = stack;
 	
 	// filter by type

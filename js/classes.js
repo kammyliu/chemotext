@@ -40,14 +40,9 @@ class Term {
 		var copy = new Term(this.name,this.type,this.subtype);
 		copy.count = this.count;
 		copy.isDrug = this.isDrug;
-		copy.stack = this.stack.slice();
 		copy.sharedCount1 = this.sharedCount1;
-		copy.stack1 = this.stack1;
-		copy.stack2 = this.stack2;
 		copy.sharedCount2 = this.sharedCount2;
-		
 		copy.articles = this.articles.slice()
-
 		return copy;
 	}
 	

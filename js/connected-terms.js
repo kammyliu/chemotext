@@ -4,9 +4,10 @@ var input;
 $(document).ready(function(){	
 	makePageSections();
 	
-	makeAutocomplete($("#inputSection"), "inputbar");
+	makeAutocomplete($("#inputSection"), "inputbar", "GAK protein, human");
 	input = document.getElementById("inputbar");
-
+	
+	addExampleLink();
 });
 
 var _withSubterms = false;

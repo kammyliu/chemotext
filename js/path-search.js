@@ -5,13 +5,15 @@ var input, selectBar;
 $(document).ready(function(){	
 	makePageSections();
 
-	makeAutocomplete($("#inputSection"), "inputbar");
+	makeAutocomplete($("#inputSection"), "inputbar", "GAK protein, human");
 	
 	makeTypeDropdown("selectBar", false);
 	makeTypeDropdown("triType", false);
 
 	input = document.getElementById("inputbar");
 	selectBar = document.getElementById("selectBar");	
+	
+	addExampleLink();
 });
 
 var _withSubterms = false;
