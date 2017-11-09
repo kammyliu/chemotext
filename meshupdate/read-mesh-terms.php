@@ -1,6 +1,6 @@
 <?php
 $handle = @fopen($argv[1], "r");
-$filter = "~^(MH |PA|MN = (B0(3|4|5)|C|D)|ENTRY|PRINT ENTRY)[^\|]*~";
+$filter = "~^(MH |PA|MN = (A1(0|1)|B0(3|4|5)|C|D)|ENTRY|PRINT ENTRY)[^\|]*~";
 	// matches MH, PA, MN, ENTRY, and PRINT ENTRY lines
 	// "MH " is to not match MH_TH lines
 	// only matches MN lines that are in the type domain
@@ -8,6 +8,8 @@ $filter = "~^(MH |PA|MN = (B0(3|4|5)|C|D)|ENTRY|PRINT ENTRY)[^\|]*~";
 	// may be multiple PA, MN, ENTRY, and PRINT ENTRY lines for each record
 
 $typeMap = array(
+        "A10" => "Tissues",
+	"A11" => "Cells",
 	"B03" => "Bacteria",
 	"B04" => "Viruses",
 	"B05" => "Organism Forms",
@@ -104,6 +106,9 @@ if ($handle) {
 					if (isset($typeMap[$prefix])) $term["subtype"] = $typeMap[$prefix];
 					
 					switch(substr($prefix, 0, 1)){
+						case "A":
+							$type = "Anatomy";
+							break;
 						case "B": case "C":
 							$type = "Disease";
 							break;

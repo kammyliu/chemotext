@@ -172,6 +172,10 @@ function makeTypeDropdown(id, withNone){
 	// https://meshb.nlm.nih.gov/treeView
 	
 	var subtypes = [
+		"Anatomy",
+		"Tissues",	//A10
+		"Cells",	//A11
+
 		"Disease",
 		"Bacteria",	//B03
 		"Viruses",	//B04
@@ -232,6 +236,9 @@ function makeTypeDropdown(id, withNone){
 		if(subtypes[i]== "Disease"){
 			option.innerHTML = "Diseases and Indications";
 			option.style.fontWeight = 'bold';
+		}else if(subtypes[i] == "Anatomy"){
+			option.style.fontWeight = 'bold';
+			option.innerHTML = "Anatomy";
 		}else if(subtypes[i] == "Other"){
 			option.innerHTML = "Proteins-Pathways-Intermediaries-Other";
 			option.style.fontWeight = 'bold';
@@ -468,7 +475,7 @@ function filterType(stack, type){
 	var newStack = [];
 
 	var condition;
-	if(type == "Disease" || type == "Chemical" || type == "Other"){
+	if(type == "Disease" || type == "Chemical" || type == "Other" || type == "Anatomy"){
 		condition = function(term){return term.type==type;};
 	} else if(type=="Drug"){
 		condition = function(term){return term.isDrug;};
@@ -589,7 +596,7 @@ function getMentionsFromListPayload(terms, type){
 function getQueryTypeFilter(type){
 	var typeFilter="";	//no type filter
 	if (type){
-		if(type == "Disease" || type == "Other" || type == "Chemical"){
+		if(type == "Disease" || type == "Other" || type == "Chemical" || type == "Anatomy"){
 			typeFilter = ":Term{type:{type}}";	
 		}else if (type=="Drug"){
 			typeFilter = ":Term{isDrug:{type}}"; //will be corrected to isDrug:true	
