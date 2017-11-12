@@ -185,18 +185,18 @@ function filterStack(dropbox,stack,name){
 }
 	
 /* Filters the input stack by type and returns a new stack */
-function filterType(stack, type){
-	var newStack = [];
-
+function filterType(stack, key){
+	var type = MeshTree[key];
 	var condition;
-	if(type == "Disease" || type == "Chemical" || type == "Other" || type == "Anatomy"){
-		condition = function(term){return term.type==type;};
-	} else if(type=="Drug"){
-		condition = function(term){return term.isDrug;};
+	if (type.isFlag){
+		condition = function(term){return term[type.flagName];};
+	} else if (type.isMainType){
+		condition = function(term){return term.type==key;};		
 	} else {
-		condition = function(term){return term.subtype==type;};
+		condition = function(term){return term.subtype==key;};
 	}
 	
+	var newStack = [];	
 	for (var i=0; i<stack.length; i++){
 		var term = stack[i];
 		if (condition(term)){
@@ -250,8 +250,6 @@ function filterDate(stack, removeBefore, dateValue){
 /* Return the query string for getting terms that co-occur with the input term*/
 function getMentionsPayload(name, type){
 	var typeFilter = getQueryTypeFilter(type);
-	if (type=="Drug") type=true;
-
 	return JSON.stringify({
 		"statements" : [{
 			// match Terms with the name 'name' that are mentioned by an 'article' that mentions a 'term'
@@ -266,8 +264,6 @@ function getMentionsPayload(name, type){
 /* Return the query string for getting terms that co-occur with the input term or its subterms*/
 function getMentionsWithSubtermsPayload(name, type){
 	var typeFilter = getQueryTypeFilter(type);
-	if (type=="Drug") type=true;
-
 	return JSON.stringify({
 		"statements" : [
 			{
@@ -293,8 +289,6 @@ function getMentionsWithSubtermsPayload(name, type){
 /* Return the query string for getting terms that co-occur with at least one of the input terms*/
 function getMentionsFromListPayload(terms, type){
 	var typeFilter = getQueryTypeFilter(type);
-	if (type=="Drug") type=true;
-
 	return JSON.stringify({
 		"statements" : [{
 			"statement": "MATCH (n:Term)-[:MENTIONS]-(article)-[:MENTIONS]-(term"+typeFilter+") " +
@@ -307,16 +301,17 @@ function getMentionsFromListPayload(terms, type){
 }
 
 /* Return the type modifier for a query */
-function getQueryTypeFilter(type){
+function getQueryTypeFilter(key){
 	var typeFilter="";	//no type filter
-	if (type){
-		if(type == "Disease" || type == "Other" || type == "Chemical" || type == "Anatomy"){
-			typeFilter = ":Term{type:{type}}";	
-		}else if (type=="Drug"){
-			typeFilter = ":Term{isDrug:{type}}"; //will be corrected to isDrug:true	
-		}else{
-			typeFilter = ":Term{subtype:{type}}"; 	
-		}	
+	if (key){
+		var type = MeshTree[key];
+		if (type.isFlag){
+			typeFilter = ":Term{"+type.flagName+":true}"
+		} else if (type.isMainType){
+			typeFilter = ":Term{type:{type}}";				
+		} else {
+			typeFilter = ":Term{subtype:{type}}";			
+		}
 	} 
 	return typeFilter;
 }

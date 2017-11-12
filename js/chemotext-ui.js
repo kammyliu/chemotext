@@ -82,99 +82,26 @@ function addExampleLink(){
 /* Build the <select> with type options. 'withNone': true for the table results filter, false for Path Search subresults */
 function makeTypeDropdown(id, withNone){
 	var select = document.getElementById(id);
-	
 	if(withNone){
 		$(select).append('<option value="None">No Filter</option>');
 	}
-	
-	// comments specify tree nodes in the 2017 MeSH trees
-	// top-level types "Disease", "Chemical", and "Other" don't align with the MeSH trees
-	// https://meshb.nlm.nih.gov/treeView
-	
-	var subtypes = [
-		"Anatomy",
-		"Tissues",	//A10
-		"Cells",	//A11
-
-		"Disease",
-		"Bacteria",	//B03
-		"Viruses",	//B04
-		"Organism Forms",	//B05
-		"Bacterial Infections and Mycoses",	//C01 (sequential from here to C26)
-		"Virus Diseases",
-		"Parasitic Diseases",
-		"Neoplasms",
-		"Musculoskeletal Diseases",
-		"Digestive System Diseases",
-		"Stomatognathic Diseases",
-		"Respiratory Tract Diseases",
-		"Otorhinolaryngologic Diseases",
-		"Nervous System Diseases",
-		"Eye Diseases",
-		"Male Urogenital Diseases",
-		"Female Urogenital Diseases and Pregnancy Complications",
-		"Cardiovascular Diseases",
-		"Hemic and Lymphatic Diseases",
-		"Congenital, Hereditary, and Neonatal Diseases and Abnormalities",
-		"Skin and Connective Tissue Diseases",
-		"Nutritional and Metabolic Diseases",
-		"Endocrine System Diseases",
-		"Immune System Diseases",
-		"Disorders of Environmental Origin",
-		"Animal Diseases",
-		"Pathological Conditions, Signs and Symptoms",
-		"Occupational Diseases",
-		"Chemically-Induced Disorders",
-		"Wounds and Injuries",	//C26
+	for (var key in MeshTree){
+		var type = MeshTree[key];
+		var option = document.createElement("option");
+		option.value = key;
 		
-		"Chemical",  
-		"Drug",	//special sub-category
-		"Inorganic Chemicals",	//D01
-		"Organic Chemicals",	//D02
-		"Heterocyclic Compounds",	//D03
-		"Polycyclic Compounds",	//D04
-		"Macromolecular Substances",	//D05
-		"Complex Mixtures",	//D20
-		"Biomedical and Dental Materials",	//D25
-		"Pharmaceutical Preparations",	//D26
-		"Chemical Actions and Uses",	//D27
+		var label = type.label ? type.label : key;
+		if (!type.isMainType){
+			label = '- - ' + label;
+		} 
+		option.textContent = label;
 		
-		"Other",
-		"Hormones, Hormone Substitutes, and Hormone Antagonists",	//D06
-		"Enzymes and Coenzymes",	//D08
-		"Carbohydrates",	//D09
-		"Lipids",	//D10
-		"Amino Acids, Peptides, and Proteins",	//D12
-		"Nucleic Acids, Nucleotides, and Nucleosides",	//D13
-		"Biological Factors"	//D23
-		];
-	
-	
-	for(var i =0; i<subtypes.length;i++){
-		var option= document.createElement("option");
-		option.value = subtypes[i];
-		if(subtypes[i]== "Disease"){
-			option.innerHTML = "Diseases and Indications";
-			option.style.fontWeight = 'bold';
-		}else if(subtypes[i] == "Anatomy"){
-			option.style.fontWeight = 'bold';
-			option.innerHTML = "Anatomy";
-		}else if(subtypes[i] == "Other"){
-			option.innerHTML = "Proteins-Pathways-Intermediaries-Other";
-			option.style.fontWeight = 'bold';
-		}else if(subtypes[i]=="Chemical"){
-			option.innerHTML = "Chemicals";
-			option.style.fontWeight = 'bold';
-		}else if(subtypes[i]=="Drug"){
-			option.innerHTML = '- - ' + subtypes[i];
-			option.style.fontWeight = 'bold';
-		}else{
-			option.innerHTML = '- - ' + subtypes[i];
+		if (type.isMainType || type.isFlag){
+			option.style.fontWeight = 'bold';			
 		}
 		select.appendChild(option);
 	}	
 }
-
 
 
 /** Build search results UI **/

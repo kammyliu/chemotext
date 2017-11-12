@@ -1,4 +1,3 @@
-
 class Article{
 	constructor(pmid,date,title){
 		this.pmid = pmid;
