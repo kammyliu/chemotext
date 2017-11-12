@@ -96,7 +96,6 @@ function getSharedMentionsWithSubtermsPayload(term1, term2){
 
 /* Callback for receiving search results */
 function sharedSearchOnSuccess(data){
-	//console.log(data);
 	var results = readResults(data, _withSubterms, true);
 	showResult(results, input.value+"_"+input2.value, _withSubterms);
 }	
@@ -117,7 +116,6 @@ function makeSharedTermsTable(stack, index, indexLimit){
 	*/
 	for(var j=index;j<indexLimit;j++){
 		var node = stack[j];
-
 		$tr = $("<tr/>");
 		$tr.append('<td>'+node.name+'</td>');
 		$buttonTd = $("<td/>").append( $("<button/>", {
@@ -130,17 +128,12 @@ function makeSharedTermsTable(stack, index, indexLimit){
 		$tr.append('<td>'+node.sharedCount1+'</td>');
 		$tr.append('<td>'+node.sharedCount2+'</td>');
 		$tbody.append($tr);
-		
 	}
 }
-
-
-
 	
 /* before: true = remove those before the date, false = remove those after the date */
 function filterDateShared(stack, year, month, day, removeBefore){
 	var toFilter = removeBefore ? nodeDateBefore : nodeDateAfter;
-	
 	var benchmark = new Date(year,month,day).getTime();
 	
 	var term = stack.first;

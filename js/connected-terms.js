@@ -23,8 +23,6 @@ function simpleSearch(){
 	showLoader();
 
 	var term = termBank.getSynonym(input.value);
-	
-	//console.log("Term: "+term);
 
 	_withSubterms = subtermsCheckbox.checked;
 	if(_withSubterms){
@@ -36,10 +34,7 @@ function simpleSearch(){
 
 /* Callback for receiving the search results */
 function simpleSearchOnSuccess(data){
-	//console.log(data);
-
 	var results = readResults(data, _withSubterms);
-
 	showResult(results, input.value, _withSubterms);
 }
 

@@ -28,16 +28,13 @@ class Term {
 		this.type = type;
 		this.subtype = subtype;
 		this.isDrug = isDrug;
-		
 		this.sharedCount1 = 0;	// used for the "TermA only" part of Shared Terms search
 		this.sharedCount2 = 0;	// used for the "TermB only" part of Shared Terms search
-		
 		this.articles = [];
 	}
 
 	copy(){
 		var copy = new Term(this.name,this.type,this.subtype);
-		copy.count = this.count;
 		copy.isDrug = this.isDrug;
 		copy.sharedCount1 = this.sharedCount1;
 		copy.sharedCount2 = this.sharedCount2;
@@ -50,10 +47,12 @@ class Term {
 	}
 }
 
-	
+/**
+* Takes a sorted (case-insensitive) array of strings.
+* Each string represents a term and (optionally) its synonym.
+* The synonym is demarcated with |. 
+*/
 class TermBank {
-	
-	// takes a sorted (case-insensitive) array of strings, with synonyms demarcated by |. Terms have only 0 or 1 synonyms
 	constructor(list){
 		this.list = list;
 		this.suggestCount = 5;	//the max number of suggestions complete() will return
@@ -65,9 +64,7 @@ class TermBank {
 		if (index == -1){
 			return term;
 		}
-		//console.log(index);
 		var entry = this.list[index];
-		
 		if (entry.includes('|')){
 			entry = entry.split('|')[1];
 		} 
@@ -78,7 +75,6 @@ class TermBank {
 	complete(prefix){		
 		var options = [];
 		var index = this.getIndex(prefix, false);
-		
 		if (index > -1){
 			for (var i=0; i<this.suggestCount && index<this.list.length && this.isPrefix(prefix, this.list[index]); i++){
 				var entry = this.list[index++];
@@ -88,7 +84,6 @@ class TermBank {
 				options.push(entry);
 			}
 		} 
-		
 		return options;
 	}	
 	
@@ -107,7 +102,6 @@ class TermBank {
 			if (comp > target) { high = i - 1; continue; }
 			return i;
 		}
-
 		if (!exact && this.isPrefix(target, this.list[low])){
 			return low;
 		} 

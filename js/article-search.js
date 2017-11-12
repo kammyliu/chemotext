@@ -30,23 +30,17 @@ function articleSearch(){
 	});
 	
 	var payload = getArticleSearchPayload(articleArray);
-	 	 
-	 queryNeo4j(payload, function(data,xhr,status){
-		//console.log("Finished Search");
-
+	queryNeo4j(payload, function(data,xhr,status){
 		var data = data["results"][0]["data"];
-
 		var stack = [];		
 		for(var i=0;i<data.length;i++){
 			var date = data[i]["row"][0]["date"];
 			var pmid = data[i]["row"][0]["pmid"];
 			var title = data[i]["row"][0]["title"];
-
 			stack.push(new Article(pmid,date,title));
 		}
-		
 		showResult(stack, "", false);
-	 });
+	});
 }
 
 function getArticleSearchPayload(articleArray){
@@ -56,13 +50,11 @@ function getArticleSearchPayload(articleArray){
 	
 	var matchStr = "match (n:Term {name:{name0}})-[:MENTIONS]-(a)";
 	var params = { "name0" : articleArray[0] };
-	
 	for(var i =1;i<articleArray.length;i++){
 		var name = "name"+i;
 		params[name] = articleArray[i];
 		matchStr += " match (n"+i+":Term {name:{"+name+"}})-[:MENTIONS]-(a)";
 	}
-	
 	var payload = JSON.stringify({
 			"statements" : [{
 				"statement" : matchStr+" return a", 
@@ -74,7 +66,6 @@ function getArticleSearchPayload(articleArray){
 
 /* Build the results table */
 function makeArticleSearchTable(stack, index, indexLimit){
-
 	var $tbody = $(tableform).find("tbody");
 	
 	/*append TR: 
@@ -97,7 +88,6 @@ function makeArticleSearchTable(stack, index, indexLimit){
 function addToArticleArray(){	
 	var term = termBank.getSynonym(articleBar.value);
 	$(termsList).append('<li><span>'+term+'</span><button type="button" onclick="deleteFromArticleArray(this)">X</button></li>');
-	
 	articleBar.value = "";
 }
 

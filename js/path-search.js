@@ -33,7 +33,6 @@ function triangleSearch(){
 
 	var termA = termBank.getSynonym(input.value);
 	var type = selectBar.value;
-	//console.log(term); console.log(type);	
 	
 	_withSubterms = subtermsCheckbox.checked;
 	if(_withSubterms){
@@ -45,7 +44,6 @@ function triangleSearch(){
 
 /* Callback for receiving the query results (of the first part of the search) */
 function triangleSearchOnSuccess(data){	
-	//console.log(data);
 	var results = readResults(data, _withSubterms);
 	showSubresults(results);
 }	
@@ -53,17 +51,14 @@ function triangleSearchOnSuccess(data){
 /* Show the results for the first part of the search */
 function showSubresults(results){
 	_checkedTerms = [];
-
 	if(results.length==0){
 		$(displayText).text("No Results");
 		$("#loader").hide();
 		return;
 	}
-	
 	if (_withSubterms){
 		$("#show-subterms").show();
 	}
-	
 	SEARCH_TYPE = "path-subresults";
 	makeTables(results,tableLimit,0);
 
@@ -72,14 +67,12 @@ function showSubresults(results){
 	$("#path-subresults").show();
 	$("#downloadform").hide();
 	$("#selections").text("Choose the Intermediary Terms you want to search with");
-	
 	setFinishSearchHandler();	
 }
 
 /* Executes the final part of the search */
 function setFinishSearchHandler(){
 	var selectBar2 = document.getElementById("triType");
-	
 	var button = document.getElementById("finish-search");
 	button.onclick = function(){
 		if (_checkedTerms.length == 0){
@@ -90,27 +83,21 @@ function setFinishSearchHandler(){
 	
 		var checkedString = "Your Intermediary Terms: ";
 		var csvName = "";
-		
 		for (var i=0; i< _checkedTerms.length; i++){
 			checkedString += _checkedTerms[i] + ", ";
 			csvName += "_" + _checkedTerms[i];
 		}
 		checkedString += "<br>Your Final Term Type: " + selectBar2.value;
 		$("#selections").html(checkedString);
-		
 		getFinalTerms(_checkedTerms, selectBar2.value, csvName);
 	};
 }
 
 /* Request the final result terms, using the list of selected terms and the filter type */
 function getFinalTerms(terms, type, csvName){		
-	var payload = getMentionsFromListPayload(terms, type);
-	
+	var payload = getMentionsFromListPayload(terms, type);	
 	queryNeo4j(payload, function(data,xhr,status){
-		//console.log(data);
-		
 		var results = readResults(data, false);
-			
 		SEARCH_TYPE = "path-final-results";
 		$("#results").hide();
 		showResult(results, input.value+"_Path"+csvName, _withSubterms);
@@ -123,7 +110,6 @@ function getFinalTerms(terms, type, csvName){
 /* Build the table for showing results of the first step */
 function makePathSubresultsTable(stack, index, indexLimit){
 	var $tbody = $(tableform).find("tbody");
-	
 	$(tableform).find("tr").remove();	
 	$tbody.append('<tr><th></th><th>Terms</th><th>Count</th></tr>');
 	
@@ -141,7 +127,6 @@ function makePathSubresultsTable(stack, index, indexLimit){
 
 	for(var i=index;i<indexLimit;i++){
 		var term = stack[i];
-		
 		$tr = $("<tr/>");
 		$tr.append('<td><input '+
 			(_checkedTerms.indexOf(term.name) >-1 ?'checked ':'') +
@@ -167,7 +152,6 @@ function makePathSubresultsTable(stack, index, indexLimit){
 /* Build the table for showing final results */
 function makePathFinalResultsTable(stack, index, indexLimit){
 	$(tableform).find("tr").remove();	
-	
 	var $tbody = $(tableform).find("tbody");
 	$tbody.append('<tr><th>Terms</th><th>Count</th></tr>');
 	
@@ -181,7 +165,6 @@ function makePathFinalResultsTable(stack, index, indexLimit){
 	*/
 	for(var j=index;j<indexLimit;j++){
 		var node = stack[j];
-	
 		$tr = $("<tr/>");
 		$tr.append('<td>'+node.name+'</td>');
 		$buttonTd = $("<td/>").append( $("<button/>", {
@@ -193,4 +176,3 @@ function makePathFinalResultsTable(stack, index, indexLimit){
 		$tbody.append($tr.append($buttonTd));
 	}
 }
-

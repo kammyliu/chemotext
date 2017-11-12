@@ -49,15 +49,14 @@ function makeAutocomplete($inputSection, inputId, example=''){
 	$inputSection.prepend('<datalist id="datalist-'+inputId+
 		'"></datalist><input class="suggestion-bar" data-example="'+example+'" id="'+inputId+
 		'" list="datalist-'+inputId+'">');
-	
+
 	$("#"+inputId).keyup(function(keyEvent){
 		var inputTerm = $(this).val();
 		var newDataList = document.getElementById("datalist-"+inputId);
 		newDataList.innerHTML = "";
 		if (!inputTerm) return;
 		
-		var options = termBank.complete(inputTerm);
-		
+		var options = termBank.complete(inputTerm);		
 		for(var i=0;i<options.length;i++){
 			var option = document.createElement("option");
 			option.value = options[i];
@@ -113,20 +112,17 @@ function showLoader(){
 
 /* show the final results for any search type */
 function showResult(stack, csvName, withSubterms){
-	
 	if(stack.length==0){
 		$(displayText).text("No Results");
 		$("#loader").hide();
 		return;
 	}
-	
 	$("#loader").hide();
 	$("#results").show();
 	
 	if (withSubterms){
 		$("#show-subterms").show();
 	}
-	
 	if (document.getElementById("filterSection") != null) {
 		setFilterHandler(stack, csvName);
 	}
@@ -156,14 +152,11 @@ function setFilterHandler(stack,name){
 /* Build the results table */
 function makeTables(stack,limit,index=0){		
 	$(tableform).find("tr").slice(1).remove();	//remove all tr except the first one
-	
 	var indexLimit = index+limit;
 	if(indexLimit>stack.length){
 		indexLimit = stack.length;
 	}
-	
 	updateTableFooter(stack,limit,index);
-	
 	switch (SEARCH_TYPE) {
 		case 'connected':
 			makeConnectedTermsTable(stack, index, indexLimit);
@@ -187,14 +180,11 @@ function makeTables(stack,limit,index=0){
 /* Update the table footer section. Called by makeTables() */
 function updateTableFooter(stack,limit,index){
 	$("#prev-arrow")[0].onclick = function(){makeTables(stack,limit,index-limit);}
-
 	$("#table-limit-button")[0].onclick = function(){
 		tableLimit = parseInt(document.getElementById("table-limit").value);
 		makeTables(stack,tableLimit,0);
 	};
-	
 	$("#next-arrow")[0].onclick = function(){makeTables(stack,limit,index+limit);}
-
 	$("#results-count").text(stack.length);
 	
 	if(index == 0){
@@ -202,7 +192,6 @@ function updateTableFooter(stack,limit,index){
 	} else {
 		$("#prev-arrow").show();
 	}
-	
 	if(index+limit >= stack.length){
 		$("#next-arrow").hide();
 	} else {

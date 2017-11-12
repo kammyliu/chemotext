@@ -1,7 +1,5 @@
 var SEARCH_TYPE;	//works like an enum for which type of search is being executed
-
 var tableLimit = 10;	//default number of results in one page of the table
-
 var termBank = new TermBank(termList);	//the autocompletion list
 
 // fields specific to each search execution and used by this file
@@ -18,7 +16,7 @@ $(document).ready(function(){
 /* Query the database */
 function queryNeo4j(payload,successFunc){
 	console.log(payload);
-	$.ajax({ //443 works.
+	$.ajax({
 		url: "http://chemotext.mml.unc.edu:7474/db/data/transaction/commit",
 		accepts: "application/json; charset=UTF-8",	
 		dataType:"json",
@@ -38,39 +36,25 @@ function queryNeo4j(payload,successFunc){
 /* Process the results of query into a list of Term objects */	
 function readResults(data, withSubterms, withSharedCounts){
 	var results = [];
-	
 	if (withSubterms){
 		_subterms = data["results"][1]["data"][0].row[0];
 	}
-		
 	data = data["results"][0]["data"];
-
 	for (var i=0; i< data.length ; i++){
-		//console.log(i+" out of "+data2.length);
 		var row = data[i].row;
 		
-		var name = row[0]["name"];
-		var type = row[0]["type"];
-		var subtype = row[0]["subtype"];
-		var isDrug = row[0]["isDrug"];
-		
-		var newTerm = new Term(name,type,subtype,isDrug);
+		var term = row[0];
+		var newTerm = new Term(term["name"], term["type"], term["subtype"], term["isDrug"]);
 	
 		var articles = row[1];
 		for (var j=0; j<articles.length; j++){
 			var a = articles[j];
-			var date = a["date"];
-			var pmid = a["pmid"];
-			var title = a["title"];
-			newTerm.addArticle(pmid,date,title);
+			newTerm.addArticle(a["pmid"], a["date"], a["title"]);
 		}
-		
-
 		if (withSharedCounts){
 			newTerm.sharedCount1 = row[2];
 			newTerm.sharedCount2 = row[3];
 		}
-
 		results.push(newTerm);
 	}
 	return results;
@@ -92,15 +76,12 @@ function showSubterms(){
 
 /* Open a new page listing article names or ids */
 function openArticleList(node){		
-	
 	var html = "<html><head><title>" + node.name + "</title></head><body>";
-	
 	var articles = node.articles;
 	for (var i=0; i<articles.length; i++){
 		var name = articles[i].getTitleOrId();
 		html = html + "<p><a href=http://www.ncbi.nlm.nih.gov/pubmed/"+articles[i].pmid+">"+name+"</a></p>";
 	}
-	
 	html = html + "</body></html>"
 	var newpage = window.open("");
 	newpage.document.write(html)
@@ -108,7 +89,6 @@ function openArticleList(node){
 
 /* Write the results CSV to a new window */
 function onInitFs(fs, name, stack, withPmids){
-	console.log('Opened File System:' + fs.name);
 	var fileName = name + (withPmids ? "_pmids_chemotext.csv" : "_chemotext.csv");
 	fs.root.getFile(fileName,{create:true}, function(fileEntry){
 		fileEntry.createWriter(function(fileWriter){
@@ -119,67 +99,52 @@ function onInitFs(fs, name, stack, withPmids){
 			}
 			for(var j=0;j<stack.length;j++){
 				var node = stack[j];				
-
 				var arts = "";
 				if (withPmids){
 					for(var k=0;k<node.articles.length;k++){
 						arts = arts+"\t"+node.articles[k].pmid;
 					}	
 				}
-				
 				data = data + node.name + ";" + node.articles.length + arts;
 				if(SEARCH_TYPE == "shared" && !withPmids){ 
 					data = data + "\t" + node.sharedCount1 + "\t" + node.sharedCount2; 
 				}
 				data += "\n";
 			}
-			
 			fileWriter.addEventListener("writeend", function() {
 				window.open("filesystem:http://chemotext.mml.unc.edu/temporary/"+fileName);
 			}, false);
 			var blob = new Blob([data],{type: 'text/plain'});
 			fileWriter.write(blob);
-			console.log("WRITTEN");
-		},errorHandler);
-	},errorHandler);
+		}, errorHandler);
+	}, errorHandler);
 }
 
 /* Filters the results table. Rebuilds the table and updates the CSV download handler */
 function filterStack(dropbox,stack,name){
-	console.log("Stack Length:"+ stack.length);
-
 	var dateAfter = document.getElementById("dateAfterInput");
 	var dateBefore = document.getElementById("dateBeforeInput");
 	
-// console.log(dateAfter.value);
-// console.log(dateBefore.value);	
-
 	var newStack = stack;
-	
 	// filter by type
 	var type = dropbox.value;
 	if(SEARCH_TYPE!="article" && type!="None"){
 		name = name+"_"+type;
 		newStack = filterType(newStack, type);
 	}
-
 	// filter by date after
 	if(dateAfter.value!=""){
 		name = name + "_After" + dateAfter.value;
 		newStack = filterDate(newStack, true, dateAfter.value);
 	}
-
 	// filter by date after
 	if(dateBefore.value!=""){
 		name = name + "_Before" + dateBefore.value;
 		newStack = filterDate(newStack, false, dateBefore.value);
-	}
-	
-	console.log("Creating tables");
+	}	
 	makeTables(newStack,tableLimit,0);
 	
 	if(SEARCH_TYPE!="article"){
-		console.log("Updating CSV");
 		setDownloadHandler(name,newStack);
 	}
 }
@@ -215,9 +180,7 @@ function filterDate(stack, removeBefore, dateValue){
 	var benchmark = new Date(year,month,day).getTime();
 
 	var toFilter = removeBefore ? nodeDateBefore : nodeDateAfter;
-		
 	var newStack = [];
-	
 	for (var i=0; i<stack.length; i++){
 		var term = stack[i];
 		var termCopy = term.copy();	//also deep copies the articles array
@@ -232,12 +195,10 @@ function filterDate(stack, removeBefore, dateValue){
 			newStack.push(termCopy);
 		}
 	}
-	
 	//resort the terms by new article count
 	newStack.sort(function(term1, term2){
 		return term2.articles.length - term1.articles.length;
 	});
-	
 	if(SEARCH_TYPE=="shared"){
 		filterDateShared(newStack,year,month,day,removeBefore);
 	}
