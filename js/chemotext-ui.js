@@ -137,8 +137,7 @@ function setDownloadHandler(name,stack){
 	$(".download-button").off("click");
 	$(".download-button").click(function(){
 		var withPmids = this.id!="csv";
-		window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
-		window.requestFileSystem(window.TEMPORARY, 5*1024*1024, function(fs){onInitFs(fs,name,stack,withPmids)}, errorHandler);
+                writeCsv(name,stack,withPmids);
 	});
 }
 

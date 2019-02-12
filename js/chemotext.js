@@ -88,7 +88,7 @@ function openArticleList(node){
 }
 
 /* Write the results CSV to a new window */
-function onInitFs(fs, name, stack, withPmids){
+function writeCsv(name, stack, withPmids){
 	var fileName = name + (withPmids ? "_pmids_chemotext.csv" : "_chemotext.csv");
 	var data = "";
 	if(SEARCH_TYPE == "shared" && !withPmids){
