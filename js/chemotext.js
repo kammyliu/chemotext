@@ -17,7 +17,8 @@ $(document).ready(function(){
 function queryNeo4j(payload,successFunc){
 	console.log(payload);
 	$.ajax({
-		url: "http://chemotext.mml.unc.edu:7474/db/data/transaction/commit",
+		//url: "http://chemotext.mml.unc.edu:7474/db/data/transaction/commit",
+		url: "http://chemotext.mml.unc.edu/neoFourJ/db/data/transaction/commit",
 		accepts: "application/json; charset=UTF-8",
 		dataType:"json",
 		contentType:"application/json",
