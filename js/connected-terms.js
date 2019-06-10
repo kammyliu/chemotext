@@ -3,9 +3,25 @@ SEARCH_TYPE = "connected";
 var input;
 $(document).ready(function(){	
 	makePageSections();
-	
-	makeAutocomplete($("#inputSection"), "inputbar", "GAK protein, human");
-	input = document.getElementById("inputbar");
+    
+    urlQuery = getInputFromURL(window.location.href);
+    
+    if (urlQuery){
+        console.log(urlQuery["term"]);
+
+        makeAutocomplete($("#inputSection"), "inputbar", urlQuery["term"]);
+        input = document.getElementById("inputbar");
+        
+        $("#inputSection input").each(function(i, el){
+			if ($(el).attr("data-example")){
+				$(el).val($(el).attr("data-example"));
+			}
+        });
+        simpleSearch();
+    } else {
+    	makeAutocomplete($("#inputSection"), "inputbar", "GAK protein, human");
+        input = document.getElementById("inputbar");
+    }
 	
 	addExampleLink();
 });
@@ -45,7 +61,7 @@ function getInputFromURL(url){
 
 /* Executes the search */
 function simpleSearch(){
-    console.log(typeof input);
+    console.log(input.value);
 	if (input.value == "") return;
 
 	$(displayText).text("");
