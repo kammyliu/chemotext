@@ -4,16 +4,27 @@ var articleBar, termsList, searchbutton;
 
 $(document).ready(function(){	
 	makePageSections();
-
+    
 	makeAutocomplete($("#inputSection"), "articleBar");
 	articleBar = document.getElementById("articleBar");
 	termsList = document.getElementById("terms-list");
 	searchbutton = document.getElementById("search-button");
-	
+
+    url = "chemotext.unc.edu/Article_Search.html?terms=%5B%22GAK%20protein,%20human%22,%22Clathrin%22%5D"
+    urlQuery = getInputFromURL(url);
+    //urlQuery = getInputFromURL(window.location.href);
+
+    if(urlQuery) {
+        for(var i=0;i<urlQuery.length;i++){
+            addToArticleArray(urlQuery[i]);
+        }
+        articleSearch();
+    }
+    
 	$("#add-term-button").click(function(){
 		if(articleBar.value!=""){
 			searchbutton.disabled = false;
-			addToArticleArray()
+			addToArticleArray(articleBar.value)
 		}
 	});
 });
@@ -85,8 +96,8 @@ function makeArticleSearchTable(stack, index, indexLimit){
 	
 
 /* Add a checked term to the list */
-function addToArticleArray(){	
-	var term = termBank.getSynonym(articleBar.value);
+function addToArticleArray(raw){	
+	var term = termBank.getSynonym(raw);
 	$(termsList).append('<li><span>'+term+'</span><button type="button" onclick="deleteFromArticleArray(this)">X</button></li>');
 	articleBar.value = "";
 }
@@ -98,8 +109,3 @@ function deleteFromArticleArray(button){
 		searchbutton.disabled = true;		
 	}
 }
-
-
-	
-
-

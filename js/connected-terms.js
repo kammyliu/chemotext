@@ -4,12 +4,14 @@ var input;
 $(document).ready(function(){	
 	makePageSections();
     
-    urlQuery = getInputFromURL(window.location.href);
+    url = encodeURI('chemotext.mml.unc.edu/Shared_Terms.html?terms=["GAK protein, human"]');
+    urlQuery = getInputFromURL(url);
+    //urlQuery = getConnectedTermsInputFromURL(window.location.href);
     
     if (urlQuery){
         console.log(urlQuery["term"]);
 
-        makeAutocomplete($("#inputSection"), "inputbar", urlQuery["term"]);
+        makeAutocomplete($("#inputSection"), "inputbar", urlQuery[0]);
         input = document.getElementById("inputbar");
         
         $("#inputSection input").each(function(i, el){
@@ -28,36 +30,6 @@ $(document).ready(function(){
 
 var _withSubterms = false;
 //var _subterms declared in chemotext.js
-
-/* Get search terms from url*/
-function getInputFromURL(url){
-    var rawURL = decodeURI(url)
-    var queryString = rawURL.split('?')[1];
-
-    var queryObj = {};
-    
-    if (queryString) {
-        var arr = queryString.split('&');
-        for (var i = 0; i < arr.length; i++){
-            var rawParam = arr[i].split('=')
-
-            var paramKey = rawParam[0];
-            var paramValue = typeof (rawParam[1]) === 'undefined' ? true : rawParam[1];
-
-            if (!queryObj[paramKey]) {
-                queryObj[paramKey] = paramValue;
-            } else if (queryObj[paramKey] && typeof queryObj[paramKey] === 'string'){
-                queryObj[paramKey] = [queryObj[paramKey]];
-                queryObj[paramKey].push(paramValue);
-            } else {
-                queryObj[paramKey].push(paramValue);
-            }
-        }
-        return queryObj;
-    } else {
-        return;
-    }
-}
 
 /* Executes the search */
 function simpleSearch(){
