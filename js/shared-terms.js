@@ -4,12 +4,37 @@ var input, input2;
 $(document).ready(function(){	
 	makePageSections();
 
-	makeAutocomplete($("#inputSection"), "inputbar2", "gefitinib");	//2 first because it prepends
-	makeAutocomplete($("#inputSection"), "inputbar", "GAK protein, human");
-	
-	input = document.getElementById("inputbar");
-	input2 = document.getElementById("inputbar2");
-	
+    url = encodeURI('chemotext.mml.unc.edu/Shared_Terms.html?terms=["GAK protein, human","gefitinib"]');
+    urlQuery = getInputFromURL(url);
+    //urlQuery = getInputFromUrl(window.location.href);
+    
+    if (urlQuery){
+        makeAutocomplete($("#inputSection"), "inputbar2", urlQuery[1]);	
+	    makeAutocomplete($("#inputSection"), "inputbar", urlQuery[0]);
+
+        input = document.getElementById("inputbar");
+	    input2 = document.getElementById("inputbar2");
+
+        $("#inputSection input").each(function(i, el){
+			if ($(el).attr("data-example")){
+				$(el).val($(el).attr("data-example"));
+			}
+        });
+        $("#inputSection input2").each(function(i, el){
+			if ($(el).attr("data-example")){
+				$(el).val($(el).attr("data-example"));
+			}
+        });
+        
+        sharedSearch();
+    } else {
+	    makeAutocomplete($("#inputSection"), "inputbar2", "gefitinib");	//2 first because it prepends
+	    makeAutocomplete($("#inputSection"), "inputbar", "GAK protein, human");
+	    
+	    input = document.getElementById("inputbar");
+	    input2 = document.getElementById("inputbar2");
+	}
+    
 	addExampleLink();
 });
 

@@ -13,6 +13,19 @@ $(document).ready(function(){
 	subtermsCheckbox = document.getElementById("include-subterms");
 });
 
+/* Get search terms from url, returns array of terms*/
+function getInputFromURL(url){
+    var rawURL = decodeURI(url);
+    var queryString = rawURL.split('?')[1];
+
+    if (queryString) {
+        return JSON.parse(queryString.split('=')[1]);
+                                                     
+    } else {
+        return;
+    }
+}
+
 /* Query the database */
 function queryNeo4j(payload,successFunc){
 	console.log(payload);
